@@ -7,6 +7,6 @@ RUN gradle build --no-daemon --no-watch-fs
 
 # Package stage
 FROM openjdk:11-jre-slim
-COPY --from=build /home/gradle/source/build/libs/salog-0.0.1-SNAPSHOT.jar /app/salog.jar
+COPY --from=build /home/gradle/server/build/libs/salog-0.0.1-SNAPSHOT.jar /app/salog.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app/salog.jar"]
