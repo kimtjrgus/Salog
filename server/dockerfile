@@ -2,7 +2,8 @@
 FROM gradle:7.2.0-jdk11 AS build
 COPY --chown=gradle:gradle . /home/gradle/source
 WORKDIR /home/gradle/source
-RUN gradle build --no-daemon
+RUN gradle build --no-daemon --no-watch-fs
+
 
 # Package stage
 FROM openjdk:11-jre-slim
