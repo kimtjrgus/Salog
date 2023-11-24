@@ -32,13 +32,14 @@ jobs:
       # Github secrets로부터 데이터를 받아서, 워크 플로우에 파일을 생성
       - name: Make application.properties
         run: |
-          cd ./salog/server/src/main/resources
+          cd ./salog/salog/server/src/main/resources
           touch application.properties
           echo "${{ secrets.PROPERTIES }}" > application.properties
         shell: bash
 
       - name: Build with Gradle
         run: |
+          cd ./salog/salog/server/
           chmod +x ./gradlew
           ./gradlew clean build -x test
 
