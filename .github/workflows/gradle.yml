@@ -47,10 +47,10 @@ jobs:
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -f ./server/Dockerfile -t ${{ secrets.DOCKER_REPO }}/directors-dev .
+        run: docker build -f ./server/Dockerfile -t ${{ secrets.DOCKER_REPO }}/salog .
 
       - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.DOCKER_REPO }}/directors-dev
+        run: docker push ${{ secrets.DOCKER_REPO }}/salog
 
       - name: Deploy to server
         uses: appleboy/ssh-action@master
@@ -60,6 +60,6 @@ jobs:
           key: ${{ secrets.KEY }}
           script: |
             docker rm -f $(docker ps -aq)
-            docker pull ${{ secrets.DOCKER_REPO }}/directors-dev
+            docker pull ${{ secrets.DOCKER_REPO }}/salog
             docker-compose up -d
             docker image prune -f
