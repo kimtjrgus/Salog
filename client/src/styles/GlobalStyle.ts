@@ -40,11 +40,11 @@ const GlobalStyle = createGlobalStyle`
         box-sizing: border-box;
     }
 
-    html{
+    html {
         font-size: 62.5%;
     }
 
-    body{
+    body {
         color: var(--color-black);
         font-family: 'Pretendard-Regular';
         font-size: 1.6rem;
@@ -52,7 +52,7 @@ const GlobalStyle = createGlobalStyle`
 
     h1,h2,h3,h4,h5,h6{
         font-family: 'Pretendard-SemiBold';
-        font-size: 2.8rem
+        font-size: 2.8rem;
     }
 
     ol,ul,li{
