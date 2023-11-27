@@ -11,6 +11,16 @@
   },
   "plugins": ["react"],
   "rules": {
-    "@typescript-eslint/explicit-function-return-type" : "off"
+    "indent": [2,"tab"],
+    "@typescript-eslint/explicit-function-return-type" : "off",
+    "react/react-in-jsx-scope": "off",
+    "prettier/prettier": [
+            "error",
+            {
+                "useTabs": true,
+                "endOfLine": "auto",
+                "singleQuote": false
+            }
+        ]
   }
 }
