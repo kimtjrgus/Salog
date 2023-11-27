@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "outDir": "./dist",
+    "pretty": true,  
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true, // 모듈 호출시, ES호환성 관련 옵션
+    "declaration": true, // d.ts 파일 생성 관련 옵션(d.ts 파일은 변수 및 커스텀 생성한 Type 등에 대한 명세를 보여준다) 
+    "allowSyntheticDefaultImports": true, /* Allow 'import x from y' when a module doesn't have a default export. */
+    //strict : true 시 아래의 항목들을 검사함
+    /*
+    "noImplicitAny": true,                      // any타입이 될거 같으면 error
+    "noImplicitThis": true,                     // this 쓸 때, 요소가 any타입이면 error
+    "alwaysStrict": true,                       // 컴파일 시에 모든 파일에 'use strict'포함.
+    "strictBindCallApply": true,                // bind, call, apply 메소드를 엄격하게 검사
+    "strictNullChecks": true,                   // null, undefined는 any혹은 각각을 표기한 곳에서만 허용, 포함되있던 일반적 경우에 대해 모두 제거
+    "strictFunctionTypes": true,                // 서브타입은 파라미터로 받지 않음.
+    "strictPropertyInitialization": true,       // 초기화 되지 않은 class 변수는 constructor에서 초기화를 보장(타입 + 초기값)
+    */  
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true, // switch 구문을 쓰면서 자주하는 실수를 잡아 줍 (break 미사용)
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noEmit": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "baseUrl": "."
+  },
+  "include": ["src"]
+}
