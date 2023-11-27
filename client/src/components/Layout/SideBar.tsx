@@ -6,6 +6,9 @@ import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
 import PriceChangeOutlinedIcon from "@mui/icons-material/PriceChangeOutlined";
 import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
 import StickyNote2OutlinedIcon from "@mui/icons-material/StickyNote2Outlined";
+import ContactSupportOutlinedIcon from "@mui/icons-material/ContactSupportOutlined";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import ExitToAppRoundedIcon from "@mui/icons-material/ExitToAppRounded";
 import { NavLink } from "react-router-dom";
 
 export const SideBar = () => {
@@ -57,6 +60,30 @@ export const SideBar = () => {
 						sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
 					/>
 					<ListTitle>일기</ListTitle>
+				</NavStyle>
+			</Lists>
+			<NavTitle>ACCOUNT</NavTitle>
+			<Lists>
+				<NavStyle to="/inquiry">
+					<SvgIcon
+						component={ContactSupportOutlinedIcon}
+						sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
+					/>
+					<ListTitle>문의</ListTitle>
+				</NavStyle>
+				<NavStyle to="/setting">
+					<SvgIcon
+						component={SettingsOutlinedIcon}
+						sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
+					/>
+					<ListTitle>설정</ListTitle>
+				</NavStyle>
+				<NavStyle to="/setting">
+					<SvgIcon
+						component={ExitToAppRoundedIcon}
+						sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
+					/>
+					<ListTitle>로그아웃</ListTitle>
 				</NavStyle>
 			</Lists>
 		</Container>
