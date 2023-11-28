@@ -19,7 +19,7 @@ export const Header = () => {
 
 export const Container = styled.div`
 	width: 100%;
-	height: 5.5rem;
+	height: 6rem;
 	border-bottom: 0.1rem solid #b4b4b4;
 	position: fixed;
 	top: 0;
@@ -31,14 +31,17 @@ export const Container = styled.div`
 
 export const Logo = styled.div`
 	display: flex;
-	border: 1px solid black;
+	align-items: center;
+	margin-left: 60px;
+	> img {
+		width: 50px;
+	}
 `;
 
 export const LogoTitle = styled.p`
 	color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
 	font-size: 2rem;
 	font-weight: 600;
-	margin-left: 60px;
 `;
 
 export const Alarm = styled.div`
