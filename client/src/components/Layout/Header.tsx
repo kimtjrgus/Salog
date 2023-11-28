@@ -1,11 +1,15 @@
 import styled from "styled-components";
 import SvgIcon from "@mui/material/SvgIcon";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import logo from "../../assets/Slogo.png";
 
 export const Header = () => {
 	return (
 		<Container>
-			<Logo>샐로그</Logo>
+			<Logo>
+				<img src={logo} alt="로고" />
+				<LogoTitle>샐로그</LogoTitle>
+			</Logo>
 			<Alarm>
 				<SvgIcon component={NotificationsNoneIcon} />
 			</Alarm>
@@ -25,7 +29,12 @@ export const Container = styled.div`
 	align-items: center;
 `;
 
-export const Logo = styled.p`
+export const Logo = styled.div`
+	display: flex;
+	border: 1px solid black;
+`;
+
+export const LogoTitle = styled.p`
 	color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
 	font-size: 2rem;
 	font-weight: 600;

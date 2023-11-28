@@ -13,6 +13,7 @@
   "rules": {
     "indent": [2,"tab"],
     "@typescript-eslint/explicit-function-return-type" : "off",
+    "@typescript-eslint/strict-boolean-expressions" : 0,
     "react/react-in-jsx-scope": "off",
     "prettier/prettier": [
             "error",

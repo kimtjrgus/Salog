@@ -4,6 +4,7 @@ import MainLayout from "./components/Layout/MainLayout";
 import Dashboard from "./pages/dashboard";
 import Diary from "./pages/diary";
 import History from "./pages/imcome_outgo";
+import Login from "./pages/login";
 
 function App() {
 	return (
@@ -14,6 +15,7 @@ function App() {
 					<Route path={"/history"} element={<History />} />
 					<Route path={"/diary"} element={<Diary />} />
 				</Route>
+				<Route path={"/login"} element={<Login />} />
 			</Routes>
 		</>
 	);
