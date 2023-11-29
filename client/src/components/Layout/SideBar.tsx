@@ -93,7 +93,7 @@ export const SideBar = () => {
 const Container = styled.div`
 	/* background-color: #e9eeff; */
 	border-right: 1px solid #b4b4b4;
-	margin-top: 5.5rem;
+	margin-top: 6rem;
 	position: fixed;
 	width: 20rem;
 	height: 100%;

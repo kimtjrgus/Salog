@@ -1,6 +1,7 @@
 const COLORS = {
 	WHITE: "#FFF",
 	BLACK: "#000",
+	SKY: "#CDD8FF",
 	GRAY_100: "#F5F5F9",
 	GRAY_200: "#E9E9EE",
 	GRAY_300: "#D9D9D9",
