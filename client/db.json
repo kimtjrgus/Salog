@@ -1,0 +1,26 @@
+{
+  "users": [],
+  "outgo": [
+    {
+      "id": 1,
+      "date": "2023-11-23",
+      "outgoName": "폰값",
+      "money": 100000,
+      "memo": "휴대폰 결제",
+      "outgoTag": "통신",
+      "wasteList": false,
+      "fixed": true,
+      "reciptImg": "imagesdasd"
+    }
+  ],
+  "income": [
+    {
+      "incomeTag": "입금",
+      "date": "2023-11-23",
+      "money": 2000000,
+      "income_name": "회사",
+      "memo": "월급",
+      "fixed": false
+    }
+  ]
+}
