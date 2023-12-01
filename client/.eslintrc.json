@@ -11,8 +11,9 @@
   },
   "plugins": ["react"],
   "rules": {
-    "indent": [2,"tab"],
+     "indent": "off",
     "@typescript-eslint/explicit-function-return-type" : "off",
+    "@typescript-eslint/indent" : "off",
     "@typescript-eslint/strict-boolean-expressions" : 0,
     "react/react-in-jsx-scope": "off",
     "prettier/prettier": [
