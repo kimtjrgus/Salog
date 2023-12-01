@@ -169,6 +169,11 @@ export const SubmitBtn = styled.button`
 		font-weight: 500;
 		font-size: 1.6rem;
 	}
+
+	&:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
 `;
 
 const RedirectContainer = styled.div`
