@@ -1,5 +1,11 @@
 {
-  "users": [],
+  "users": [
+    {
+      "email": "suafjwe1@naver.com",
+      "password": "$2a$10$TVhpCR86aKl2gMe6rjUcUOfvL1b.HIHSYvGLeLhg1KSng482AAo1i",
+      "id": 1
+    }
+  ],
   "outgo": [
     {
       "id": 1,
@@ -21,6 +27,17 @@
       "income_name": "회사",
       "memo": "월급",
       "fixed": false
+    }
+  ],
+  "monthlyOutgo": [{}],
+  "diary": [
+    {
+      "id": 1,
+      "date": "2023-11-23",
+      "title": "일기 제목 입니다",
+      "body": "글을 적습니다. 글을 적습니다. 글을 적습니다. 글을 적습니다. 글을 적습니다. 글을 적습니다.",
+      "img": "imgLink",
+      "diaryTag": ["일본", "맛집"]
     }
   ]
 }
