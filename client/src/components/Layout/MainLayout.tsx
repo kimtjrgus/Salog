@@ -33,7 +33,7 @@ const Container = styled.div`
 	width: 92%;
 	max-width: 120.5rem;
 	position: relative;
-	padding: 1.5rem;
+	padding: 8rem;
 	padding-top: 7.5rem;
 	height: 100vh;
 	left: 20rem;
