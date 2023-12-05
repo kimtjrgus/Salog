@@ -174,16 +174,16 @@ const Container = styled.div`
 	display: flex;
 	height: 90vh;
 	justify-content: center;
-`;
-
-const DiaryContainer = styled.div`
-	margin-top: 3rem;
-	width: 65%;
 	overflow: scroll;
 
 	&::-webkit-scrollbar {
 		display: none;
 	}
+`;
+
+const DiaryContainer = styled.div`
+	margin-top: 3rem;
+	width: 65%;
 
 	hr {
 		width: 100%;
@@ -203,11 +203,9 @@ const DiaryContainer = styled.div`
 `;
 
 const RemainContainer = styled.div`
-	display: flex;
 	margin-top: 3rem;
 	margin-left: 3rem;
-	flex-direction: column;
-	width: 35%;
+	width: 30%;
 `;
 
 const ListContainer = styled.ul`
@@ -308,7 +306,6 @@ const Info = styled.div`
 
 const NotDataContainer = styled.div`
 	display: flex;
-	height: 50%;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
