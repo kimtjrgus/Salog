@@ -31,12 +31,13 @@ const Inner = styled.div`
 
 const Container = styled.div`
 	width: 92%;
-	max-width: 120.5rem;
-	position: relative;
-	padding: 1.5rem;
-	padding-top: 7.5rem;
 	height: 100vh;
-	left: 20rem;
+	max-width: 130.5rem;
+	margin: 0 auto;
+	padding-top: 7.5rem;
+	padding-left: 20rem;
+	/* position: relative; */
+	/* left: 20rem; */
 `;
 
 export default MainLayout;

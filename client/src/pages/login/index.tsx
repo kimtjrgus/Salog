@@ -7,6 +7,8 @@ import { ReactComponent as Kakao } from "../../assets/Kakao.svg";
 import { ReactComponent as Google } from "../../assets/Google.svg";
 import { ReactComponent as Naver } from "../../assets/Naver.svg";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { setCookie } from "src/utils/cookie";
 
 interface userType {
 	email: string;
@@ -26,6 +28,19 @@ const Login = () => {
 	// 비밀번호 표시/감추기 버튼 클릭 시 실행되는 함수
 	const onClickVisibleBtn = () => {
 		setIsVisible(!isVisible);
+	};
+
+	const onClickLoginBtn = () => {
+		// 유효성 검사가 true라면
+		axios
+			.post("http://localhost:8000/login", values)
+			.then((res) => {
+				setCookie("accessToken", res.data.accessToken, { path: "/" });
+				navigate("/");
+			})
+			.catch((error) => {
+				console.log(error);
+			});
 	};
 
 	return (
@@ -56,7 +71,7 @@ const Login = () => {
 							)}
 						</button>
 					</PasswordLabel>
-					<SubmitBtn>
+					<SubmitBtn onClick={onClickLoginBtn}>
 						<p>로그인</p>
 					</SubmitBtn>
 				</LoginDiv>
@@ -144,16 +159,20 @@ export const PasswordLabel = styled.label`
 export const Input = styled.input.attrs({ required: true })`
 	width: 100%;
 	height: 4.3rem;
-	margin-top: 1.5rem;
 	padding-left: 1rem;
 	padding-right: 5.5rem;
 	border-radius: 0.6rem;
 	border: 1px solid ${(props) => props.theme.COLORS.GRAY_400};
+
+	&.placeholder {
+		color: ${(props) => props.theme.COLORS.GRAY_300};
+	}
 `;
 
 const Title = styled.p`
 	color: ${(props) => props.theme.COLORS.GRAY_500};
 	margin-top: 2rem;
+	margin-bottom: 1.5rem;
 `;
 
 export const SubmitBtn = styled.button`

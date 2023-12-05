@@ -8,7 +8,8 @@ import { checkEmail, checkPassword } from "src/utils/validCheck";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { debounce } from "src/utils/timeFunc";
-
+import axios from "axios";
+import { setCookie } from "src/utils/cookie";
 interface inputType {
 	[key: string]: any;
 	email: string;
@@ -149,6 +150,21 @@ const SignUp = () => {
 		[],
 	);
 
+	const onClickSubmitBtn = () => {
+		axios
+			.post("http://localhost:8000/register", {
+				email: values.email,
+				password: values.password,
+			})
+			.then((res) => {
+				setCookie("accessToken", res.data.accessToken, { path: "/" });
+				navigate("/login");
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	};
+
 	useEffect(() => {
 		let countDown: NodeJS.Timeout | null = null;
 
@@ -266,7 +282,7 @@ const SignUp = () => {
 						로그인 화면으로 이동
 					</span>
 				</SmallTitle>
-				<SubmitBtn disabled={empty}>
+				<SubmitBtn disabled={empty} onClick={onClickSubmitBtn}>
 					<p>회원가입</p>
 				</SubmitBtn>
 			</SignUpContainer>
