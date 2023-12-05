@@ -1,9 +1,82 @@
 import { SvgIcon } from "@mui/material";
 import { styled } from "styled-components";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import axios from "axios";
+import NotData from "../../assets/NotData.png";
+import { Input } from "../login";
 import Test from "../../assets/Test.jpeg";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+
+interface diaryType {
+	id: number;
+	date: string;
+	title: string;
+	body: string;
+	img: string;
+	diaryTag: string[];
+}
 
 const Diary = () => {
+	const [diaries, setDiaries] = useState<diaryType[]>([]);
+
+	const path = useLocation().pathname;
+	const search = useLocation().search;
+	const decodeUrl = decodeURI(search).split("=")[1];
+
+	// 일기의 날짜 표시를 원하는 형식으로 바꿔주는 함수
+	const dateAsKor = (date: string) => {
+		const weeks = ["일", "월", "화", "수", "목", "금", "토"];
+		const dateString = new Date(date);
+		const year = dateString.getFullYear();
+		const month = dateString.getMonth() + 1;
+		const day = dateString.getDate();
+		const week = dateString.getDay();
+
+		return `${year}년 ${month}월 ${day}일 (${weeks[week]})`;
+	};
+
+	const categoryOrganize = () => {
+		const map = new Map();
+		const arr = [];
+		diaries.forEach((diary) => {
+			const category = diary.diaryTag;
+			category.forEach((tag) => {
+				map.get(tag) !== undefined
+					? map.set(tag, map.get(tag) + 1)
+					: map.set(tag, 1);
+			});
+		});
+
+		for (const [key, value] of map) {
+			arr.push(
+				<NavStyle
+					to={`/diary?category=${key}`}
+					key={Math.floor(Math.random() * 1000000000000000)}
+					className={decodeUrl === key ? "active" : ""}
+				>
+					<p>{key}</p>
+					&nbsp;
+					<span>{`(${value})`}</span>
+				</NavStyle>,
+			);
+		}
+		return arr;
+	};
+
+	useEffect(() => {
+		axios
+			.get(`http://localhost:8000${path}${search}`)
+			.then((res) => {
+				setDiaries(res.data);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	}, []);
+
 	return (
 		<Container>
 			<DiaryContainer>
@@ -19,29 +92,80 @@ const Diary = () => {
 				</DiaryTitle>
 				<SubTitle>일기를 기록하여 하루를 정리해보세요!</SubTitle>
 				<hr />
-				<h3>분류 전체보기 (0)</h3>
-				<ListContainer>
-					<List>
-						<ListMain>
-							<h4>일기 제목입니다</h4>
-							<p>
-								오늘은 텐진역 근처에 있는 이치란 라멘을 들렀다. 대기하는
-								사람들도 많았지만 기다리고 기다려서 이치란 본점에 입장하였어요.
-							</p>
-							<Tags>
-								<Tag>일본</Tag>
-								<Tag>혼술</Tag>
-							</Tags>
-							<Info>
-								<p>2023년 11월 18일 (토)</p>
-								<p>지출 내역: 4개 / 수입 내역: 0개</p>
-							</Info>
-						</ListMain>
-						<img src={Test} alt="이미지" />
-					</List>
-				</ListContainer>
+				{diaries?.length !== 0 ? (
+					<>
+						{search === "" ? (
+							<h3>분류 전체보기 ({diaries.length})</h3>
+						) : (
+							<h3>{decodeUrl}</h3>
+						)}
+						<ListContainer>
+							{diaries.map((diary) => {
+								return (
+									<List key={diary.id}>
+										<ListMain>
+											<h4>{diary.title}</h4>
+											<p>{diary.body}</p>
+											<Tags>
+												{diary.diaryTag.map((tag, idx) => {
+													return <Tag key={idx}>{tag}</Tag>;
+												})}
+											</Tags>
+											<Info>
+												<p>{dateAsKor(diary.date)}</p>
+												<p>지출 내역: 4개 / 수입 내역: 0개</p>
+											</Info>
+										</ListMain>
+										<img src={Test} alt="이미지" />
+									</List>
+								);
+							})}
+						</ListContainer>
+					</>
+				) : (
+					<NotDataContainer>
+						<div className="img_background">
+							<img src={NotData} alt="데이터 없음" />
+						</div>
+						<p>작성된 일기가 없습니다.</p>
+					</NotDataContainer>
+				)}
 			</DiaryContainer>
-			<RemainContainer></RemainContainer>
+			<RemainContainer>
+				<SearchContainer>
+					<div className="header">
+						<SvgIcon
+							component={SearchOutlinedIcon}
+							sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+						/>
+						<h3>검색</h3>
+					</div>
+					<hr />
+					<div className="search_input">
+						<Input placeholder="게시글 검색" />
+						<button>
+							<SvgIcon
+								component={SearchOutlinedIcon}
+								sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+							/>
+						</button>
+					</div>
+				</SearchContainer>
+				<CategoryContainer>
+					<div className="header">
+						<SvgIcon
+							component={CategoryOutlinedIcon}
+							sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+						/>
+						<h3>카테고리</h3>
+					</div>
+					<hr />
+					<NavStyle to="/diary" className={search === "" ? "active" : ""}>
+						<p>전체보기</p>&nbsp;<span>{`(${diaries.length})`}</span>
+					</NavStyle>
+					{categoryOrganize()}
+				</CategoryContainer>
+			</RemainContainer>
 		</Container>
 	);
 };
@@ -49,24 +173,29 @@ const Diary = () => {
 const Container = styled.div`
 	display: flex;
 	height: 90vh;
+	justify-content: center;
 `;
 
 const DiaryContainer = styled.div`
-	display: flex;
 	margin-top: 3rem;
-	flex-direction: column;
-	width: 65rem;
+	width: 65%;
+	overflow: scroll;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 
 	hr {
 		width: 100%;
 		border: none;
 		height: 1px;
 		margin-top: 1.5rem;
-		background-color: ${(props) => props.theme.COLORS.GRAY_200};
+		margin-bottom: 1.5rem;
+		background-color: ${(props) => props.theme.COLORS.GRAY_300};
 	}
 
 	h3 {
-		margin-top: 1.5rem;
+		margin: 2rem 0;
 		font-size: 1.8rem;
 		color: ${(props) => props.theme.COLORS.GRAY_600};
 		text-align: center;
@@ -78,8 +207,7 @@ const RemainContainer = styled.div`
 	margin-top: 3rem;
 	margin-left: 3rem;
 	flex-direction: column;
-	width: 35rem;
-	border: 1px solid black;
+	width: 35%;
 `;
 
 const ListContainer = styled.ul`
@@ -124,18 +252,15 @@ const WriteBtn = styled.button`
 
 const List = styled.li`
 	display: flex;
-	height: 16rem;
+	height: 15rem;
 	justify-content: space-between;
 	border: 1px solid ${(props) => props.theme.COLORS.GRAY_200};
 	padding: 0 2rem;
 	padding-top: 1.5rem;
 	padding-bottom: 1rem;
+	margin-bottom: 1rem;
 	border-radius: 4px;
 	box-shadow: 1px 1px 1px rgb(0, 0, 0, 25%);
-
-	img {
-		width: 15rem;
-	}
 `;
 
 const ListMain = styled.div`
@@ -144,20 +269,23 @@ const ListMain = styled.div`
 	flex-direction: column;
 
 	h4 {
-		font-size: 1.6rem;
+		font-size: 1.8rem;
 		color: ${(props) => props.theme.COLORS.GRAY_600};
 	}
 
 	p {
 		font-size: 1.2rem;
-		margin-top: 1rem;
+		margin-top: 1.2rem;
 		line-height: 1.2;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		color: ${(props) => props.theme.COLORS.GRAY_500};
 	}
 `;
 
 const Tags = styled.ul`
 	display: flex;
+	margin-top: 0.5rem;
 `;
 
 const Tag = styled.li`
@@ -174,6 +302,116 @@ const Tag = styled.li`
 const Info = styled.div`
 	display: flex;
 	justify-content: space-between;
+	flex: 1;
+	align-items: flex-end;
+`;
+
+const NotDataContainer = styled.div`
+	display: flex;
+	height: 50%;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
+	.img_background {
+		width: 100px;
+		border-radius: 50px;
+		padding: 2.5rem;
+		margin-bottom: 2.5rem;
+		background-color: ${(props) => props.theme.COLORS.GRAY_200};
+	}
+
+	img {
+		width: 100%;
+	}
+
+	p {
+		padding-left: 1rem;
+		color: ${(props) => props.theme.COLORS.GRAY_600};
+		font-size: 2rem;
+		font-weight: 600;
+	}
+`;
+
+const SearchContainer = styled.div`
+	border: 1px solid ${(props) => props.theme.COLORS.GRAY_400};
+	border-radius: 4px;
+	margin-top: 12.4rem;
+	padding: 2rem;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+
+	.header {
+		display: flex;
+		align-items: center;
+		svg {
+			font-size: 2rem;
+			margin-right: 0.5rem;
+		}
+
+		h3 {
+			font-size: 1.6rem;
+			color: ${(props) => props.theme.COLORS.GRAY_600};
+		}
+	}
+
+	.search_input {
+		display: flex;
+		position: relative;
+
+		input {
+			height: 4rem;
+		}
+
+		button {
+			position: absolute;
+			right: 1rem;
+			top: 30%;
+
+			svg {
+				font-size: 2rem;
+				&:hover {
+					transition: 0.5s all;
+					transform: scale(1.1);
+				}
+			}
+		}
+	}
+
+	hr {
+		width: 100%;
+		border: none;
+		height: 1px;
+		margin-bottom: 1.8rem;
+		background-color: ${(props) => props.theme.COLORS.GRAY_300};
+	}
+`;
+
+const CategoryContainer = styled(SearchContainer)`
+	margin-top: 3rem;
+	min-height: 8rem;
+`;
+
+const NavStyle = styled(Link)`
+	display: flex;
+	font-size: 1.4rem;
+	color: ${(props) => props.theme.COLORS.GRAY_600};
+	font-weight: 500;
+	margin-bottom: 1.5rem;
+
+	p {
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	&.active {
+		p {
+			color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
+			font-size: 1.5rem;
+		}
+	}
 `;
 
 export default Diary;

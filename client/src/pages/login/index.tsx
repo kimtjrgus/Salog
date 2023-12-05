@@ -159,16 +159,20 @@ export const PasswordLabel = styled.label`
 export const Input = styled.input.attrs({ required: true })`
 	width: 100%;
 	height: 4.3rem;
-	margin-top: 1.5rem;
 	padding-left: 1rem;
 	padding-right: 5.5rem;
 	border-radius: 0.6rem;
 	border: 1px solid ${(props) => props.theme.COLORS.GRAY_400};
+
+	&.placeholder {
+		color: ${(props) => props.theme.COLORS.GRAY_300};
+	}
 `;
 
 const Title = styled.p`
 	color: ${(props) => props.theme.COLORS.GRAY_500};
 	margin-top: 2rem;
+	margin-bottom: 1.5rem;
 `;
 
 export const SubmitBtn = styled.button`
