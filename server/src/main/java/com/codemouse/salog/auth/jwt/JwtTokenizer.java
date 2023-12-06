@@ -8,23 +8,20 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Getter
-@Setter
 public class JwtTokenizer {
     @Value("${jwt.key}")
     private String secretKey;
-    @Value("$jwt.access-token-expiration-minutes")
+
+    @Value("${jwt.access-token-expiration-minutes}")
     private int accessTokenExpirationMinutes;
+
     @Value("${jwt.refresh-token-expiration-minutes}")
     private int refreshTokenExpirationMinutes;
 

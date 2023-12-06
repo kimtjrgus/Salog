@@ -21,11 +21,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity(debug = true)
 @AllArgsConstructor
-public class SecurityConfiguration {
+public class SecurityConfiguration implements WebMvcConfigurer {
     private final CustomAuthorityUtils authorityUtils;
     private final CustomCorsConfiguration corsConfiguration;
     private final MemberRepository memberRepository;
@@ -56,15 +57,15 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .antMatchers(HttpMethod.POST, "/members/signup").permitAll()
                         .antMatchers(HttpMethod.POST, "/members/login").permitAll()
-                        .antMatchers(HttpMethod.POST, "/members/emailcheck").permitAll()
-                        .antMatchers(HttpMethod.POST, "/members/sendmail").permitAll()
-                        .antMatchers(HttpMethod.POST, "/members/findpassword/sendmail").permitAll()
-                        .antMatchers(HttpMethod.POST, "/members/nicknamecheck").permitAll()
-                        .antMatchers(HttpMethod.PATCH, "/members/findpassword").permitAll()
-                        .antMatchers(HttpMethod.PATCH, "/members/mypage/update").hasRole("USER")
-                        .antMatchers(HttpMethod.PATCH, "/members/mypage/passwordupdate").hasRole("USER")
-                        .antMatchers(HttpMethod.GET, "/members/myprofile").hasRole("USER")
-                        .antMatchers(HttpMethod.DELETE, "/members/leaveid").hasRole("USER")
+//                        .antMatchers(HttpMethod.POST, "/members/emailcheck").permitAll()
+//                        .antMatchers(HttpMethod.POST, "/members/sendmail").permitAll()
+//                        .antMatchers(HttpMethod.POST, "/members/findpassword/sendmail").permitAll()
+//                        .antMatchers(HttpMethod.POST, "/members/nicknamecheck").permitAll()
+//                        .antMatchers(HttpMethod.PATCH, "/members/findpassword").permitAll()
+//                        .antMatchers(HttpMethod.PATCH, "/members/mypage/update").hasRole("USER")
+//                        .antMatchers(HttpMethod.PATCH, "/members/mypage/passwordupdate").hasRole("USER")
+//                        .antMatchers(HttpMethod.GET, "/members/myprofile").hasRole("USER")
+//                        .antMatchers(HttpMethod.DELETE, "/members/leaveid").hasRole("USER")
                 );
         return http.build();
     }

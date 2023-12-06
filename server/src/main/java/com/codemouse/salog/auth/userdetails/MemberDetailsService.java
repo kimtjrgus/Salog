@@ -1,11 +1,14 @@
 package com.codemouse.salog.auth.userdetails;
 
 import com.codemouse.salog.auth.utils.CustomAuthorityUtils;
+import com.codemouse.salog.exception.BusinessLogicException;
+import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -14,11 +17,10 @@ import java.util.Optional;
 
 @Component
 @AllArgsConstructor
-public class MemberDetailsService {
+public class MemberDetailsService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final CustomAuthorityUtils customAuthorityUtils;
 
-    // TODO: 2023-12-04 비지니스 예외 AOP 생성 후 정상작동 시 todo 삭제
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Member> optionalMember = memberRepository.findByEmail(username);

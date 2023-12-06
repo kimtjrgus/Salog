@@ -2,6 +2,7 @@ package com.codemouse.salog.auth.filter;
 
 import com.codemouse.salog.auth.dto.LoginDto;
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
+import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +29,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final JwtTokenizer jwtTokenizer;
     private final MemberRepository memberRepository;
 
-    // TODO: 2023-12-04 Exception AOP 구현 필요
     @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,

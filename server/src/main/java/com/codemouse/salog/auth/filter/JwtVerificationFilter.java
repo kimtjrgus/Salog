@@ -15,7 +15,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.SignatureException;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +28,6 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         try {
             Map<String, Object> claims = verifyJws(request);
             setAuthenticationToContext(claims);
-        } catch (SignatureException se) {
-            request.setAttribute("signature exception", se);
         } catch (ExpiredJwtException ee) {
             request.setAttribute("expired exception", ee);
         } catch (Exception e) {
