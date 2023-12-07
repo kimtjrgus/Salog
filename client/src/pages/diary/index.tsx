@@ -7,8 +7,9 @@ import axios from "axios";
 import NotData from "../../assets/NotData.png";
 import { Input } from "../login";
 import Test from "../../assets/Test.jpeg";
+import dateAsKor from "src/utils/dateAsKor";
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface diaryType {
 	id: number;
@@ -25,17 +26,10 @@ const Diary = () => {
 	const path = useLocation().pathname;
 	const search = useLocation().search;
 	const decodeUrl = decodeURI(search).split("=")[1];
+	const navigate = useNavigate();
 
-	// 일기의 날짜 표시를 원하는 형식으로 바꿔주는 함수
-	const dateAsKor = (date: string) => {
-		const weeks = ["일", "월", "화", "수", "목", "금", "토"];
-		const dateString = new Date(date);
-		const year = dateString.getFullYear();
-		const month = dateString.getMonth() + 1;
-		const day = dateString.getDate();
-		const week = dateString.getDay();
-
-		return `${year}년 ${month}월 ${day}일 (${weeks[week]})`;
+	const onClickWriteBtn = () => {
+		navigate("/diary/post");
 	};
 
 	const categoryOrganize = () => {
@@ -54,6 +48,7 @@ const Diary = () => {
 			arr.push(
 				<NavStyle
 					to={`/diary?category=${key}`}
+					// key는 서버 연동 후 id가 생기면 변경 예정
 					key={Math.floor(Math.random() * 1000000000000000)}
 					className={decodeUrl === key ? "active" : ""}
 				>
@@ -82,7 +77,7 @@ const Diary = () => {
 			<DiaryContainer>
 				<DiaryTitle>
 					<h2>일기</h2>
-					<WriteBtn>
+					<WriteBtn onClick={onClickWriteBtn}>
 						<SvgIcon
 							component={CreateOutlinedIcon}
 							sx={{ stroke: "#ffffff", strokeWidth: 1 }}
@@ -174,16 +169,16 @@ const Container = styled.div`
 	display: flex;
 	height: 90vh;
 	justify-content: center;
-`;
-
-const DiaryContainer = styled.div`
-	margin-top: 3rem;
-	width: 65%;
 	overflow: scroll;
 
 	&::-webkit-scrollbar {
 		display: none;
 	}
+`;
+
+const DiaryContainer = styled.div`
+	margin-top: 3rem;
+	width: 65%;
 
 	hr {
 		width: 100%;
@@ -203,11 +198,9 @@ const DiaryContainer = styled.div`
 `;
 
 const RemainContainer = styled.div`
-	display: flex;
 	margin-top: 3rem;
 	margin-left: 3rem;
-	flex-direction: column;
-	width: 35%;
+	width: 30%;
 `;
 
 const ListContainer = styled.ul`
@@ -308,7 +301,6 @@ const Info = styled.div`
 
 const NotDataContainer = styled.div`
 	display: flex;
-	height: 50%;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
