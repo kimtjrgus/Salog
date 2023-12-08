@@ -1,5 +1,7 @@
 package com.codemouse.salog.auth.jwt;
 
+import com.codemouse.salog.exception.BusinessLogicException;
+import com.codemouse.salog.exception.ExceptionCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -98,8 +100,7 @@ public class JwtTokenizer {
     // 클레임에서 회원 id를 추출
     public Long getMemberId(String token) {
         if (token == null) {
-            // TODO: 2023-11-29 : 회원 인증 불가 시 에러 리턴
-            return null;
+            throw new BusinessLogicException(ExceptionCode.MEMBER_UNAUTHORIZED);
         } else {
             return Objects.requireNonNull(parseToken(token)).get("memberId", Long.class);
         }
@@ -118,8 +119,7 @@ public class JwtTokenizer {
                     .parseClaimsJws(jws)
                     .getBody();
         }   catch (ExpiredJwtException e) {
-            // TODO: 2023-11-29 : 토큰 만료 시 인증 불가 에러 리턴 
-            return null;
+            throw new BusinessLogicException(ExceptionCode.MEMBER_UNAUTHORIZED);
         }
         System.out.println(claims);
         return claims;
