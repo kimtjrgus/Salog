@@ -15,7 +15,7 @@ import java.util.*;
 public class Member extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int memberId;
+    private long memberId;
 
     @Column(nullable = false, unique = true)
     private String email;

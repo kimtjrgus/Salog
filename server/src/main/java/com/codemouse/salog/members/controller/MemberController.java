@@ -1,7 +1,9 @@
 package com.codemouse.salog.members.controller;
 
+import com.codemouse.salog.dto.SingleResponseDto;
 import com.codemouse.salog.members.dto.MemberDto;
 import com.codemouse.salog.members.entity.Member;
+import com.codemouse.salog.members.mapper.MemberMapper;
 import com.codemouse.salog.members.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,24 +21,35 @@ import javax.validation.Valid;
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
+    private final MemberMapper memberMapper;
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
     public void SignupMember(@Valid @RequestBody MemberDto.Post requestBody) {
-
+        memberService.createMember(memberMapper.memberPostDtoToMember(requestBody));
     }
 
     @PatchMapping("/update")
     @ResponseStatus(HttpStatus.OK)
-    public void updateMember(@Valid @RequestBody MemberDto.Patch requestBody) {
+    public void updateMember(@RequestHeader(name = "Authorization") String token,
+                             @Valid @RequestBody MemberDto.Patch requestBody) {
+        memberService.updateMember(token, memberMapper.memberPatchDtoToMember(requestBody));
+    }
 
+    @PatchMapping("/changepassword")
+    @ResponseStatus(HttpStatus.OK)
+    public void changePassword(@RequestHeader(name = "Authorization") String token,
+                               @Valid @RequestBody MemberDto.PatchPassword requestBody) {
+        memberService.updatePassword(token, requestBody);
     }
 
     @GetMapping("/get")
     public ResponseEntity getMember(@RequestHeader(name = "Authorization") String token) {
         Member member = memberService.findMember(token);
 
-        return null;
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(memberMapper.memberToMemberResponseDto(member))
+                , HttpStatus.OK);
     }
 
     @DeleteMapping("/leaveid")
