@@ -10,7 +10,10 @@ public enum ExceptionCode {
     MEMBER_EXISTS(409, "MEMBER_EXISTS\n이미 존재하는 회원"),
     NOT_IMPLEMENTATION(501, "Not Implementation\n존재하지 않는 기능"),
     PASSWORD_MISMATCHED(400,"PASSWORD_MISMATCHED\n비밀번호가 일치하지 않음"),
-    ID_MISMATCHED(400,"ID_MISMATCHED\n아이디가 일치하지 않음");
+    ID_MISMATCHED(400,"ID_MISMATCHED\n아이디가 일치하지 않음"),
+    MEMBER_ALREADY_DELETED(409, "MEMBER_ALREADY_DELETED\n이미 탈퇴한 회원"),
+    EMAIL_EXIST(409, "EMAIL_EXIST\n이미 존재하는 이메일"),
+    PASSWORD_IDENTICAL(409, "PASSWORD_IDENTICAL\n이전 비밀번호와 동일함");
 
     private int status;
 
