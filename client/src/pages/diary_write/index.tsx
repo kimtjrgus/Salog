@@ -4,18 +4,32 @@ import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import dateAsKor from "src/utils/dateAsKor";
 import { styled } from "styled-components";
 import { Input } from "../login";
+import Reactquill from "./textEditor";
+
+export interface valuesType {
+	title: string;
+	body: string;
+}
 
 const DiaryWrite = () => {
+	const [values, setValues] = useState<valuesType>({ title: "", body: "" });
 	const [categories, setCategories] = useState<string[]>([]);
-	console.log(categories);
-
 	const [category, setCategory] = useState<string>("");
+
+	const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setValues({ ...values, [name]: value });
+	};
+
+	const onChangeBody = (value: string) => {
+		setValues({ ...values, body: value });
+	};
 
 	const onChangeCategory = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCategory(e.target.value);
 	};
 
-	const onKeyPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+	const onKeyUpEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		const inputElement = e.target as HTMLInputElement;
 		if (inputElement.value.trim() !== "" && inputElement.value !== ",") {
 			if (e.key === ",") {
@@ -29,6 +43,13 @@ const DiaryWrite = () => {
 				setCategories([...categories, inputElement.value.trim()]);
 				setCategory("");
 			}
+		}
+	};
+
+	const onKeyDownEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		const inputElement = e.target as HTMLInputElement;
+		if (e.key === "Backspace" && inputElement.value === "") {
+			setCategories([...categories.slice(0, categories.length - 1)]);
 		}
 	};
 
@@ -48,13 +69,18 @@ const DiaryWrite = () => {
 					</div>
 				</div>
 				<h4>제목</h4>
-				<Input placeholder="제목을 입력하세요." />
+				<Input
+					placeholder="제목을 입력하세요."
+					type="text"
+					name="title"
+					onChange={onChangeValues}
+				/>
 				<h4>카테고리</h4>
 				<CategoryList>
 					{categories.map((category: string, idx: number) => {
 						return (
 							// key는 서버 연동 후 id가 생기면 변경 예정
-							<span key={Math.floor(Math.random() * 1000000000000000)}>
+							<div key={Math.floor(Math.random() * 1000000000000000)}>
 								<p>{category}</p>
 								<button
 									onClick={() => {
@@ -66,18 +92,19 @@ const DiaryWrite = () => {
 										sx={{ stroke: "#ffffff", strokeWidth: 0.7 }}
 									/>
 								</button>
-							</span>
+							</div>
 						);
 					})}
 					<Input
-						placeholder={
-							categories.length === 0 ? "카테고리를 입력하세요." : ""
-						}
+						placeholder={"카테고리를 입력하세요."}
 						onChange={onChangeCategory}
-						onKeyUp={onKeyPressEnter}
+						onKeyUp={onKeyUpEvent}
+						onKeyDown={onKeyDownEvent}
 						value={category}
 					/>
 				</CategoryList>
+				<h4>내용</h4>
+				<Reactquill body={values.body} onChangeBody={onChangeBody} />
 			</WriteContainer>
 		</Container>
 	);
@@ -86,12 +113,17 @@ const DiaryWrite = () => {
 const Container = styled.div`
 	display: flex;
 	height: 90vh;
-	overflow: scroll;
 `;
 
 const WriteContainer = styled.div`
 	width: 65%;
+	min-width: 70rem;
 	margin-top: 3rem;
+	overflow: scroll;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 
 	.header {
 		display: flex;
@@ -132,19 +164,34 @@ const WriteContainer = styled.div`
 
 const CategoryList = styled.div`
 	display: flex;
+	flex-wrap: wrap;
 	margin-bottom: 1.5rem;
 	padding: 0.4rem 0.7rem;
 	border: 1px solid ${(props) => props.theme.COLORS.GRAY_400};
 
-	span {
-		display: flex;
+	div {
+		display: inline-flex;
 		align-items: center;
 		border-radius: 1.5rem;
 		white-space: nowrap;
 		border: none;
-		margin-right: 0.6rem;
+		height: 2.5rem;
+		margin-right: 0.4rem;
 		padding: 0 0.8rem;
 		background-color: ${(props) => props.theme.COLORS.GRAY_200};
+		/* transition: all 0.125s ease-in 0s;
+		@keyframes mount {
+			0% {
+				opacity: 0.7;
+				transform: scale3d(0.8, 0.8, 1);
+			}
+
+			100% {
+				opacity: 1;
+				transform: scale3d(1, 1, 1);
+			}
+		}
+		animation: 0.125s ease-in-out 0s 1 normal forwards running mount; */
 
 		p {
 			color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
@@ -164,8 +211,9 @@ const CategoryList = styled.div`
 	}
 
 	input {
-		padding-left: 0.3rem;
+		padding: 0.3rem;
 		border-radius: 0.2rem;
+		max-width: 14rem;
 		height: 2.6rem;
 		border: none;
 	}
