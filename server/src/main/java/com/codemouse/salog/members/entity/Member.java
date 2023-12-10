@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.*;
 
 @NoArgsConstructor
 @Getter
@@ -14,7 +15,7 @@ import javax.persistence.*;
 public class Member extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int memberId;
+    private long memberId;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -30,6 +31,11 @@ public class Member extends Auditable {
 
     @Column(nullable = false)
     private Status status = Status.MEMBER_ACTIVE;
+
+    // JWT - 역할 부여
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles = new ArrayList<>();
+
 
     public enum Status {
         MEMBER_ACTIVE("활동중"),
