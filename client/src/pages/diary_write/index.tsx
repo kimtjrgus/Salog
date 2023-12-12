@@ -1,21 +1,40 @@
+import axios from "axios";
 import React, { useState } from "react";
-import { SvgIcon } from "@mui/material";
-import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
+import { useNavigate } from "react-router-dom";
+import Modal from "src/components/Layout/Modal";
+import Toast, { ToastType } from "src/components/Layout/Toast";
 import dateAsKor from "src/utils/dateAsKor";
 import { styled } from "styled-components";
 import { Input } from "../login";
+import Reactquill from "./textEditor";
+
+export interface valuesType {
+	title: string;
+	body: string;
+}
 
 const DiaryWrite = () => {
+	const [values, setValues] = useState<valuesType>({ title: "", body: "" });
 	const [categories, setCategories] = useState<string[]>([]);
-	console.log(categories);
-
 	const [category, setCategory] = useState<string>("");
+	const [isOpen, setIsOpen] = useState<boolean>(false);
+
+	const navigate = useNavigate();
+
+	const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setValues({ ...values, [name]: value });
+	};
+
+	const onChangeBody = (value: string) => {
+		setValues({ ...values, body: value });
+	};
 
 	const onChangeCategory = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCategory(e.target.value);
 	};
 
-	const onKeyPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+	const onKeyUpEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		const inputElement = e.target as HTMLInputElement;
 		if (inputElement.value.trim() !== "" && inputElement.value !== ",") {
 			if (e.key === ",") {
@@ -32,66 +51,131 @@ const DiaryWrite = () => {
 		}
 	};
 
+	const onKeyDownEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		const inputElement = e.target as HTMLInputElement;
+		if (e.key === "Backspace" && inputElement.value === "") {
+			setCategories([...categories.slice(0, categories.length - 1)]);
+		}
+	};
+
 	const onClickTagBtn = (idx: number) => {
 		setCategories([...categories.slice(0, idx), ...categories.slice(idx + 1)]);
 	};
 
+	const onClickCancelBtn = () => {
+		setIsOpen((prev) => !prev);
+	};
+
+	const onClickCloseBtn = () => {
+		navigate("/diary");
+	};
+
+	const onClickWriteBtn = () => {
+		// 모달창을 띄운 뒤 확인을 누르면
+		if (
+			values.title.length === 0 &&
+			values.body.replace(/(<([^>]+)>)/gi, "").length < 10
+		) {
+			Toast(ToastType.error, "제목과 내용을 입력해주세요");
+		} else if (values.title.length === 0) {
+			Toast(ToastType.error, "제목을 입력해주세요");
+		} else if (values.body.replace(/(<([^>]+)>)/gi, "").length < 10) {
+			Toast(ToastType.error, "내용을 10자 이상 입력해주세요");
+		} else {
+			axios
+				.post("http://localhost:8000/diary", {
+					date: new Date().toDateString(),
+					title: values.title,
+					body: values.body,
+					diaryTag: categories,
+				})
+				.then(() => {
+					navigate("/diary");
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		}
+	};
+
 	const nowDate = dateAsKor(new Date().toDateString());
 	return (
-		<Container>
-			<WriteContainer>
-				<div className="header">
-					<h3>{nowDate}</h3>
-					<div className="header_btn">
-						<button>작성 취소</button>
-						<button>작성 완료</button>
+		<>
+			<Container>
+				<WriteContainer>
+					<div className="header">
+						<h3>{nowDate}</h3>
+						<div className="header_btn">
+							<button onClick={onClickCancelBtn}>작성 취소</button>
+							<button onClick={onClickWriteBtn}>작성 완료</button>
+						</div>
 					</div>
-				</div>
-				<h4>제목</h4>
-				<Input placeholder="제목을 입력하세요." />
-				<h4>카테고리</h4>
-				<CategoryList>
-					{categories.map((category: string, idx: number) => {
-						return (
-							// key는 서버 연동 후 id가 생기면 변경 예정
-							<span key={Math.floor(Math.random() * 1000000000000000)}>
-								<p>{category}</p>
-								<button
+					<Input
+						placeholder="제목을 입력하세요."
+						type="text"
+						name="title"
+						onChange={onChangeValues}
+					/>
+					<div className="contour"></div>
+					<CategoryList>
+						{categories.map((category: string, idx: number) => {
+							return (
+								// key는 서버 연동 후 id가 생기면 변경 예정
+								<div
+									key={Math.floor(Math.random() * 1000000000000000)}
 									onClick={() => {
 										onClickTagBtn(idx);
 									}}
 								>
-									<SvgIcon
-										component={ClearOutlinedIcon}
-										sx={{ stroke: "#ffffff", strokeWidth: 0.7 }}
-									/>
-								</button>
-							</span>
-						);
-					})}
-					<Input
-						placeholder={
-							categories.length === 0 ? "카테고리를 입력하세요." : ""
-						}
-						onChange={onChangeCategory}
-						onKeyUp={onKeyPressEnter}
-						value={category}
-					/>
-				</CategoryList>
-			</WriteContainer>
-		</Container>
+									<p>{category}</p>
+								</div>
+							);
+						})}
+						<Input
+							placeholder={"카테고리를 입력하세요."}
+							onChange={onChangeCategory}
+							onKeyUp={onKeyUpEvent}
+							onKeyDown={onKeyDownEvent}
+							value={category}
+						/>
+					</CategoryList>
+					<Reactquill body={values.body} onChangeBody={onChangeBody} />
+				</WriteContainer>
+				<Calculate></Calculate>
+			</Container>
+			<Modal
+				state={isOpen}
+				setState={setIsOpen}
+				msgTitle="작성을 취소하시겠습니까?"
+				msgBody="이미 작성한 내용은 저장되지 않습니다."
+			>
+				<button
+					onClick={() => {
+						setIsOpen((prev) => !prev);
+					}}
+				>
+					취소
+				</button>
+				<button onClick={onClickCloseBtn}>확인</button>
+			</Modal>
+		</>
 	);
 };
 
 const Container = styled.div`
 	display: flex;
 	height: 90vh;
-	overflow: scroll;
 `;
 
 const WriteContainer = styled.div`
 	width: 65%;
+	min-width: 70rem;
 	margin-top: 3rem;
+	overflow: scroll;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 
 	.header {
 		display: flex;
@@ -105,6 +189,7 @@ const WriteContainer = styled.div`
 
 		.header_btn > button {
 			font-size: 1.2rem;
+			font-weight: 600;
 			background-color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
 			color: ${(props) => props.theme.COLORS.WHITE};
 			border-radius: 0.4rem;
@@ -117,58 +202,79 @@ const WriteContainer = styled.div`
 		}
 	}
 
-	h4 {
-		font-size: 1.6rem;
-		color: ${(props) => props.theme.COLORS.GRAY_600};
-		margin-bottom: 1.5rem;
+	.contour {
+		background: rgb(73, 80, 87);
+		height: 4px;
+		width: 6rem;
 		margin-top: 1.5rem;
+		margin-bottom: 1rem;
+		border-radius: 1px;
 	}
 
 	input {
 		border-radius: 0.2rem;
+		padding-left: 0;
 		height: 3.6rem;
+		border: none;
+		font-size: 2.2rem;
 	}
 `;
 
 const CategoryList = styled.div`
 	display: flex;
-	margin-bottom: 1.5rem;
-	padding: 0.4rem 0.7rem;
-	border: 1px solid ${(props) => props.theme.COLORS.GRAY_400};
+	flex-wrap: wrap;
+	margin: 1.5rem 0;
+	padding: 0.4rem 0.7rem 0.4rem 0;
 
-	span {
-		display: flex;
+	div {
+		display: inline-flex;
 		align-items: center;
 		border-radius: 1.5rem;
 		white-space: nowrap;
 		border: none;
-		margin-right: 0.6rem;
-		padding: 0 0.8rem;
+		height: 2.5rem;
+		margin-right: 0.5rem;
+		padding: 0.5rem 1rem;
+		cursor: pointer;
 		background-color: ${(props) => props.theme.COLORS.GRAY_200};
+		/* transition: all 0.125s ease-in 0s;
+		@keyframes mount {
+			0% {
+				opacity: 0.7;
+				transform: scale3d(0.8, 0.8, 1);
+			}
+
+			100% {
+				opacity: 1;
+				transform: scale3d(1, 1, 1);
+			}
+		}
+		animation: 0.125s ease-in-out 0s 1 normal forwards running mount; */
 
 		p {
 			color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
-			font-size: 1.2rem;
+			font-size: 1.4rem;
 			font-weight: 500;
 		}
 
 		button {
 			margin-left: 0.3rem;
-
-			svg {
-				position: relative;
-				font-size: 1.2rem;
-				top: 0.15rem;
-			}
 		}
 	}
 
 	input {
-		padding-left: 0.3rem;
+		padding: 0.3rem;
 		border-radius: 0.2rem;
+		max-width: 17rem;
 		height: 2.6rem;
-		border: none;
+		padding-left: 0;
+		font-size: 1.6rem;
 	}
+`;
+
+const Calculate = styled.div`
+	width: 35%;
+	padding: 2rem;
 `;
 
 export default DiaryWrite;
