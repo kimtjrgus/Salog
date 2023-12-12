@@ -1,6 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Modal from "src/components/Layout/Modal";
+import Toast, { ToastType } from "src/components/Layout/Toast";
 import dateAsKor from "src/utils/dateAsKor";
 import { styled } from "styled-components";
 import { Input } from "../login";
@@ -15,6 +17,7 @@ const DiaryWrite = () => {
 	const [values, setValues] = useState<valuesType>({ title: "", body: "" });
 	const [categories, setCategories] = useState<string[]>([]);
 	const [category, setCategory] = useState<string>("");
+	const [isOpen, setIsOpen] = useState<boolean>(false);
 
 	const navigate = useNavigate();
 
@@ -60,16 +63,24 @@ const DiaryWrite = () => {
 	};
 
 	const onClickCancelBtn = () => {
-		// 모달창을 띄운 뒤 확인을 누르면
+		setIsOpen((prev) => !prev);
+	};
+
+	const onClickCloseBtn = () => {
 		navigate("/diary");
 	};
 
 	const onClickWriteBtn = () => {
 		// 모달창을 띄운 뒤 확인을 누르면
-		if (values.title.length === 0) {
-			console.log("제목 입력해");
-		} else if (values.body.length < 10) {
-			console.log("본문 10 미만");
+		if (
+			values.title.length === 0 &&
+			values.body.replace(/(<([^>]+)>)/gi, "").length < 10
+		) {
+			Toast(ToastType.error, "제목과 내용을 입력해주세요");
+		} else if (values.title.length === 0) {
+			Toast(ToastType.error, "제목을 입력해주세요");
+		} else if (values.body.replace(/(<([^>]+)>)/gi, "").length < 10) {
+			Toast(ToastType.error, "내용을 10자 이상 입력해주세요");
 		} else {
 			axios
 				.post("http://localhost:8000/diary", {
@@ -89,47 +100,65 @@ const DiaryWrite = () => {
 
 	const nowDate = dateAsKor(new Date().toDateString());
 	return (
-		<Container>
-			<WriteContainer>
-				<div className="header">
-					<h3>{nowDate}</h3>
-					<div className="header_btn">
-						<button onClick={onClickCancelBtn}>작성 취소</button>
-						<button onClick={onClickWriteBtn}>작성 완료</button>
+		<>
+			<Container>
+				<WriteContainer>
+					<div className="header">
+						<h3>{nowDate}</h3>
+						<div className="header_btn">
+							<button onClick={onClickCancelBtn}>작성 취소</button>
+							<button onClick={onClickWriteBtn}>작성 완료</button>
+						</div>
 					</div>
-				</div>
-				<Input
-					placeholder="제목을 입력하세요."
-					type="text"
-					name="title"
-					onChange={onChangeValues}
-				/>
-				<div className="contour"></div>
-				<CategoryList>
-					{categories.map((category: string, idx: number) => {
-						return (
-							// key는 서버 연동 후 id가 생기면 변경 예정
-							<div
-								key={Math.floor(Math.random() * 1000000000000000)}
-								onClick={() => {
-									onClickTagBtn(idx);
-								}}
-							>
-								<p>{category}</p>
-							</div>
-						);
-					})}
 					<Input
-						placeholder={"카테고리를 입력하세요."}
-						onChange={onChangeCategory}
-						onKeyUp={onKeyUpEvent}
-						onKeyDown={onKeyDownEvent}
-						value={category}
+						placeholder="제목을 입력하세요."
+						type="text"
+						name="title"
+						onChange={onChangeValues}
 					/>
-				</CategoryList>
-				<Reactquill body={values.body} onChangeBody={onChangeBody} />
-			</WriteContainer>
-		</Container>
+					<div className="contour"></div>
+					<CategoryList>
+						{categories.map((category: string, idx: number) => {
+							return (
+								// key는 서버 연동 후 id가 생기면 변경 예정
+								<div
+									key={Math.floor(Math.random() * 1000000000000000)}
+									onClick={() => {
+										onClickTagBtn(idx);
+									}}
+								>
+									<p>{category}</p>
+								</div>
+							);
+						})}
+						<Input
+							placeholder={"카테고리를 입력하세요."}
+							onChange={onChangeCategory}
+							onKeyUp={onKeyUpEvent}
+							onKeyDown={onKeyDownEvent}
+							value={category}
+						/>
+					</CategoryList>
+					<Reactquill body={values.body} onChangeBody={onChangeBody} />
+				</WriteContainer>
+				<Calculate></Calculate>
+			</Container>
+			<Modal
+				state={isOpen}
+				setState={setIsOpen}
+				msgTitle="작성을 취소하시겠습니까?"
+				msgBody="이미 작성한 내용은 저장되지 않습니다."
+			>
+				<button
+					onClick={() => {
+						setIsOpen((prev) => !prev);
+					}}
+				>
+					취소
+				</button>
+				<button onClick={onClickCloseBtn}>확인</button>
+			</Modal>
+		</>
 	);
 };
 
@@ -241,6 +270,11 @@ const CategoryList = styled.div`
 		padding-left: 0;
 		font-size: 1.6rem;
 	}
+`;
+
+const Calculate = styled.div`
+	width: 35%;
+	padding: 2rem;
 `;
 
 export default DiaryWrite;
