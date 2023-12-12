@@ -1,6 +1,6 @@
+import axios from "axios";
 import React, { useState } from "react";
-import { SvgIcon } from "@mui/material";
-import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
+import { useNavigate } from "react-router-dom";
 import dateAsKor from "src/utils/dateAsKor";
 import { styled } from "styled-components";
 import { Input } from "../login";
@@ -15,6 +15,8 @@ const DiaryWrite = () => {
 	const [values, setValues] = useState<valuesType>({ title: "", body: "" });
 	const [categories, setCategories] = useState<string[]>([]);
 	const [category, setCategory] = useState<string>("");
+
+	const navigate = useNavigate();
 
 	const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -57,6 +59,34 @@ const DiaryWrite = () => {
 		setCategories([...categories.slice(0, idx), ...categories.slice(idx + 1)]);
 	};
 
+	const onClickCancelBtn = () => {
+		// 모달창을 띄운 뒤 확인을 누르면
+		navigate("/diary");
+	};
+
+	const onClickWriteBtn = () => {
+		// 모달창을 띄운 뒤 확인을 누르면
+		if (values.title.length === 0) {
+			console.log("제목 입력해");
+		} else if (values.body.length < 10) {
+			console.log("본문 10 미만");
+		} else {
+			axios
+				.post("http://localhost:8000/diary", {
+					date: new Date().toDateString(),
+					title: values.title,
+					body: values.body,
+					diaryTag: categories,
+				})
+				.then(() => {
+					navigate("/diary");
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		}
+	};
+
 	const nowDate = dateAsKor(new Date().toDateString());
 	return (
 		<Container>
@@ -64,34 +94,28 @@ const DiaryWrite = () => {
 				<div className="header">
 					<h3>{nowDate}</h3>
 					<div className="header_btn">
-						<button>작성 취소</button>
-						<button>작성 완료</button>
+						<button onClick={onClickCancelBtn}>작성 취소</button>
+						<button onClick={onClickWriteBtn}>작성 완료</button>
 					</div>
 				</div>
-				<h4>제목</h4>
 				<Input
 					placeholder="제목을 입력하세요."
 					type="text"
 					name="title"
 					onChange={onChangeValues}
 				/>
-				<h4>카테고리</h4>
+				<div className="contour"></div>
 				<CategoryList>
 					{categories.map((category: string, idx: number) => {
 						return (
 							// key는 서버 연동 후 id가 생기면 변경 예정
-							<div key={Math.floor(Math.random() * 1000000000000000)}>
+							<div
+								key={Math.floor(Math.random() * 1000000000000000)}
+								onClick={() => {
+									onClickTagBtn(idx);
+								}}
+							>
 								<p>{category}</p>
-								<button
-									onClick={() => {
-										onClickTagBtn(idx);
-									}}
-								>
-									<SvgIcon
-										component={ClearOutlinedIcon}
-										sx={{ stroke: "#ffffff", strokeWidth: 0.7 }}
-									/>
-								</button>
 							</div>
 						);
 					})}
@@ -103,7 +127,6 @@ const DiaryWrite = () => {
 						value={category}
 					/>
 				</CategoryList>
-				<h4>내용</h4>
 				<Reactquill body={values.body} onChangeBody={onChangeBody} />
 			</WriteContainer>
 		</Container>
@@ -137,6 +160,7 @@ const WriteContainer = styled.div`
 
 		.header_btn > button {
 			font-size: 1.2rem;
+			font-weight: 600;
 			background-color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
 			color: ${(props) => props.theme.COLORS.WHITE};
 			border-radius: 0.4rem;
@@ -149,25 +173,29 @@ const WriteContainer = styled.div`
 		}
 	}
 
-	h4 {
-		font-size: 1.6rem;
-		color: ${(props) => props.theme.COLORS.GRAY_600};
-		margin-bottom: 1.5rem;
+	.contour {
+		background: rgb(73, 80, 87);
+		height: 4px;
+		width: 6rem;
 		margin-top: 1.5rem;
+		margin-bottom: 1rem;
+		border-radius: 1px;
 	}
 
 	input {
 		border-radius: 0.2rem;
+		padding-left: 0;
 		height: 3.6rem;
+		border: none;
+		font-size: 2.2rem;
 	}
 `;
 
 const CategoryList = styled.div`
 	display: flex;
 	flex-wrap: wrap;
-	margin-bottom: 1.5rem;
-	padding: 0.4rem 0.7rem;
-	border: 1px solid ${(props) => props.theme.COLORS.GRAY_400};
+	margin: 1.5rem 0;
+	padding: 0.4rem 0.7rem 0.4rem 0;
 
 	div {
 		display: inline-flex;
@@ -176,8 +204,9 @@ const CategoryList = styled.div`
 		white-space: nowrap;
 		border: none;
 		height: 2.5rem;
-		margin-right: 0.4rem;
-		padding: 0 0.8rem;
+		margin-right: 0.5rem;
+		padding: 0.5rem 1rem;
+		cursor: pointer;
 		background-color: ${(props) => props.theme.COLORS.GRAY_200};
 		/* transition: all 0.125s ease-in 0s;
 		@keyframes mount {
@@ -195,27 +224,22 @@ const CategoryList = styled.div`
 
 		p {
 			color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
-			font-size: 1.2rem;
+			font-size: 1.4rem;
 			font-weight: 500;
 		}
 
 		button {
 			margin-left: 0.3rem;
-
-			svg {
-				position: relative;
-				font-size: 1.2rem;
-				top: 0.15rem;
-			}
 		}
 	}
 
 	input {
 		padding: 0.3rem;
 		border-radius: 0.2rem;
-		max-width: 14rem;
+		max-width: 17rem;
 		height: 2.6rem;
-		border: none;
+		padding-left: 0;
+		font-size: 1.6rem;
 	}
 `;
 

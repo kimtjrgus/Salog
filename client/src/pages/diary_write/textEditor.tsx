@@ -56,12 +56,13 @@ const Reactquill = (props: propsType) => {
 				modules={modules}
 				formats={formats}
 				value={props.body || ""}
+				placeholder="오늘의 기록을 남겨보세요.."
 				onChange={(content, delta, source, editor) => {
 					editor.getHTML();
 					props.onChangeBody(content);
-					console.log(content, delta, source);
+					console.log(delta, source);
 				}}
-				style={{ width: "100%", height: "34rem" }}
+				style={{ width: "100%", height: "42rem" }}
 				// readOnly={isDisable}
 			/>
 		</QuillContainer>
@@ -76,6 +77,64 @@ const QuillContainer = styled.div`
 
 	.ql-snow .ql-editor em {
 		font-style: italic;
+	}
+
+	.ql-toolbar.ql-snow {
+		border: none;
+		padding: 0;
+		margin: 2rem 0;
+	}
+
+	.ql-container.ql-snow {
+		border: none;
+		font-size: 1.6rem;
+	}
+
+	.ql-container > .ql-editor.ql-blank::before {
+		left: 0;
+	}
+
+	.ql-snow .ql-picker {
+		font-size: 18px;
+	}
+
+	.ql-toolbar.ql-snow .ql-formats {
+		margin-right: 25px;
+	}
+
+	.ql-snow .ql-picker.ql-header {
+		width: 115px;
+	}
+
+	.ql-editor {
+		padding: 12px 0px;
+	}
+
+	.ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
+		width: 20px;
+	}
+	.ql-snow.ql-toolbar button,
+	.ql-snow .ql-toolbar button {
+		height: 28px;
+		width: 32px;
+	}
+
+	.ql-snow .ql-fill,
+	.ql-snow .ql-stroke.ql-fill {
+		fill: gray;
+	}
+
+	.ql-snow .ql-picker.ql-header .ql-picker-label::before,
+	.ql-snow .ql-picker.ql-header .ql-picker-item::before {
+		color: gray;
+	}
+
+	.ql-snow .ql-stroke {
+		stroke: gray;
+	}
+
+	.ql-tooltip .ql-flip {
+		left: 0;
 	}
 `;
 

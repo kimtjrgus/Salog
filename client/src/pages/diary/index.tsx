@@ -100,7 +100,7 @@ const Diary = () => {
 									<List key={diary.id}>
 										<ListMain>
 											<h4>{diary.title}</h4>
-											<p>{diary.body}</p>
+											<p>{diary.body.replace(/(<([^>]+)>)/gi, "")}</p>
 											<Tags>
 												{diary.diaryTag.map((tag, idx) => {
 													return <Tag key={idx}>{tag}</Tag>;
@@ -402,6 +402,7 @@ const NavStyle = styled(Link)`
 		p {
 			color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
 			font-size: 1.5rem;
+			font-weight: 600;
 		}
 	}
 `;
