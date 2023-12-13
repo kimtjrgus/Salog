@@ -84,7 +84,7 @@ public class MemberService {
 
     // 존재하는 이메일인지 체크
     protected void isExistEmail(String email) {
-        if (memberRepository.findByEmail(email))
+        if (memberRepository.findByEmail(email).isPresent())
             throw new BusinessLogicException(ExceptionCode.EMAIL_EXIST);
     }
 
