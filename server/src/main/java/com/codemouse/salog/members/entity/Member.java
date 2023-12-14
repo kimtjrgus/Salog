@@ -29,6 +29,7 @@ public class Member extends Auditable {
     @Column(nullable = false)
     private boolean homeAlarm;
 
+    @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.MEMBER_ACTIVE;
 
@@ -42,7 +43,7 @@ public class Member extends Auditable {
         MEMBER_QUIT("탈퇴 상태");
 
         @Getter
-        private String status;
+        private final String status;
 
         Status(String status){
             this.status = status;

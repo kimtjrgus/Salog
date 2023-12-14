@@ -37,6 +37,6 @@ public class MemberDto {
         private int memberId;
         private boolean emailAlarm;
         private boolean homeAlarm;
-        private LocalDateTime created_at;
+        private LocalDateTime createdAt;
     }
 }

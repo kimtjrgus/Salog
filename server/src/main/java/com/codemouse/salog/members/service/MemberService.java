@@ -87,7 +87,8 @@ public class MemberService {
 
         isQuit(findMember);
 
-        memberRepository.deleteById(findMember.getMemberId());
+        findMember.setStatus(Member.Status.MEMBER_QUIT);
+        memberRepository.save(findMember);
     }
 
     // 존재하는 회원인지 체크
