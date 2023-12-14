@@ -38,34 +38,40 @@ public class MemberDetailsService implements UserDetailsService {
             setRoles(member.getRoles());
         }
 
+        // 롤 추가
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
-            return null;
+            return customAuthorityUtils.createAuthorities(this.getRoles());
         }
 
+        // 회원 이름 반환
         @Override
         public String getUsername() {
-            return null;
+            return getEmail();
         }
 
+        // 계정 만료 여부 - false 모든 계정 만료
         @Override
         public boolean isAccountNonExpired() {
-            return false;
+            return true;
         }
 
+        // 계정 잠금 여부 - false 모든 계정 잠금
         @Override
         public boolean isAccountNonLocked() {
-            return false;
+            return true;
         }
 
+        // 사용자 인증 정보 만료 여부 - false 모든 계정 만료
         @Override
         public boolean isCredentialsNonExpired() {
-            return false;
+            return true;
         }
 
+        // 계정 활성 상태 여부 - false 모든 계정 비활성
         @Override
         public boolean isEnabled() {
-            return false;
+            return true;
         }
     }
 }

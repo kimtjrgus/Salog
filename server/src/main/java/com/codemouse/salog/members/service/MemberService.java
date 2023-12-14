@@ -1,16 +1,20 @@
 package com.codemouse.salog.members.service;
 
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
+import com.codemouse.salog.auth.utils.CustomAuthorityUtils;
+import com.codemouse.salog.dto.SingleResponseDto;
 import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.members.dto.MemberDto;
 import com.codemouse.salog.members.entity.Member;
+import com.codemouse.salog.members.mapper.MemberMapper;
 import com.codemouse.salog.members.repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -20,19 +24,31 @@ public class MemberService {
     private final JwtTokenizer jwtTokenizer;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CustomAuthorityUtils authorityUtils;
+    private final MemberMapper memberMapper;
 
-    public void createMember(Member member) {
+    public void createMember(MemberDto.Post postDto) {
+        Member member = memberMapper.memberPostDtoToMember(postDto);
+
         isExistEmail(member.getEmail());
+
+        // JWT
+        String encryptedPassword = passwordEncoder.encode(member.getPassword());
+        member.setPassword(encryptedPassword);
+
+        List<String> roles = authorityUtils.createRoles(member.getEmail());
+        member.setRoles(roles);
 
         memberRepository.save(member);
     }
 
-    public void updateMember(String token, Member updateMember) {
+    public void updateMember(String token, MemberDto.Patch patchDto) {
+        Member member = memberMapper.memberPatchDtoToMember(patchDto);
         Member findMember = findVerifiedMember(jwtTokenizer.getMemberId(token));
 
-        Optional.of(updateMember.isEmailAlarm())
+        Optional.of(member.isEmailAlarm())
                 .ifPresent(findMember::setEmailAlarm);
-        Optional.of(updateMember.isHomeAlarm())
+        Optional.of(member.isHomeAlarm())
                 .ifPresent(findMember::setHomeAlarm);
 
         memberRepository.save(findMember);
@@ -58,12 +74,12 @@ public class MemberService {
         }
     }
 
-    public Member findMember(String token) {
+    public MemberDto.Response findMember(String token) {
         Member findMember = findVerifiedMember(jwtTokenizer.getMemberId(token));
 
         isQuit(findMember);
 
-        return findMember;
+        return memberMapper.memberToMemberResponseDto(findMember);
     }
 
     public void deleteMember(String token) {

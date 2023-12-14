@@ -21,19 +21,18 @@ import javax.validation.Valid;
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
-    private final MemberMapper memberMapper;
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
     public void SignupMember(@Valid @RequestBody MemberDto.Post requestBody) {
-        memberService.createMember(memberMapper.memberPostDtoToMember(requestBody));
+        memberService.createMember(requestBody);
     }
 
     @PatchMapping("/update")
     @ResponseStatus(HttpStatus.OK)
     public void updateMember(@RequestHeader(name = "Authorization") String token,
                              @Valid @RequestBody MemberDto.Patch requestBody) {
-        memberService.updateMember(token, memberMapper.memberPatchDtoToMember(requestBody));
+        memberService.updateMember(token, requestBody);
     }
 
     @PatchMapping("/changepassword")
@@ -45,11 +44,10 @@ public class MemberController {
 
     @GetMapping("/get")
     public ResponseEntity getMember(@RequestHeader(name = "Authorization") String token) {
-        Member member = memberService.findMember(token);
+        MemberDto.Response response = memberService.findMember(token);
 
         return new ResponseEntity<>(
-                new SingleResponseDto<>(memberMapper.memberToMemberResponseDto(member))
-                , HttpStatus.OK);
+                new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
     @DeleteMapping("/leaveid")
