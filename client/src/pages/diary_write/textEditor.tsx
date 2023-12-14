@@ -27,7 +27,9 @@ const Reactquill = (props: propsType) => {
 				[{ align: [] }, { color: [] }],
 				["clean"],
 			],
+			//   handlers: { image: imageHandler },
 			// ImageResize: { modules: ["Resize"] },
+			// imageDrop: true,
 		}),
 		[],
 	);

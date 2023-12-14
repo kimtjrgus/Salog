@@ -32,6 +32,10 @@ const Diary = () => {
 		navigate("/diary/post");
 	};
 
+	const onClickList = (id: number) => {
+		navigate(`/diary/:${id}`);
+	};
+
 	const categoryOrganize = () => {
 		const map = new Map();
 		const arr = [];
@@ -97,7 +101,12 @@ const Diary = () => {
 						<ListContainer>
 							{diaries.map((diary) => {
 								return (
-									<List key={diary.id}>
+									<List
+										key={diary.id}
+										onClick={() => {
+											onClickList(diary.id);
+										}}
+									>
 										<ListMain>
 											<h4>{diary.title}</h4>
 											<p>{diary.body.replace(/(<([^>]+)>)/gi, "")}</p>
@@ -254,6 +263,7 @@ const List = styled.li`
 	margin-bottom: 1rem;
 	border-radius: 4px;
 	box-shadow: 1px 1px 1px rgb(0, 0, 0, 25%);
+	cursor: pointer;
 `;
 
 const ListMain = styled.div`
