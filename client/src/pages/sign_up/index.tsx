@@ -25,7 +25,7 @@ interface errorType {
 	authNum: string;
 }
 
-interface confirmType {
+export interface confirmType {
 	isOpen: boolean;
 	minutes: number;
 	seconds: number;
@@ -311,9 +311,10 @@ const SignUpContainer = styled.div`
 	}
 `;
 
-const Title = styled.p`
+export const Title = styled.p`
 	color: ${(props) => props.theme.COLORS.GRAY_500};
 	font-size: 1.4rem;
+	margin-bottom: 1rem;
 	margin-top: 2rem;
 `;
 
@@ -329,16 +330,18 @@ const SmallTitle = styled(Title)`
 	}
 `;
 
-const InputContainer = styled.div`
+export const InputContainer = styled.div`
 	display: flex;
 	justify-content: space-between;
+	gap: 1rem;
+	align-items: flex-start;
 	position: relative;
 
 	span {
 		font-size: 1.2rem;
 		color: ${(props) => props.theme.COLORS.LIGHT_RED};
 		position: absolute;
-		top: 53%;
+		top: 36%;
 		right: 10.5rem;
 	}
 `;
@@ -351,7 +354,6 @@ const InputW80 = styled(Input)`
 const CerBtnBlue = styled.button`
 	width: 15%;
 	height: 3.8rem;
-	margin-top: 1.5rem;
 	border-radius: 6px;
 	background-color: ${(props) => props.theme.COLORS.SKY};
 	color: #6385ff;

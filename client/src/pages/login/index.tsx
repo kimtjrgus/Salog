@@ -77,7 +77,13 @@ const Login = () => {
 				</LoginDiv>
 				<RedirectContainer>
 					<p>비밀번호를 잊으셨나요?</p>
-					<span>비밀번호 찾기</span>
+					<span
+						onClick={() => {
+							navigate("/findPassword");
+						}}
+					>
+						비밀번호 찾기
+					</span>
 				</RedirectContainer>
 				<RedirectContainer>
 					<p>아직 회원이 아니신가요?</p>
@@ -147,7 +153,7 @@ export const PasswordLabel = styled.label`
 
 	button {
 		position: absolute;
-		top: 47%;
+		top: 28%;
 		right: 2rem;
 
 		svg {
