@@ -56,11 +56,15 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                 // TODO: 2023-12-04 엔드포인트 수정 필요, 추후 구현 엔드포인트 추가시 수정 필요 
                 .authorizeHttpRequests(authorize -> authorize
                         .antMatchers(HttpMethod.POST, "/members/signup").permitAll()
+                        .antMatchers(HttpMethod.POST, "/members/signup/sendmail").permitAll()
                         .antMatchers(HttpMethod.POST, "/members/login").permitAll()
+                        .antMatchers(HttpMethod.POST, "/members/emailcheck").permitAll()
+                        .antMatchers(HttpMethod.POST, "/members/findPassword").permitAll()
+                        .antMatchers(HttpMethod.POST, "/members/findPassword/sendmail").permitAll()
                         .antMatchers(HttpMethod.GET, "/members/get").hasRole("USER")
                         .antMatchers(HttpMethod.DELETE, "/members/leaveid").hasRole("USER")
                         .antMatchers(HttpMethod.PATCH, "/members/update").hasRole("USER")
-                        .antMatchers(HttpMethod.PATCH, "/members/changepassword").hasRole("USER")
+                        .antMatchers(HttpMethod.PATCH, "/members/changePassword").hasRole("USER")
                 );
         return http.build();
     }
