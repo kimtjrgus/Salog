@@ -30,11 +30,11 @@ jobs:
           distribution: 'temurin'
 
       # Github secrets로부터 데이터를 받아서, 워크 플로우에 파일을 생성
-      - name: Make application.properties
+      - name: Make application.yml
         run: |
           cd ./server/src/main/resources
-          touch application.properties
-          echo "${{ secrets.PROPERTIES }}" > application.properties
+          touch application.yml
+          echo "${{ secrets.YML }}" > application.yml
         shell: bash
 
       - name: Build with Gradle
