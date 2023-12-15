@@ -53,5 +53,5 @@ jobs:
           script: |
             docker rm -f $(docker ps -aq)
             docker pull ${{ secrets.DOCKER_REPO }}/salog
-            docker run -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} -e EMAIL=${{ secrets.EMAIL }} -e EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} -d -p 80:80 ${{ secrets.DOCKER_REPO }}/salog
+            run: docker build --build-arg JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} --build-arg EMAIL=${{ secrets.EMAIL }} --build-arg EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} -f ./server/Dockerfile -t ${{ secrets.DOCKER_REPO }}/salog .
             docker image prune -f
