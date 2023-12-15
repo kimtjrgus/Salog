@@ -29,14 +29,6 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      # Github secrets로부터 데이터를 받아서, 워크 플로우에 파일을 생성
-      - name: Make application.yml
-        run: |
-          cd ./server/src/main/resources
-          touch application.yml
-          echo "${{ secrets.YML }}" > application.yml
-        shell: bash
-
       - name: Build with Gradle
         run: |
           cd ./server/
