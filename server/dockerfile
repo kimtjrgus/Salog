@@ -2,16 +2,16 @@
 FROM gradle:7.2.0-jdk11 AS build
 COPY --chown=gradle:gradle . /home/gradle/
 WORKDIR /home/gradle/server
-RUN gradle build --no-daemon --no-watch-fs
-
-# Package stage
-FROM openjdk:11-jre-slim
 ARG JWT_SECRET_KEY
 ARG EMAIL
 ARG EMAIL_PASSWORD
+RUN gradle build -Dspring.profiles.active=default --no-daemon --no-watch-fs
+
+# Package stage
+FROM openjdk:11-jre-slim
 ENV JWT_SECRET_KEY=$JWT_SECRET_KEY
 ENV EMAIL=$EMAIL
 ENV EMAIL_PASSWORD=$EMAIL_PASSWORD
 COPY --from=build /home/gradle/server/build/libs/salog-0.0.1-SNAPSHOT.jar /app/salog.jar
 EXPOSE 80
-ENTRYPOINT ["java","-jar","/app/salog.jar"]
+ENTRYPOINT ["java","-Dspring.profiles.active=default","-jar","/app/salog.jar"]
