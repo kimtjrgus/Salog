@@ -5,7 +5,7 @@ import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
 import { ReactComponent as Logo } from "../../assets/Slogo.svg";
 import { Input, PasswordLabel, SubmitBtn } from "../login";
 import { checkEmail, checkPassword } from "src/utils/validCheck";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { debounce } from "src/utils/timeFunc";
 import axios from "axios";
@@ -31,6 +31,11 @@ export interface confirmType {
 	seconds: number;
 }
 
+interface alarmType {
+	webAlarm: boolean;
+	emailAlarm: boolean;
+}
+
 const SignUp = () => {
 	const [values, setValues] = useState<inputType>({
 		email: "",
@@ -44,6 +49,12 @@ const SignUp = () => {
 		passwordCheck: "",
 		authNum: "",
 	});
+	const [alarm, setAlarm] = useState<alarmType>({
+		webAlarm: false,
+		emailAlarm: false,
+	});
+	console.log(alarm);
+
 	// 입력값 검사 통과 여부(email은 유효성, 중복 검사 및 인증번호까지 포함)
 	const [isAuth, setIsAuth] = useState<boolean>(false);
 
@@ -150,11 +161,18 @@ const SignUp = () => {
 		[],
 	);
 
+	const onChangeCheckBox = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, checked } = e.target;
+		setAlarm({ ...alarm, [name]: checked });
+	};
+
 	const onClickSubmitBtn = () => {
 		axios
 			.post("http://localhost:8000/register", {
 				email: values.email,
 				password: values.password,
+				webAlarm: alarm.webAlarm,
+				emailAlarm: alarm.emailAlarm,
 			})
 			.then((res) => {
 				setCookie("accessToken", res.data.accessToken, { path: "/" });
@@ -272,6 +290,16 @@ const SignUp = () => {
 					onClick={checkPwdCheckInput}
 				/>
 				<WarningTitle>{errorMsg.passwordCheck}</WarningTitle>
+				<Radio>
+					<input type="checkbox" name="webAlarm" onChange={onChangeCheckBox} />
+					<span>웹 알림 수신 동의 (선택)</span>
+					<input
+						type="checkbox"
+						name="emailAlarm"
+						onChange={onChangeCheckBox}
+					/>
+					<span>이메일 알림 수신 동의 (선택)</span>
+				</Radio>
 				<SmallTitle>
 					이미 계정이 있으신가요?{" "}
 					<span
@@ -373,6 +401,35 @@ const WarningTitle = styled.p`
 	font-size: 1.2rem;
 	margin-top: 0.5rem;
 	color: ${(props) => props.theme.COLORS.LIGHT_RED};
+`;
+
+const Radio = styled.div`
+	display: flex;
+	margin-top: 2rem;
+
+	span {
+		font-size: 1.3rem;
+		align-self: center;
+		margin-right: 2rem;
+		color: ${(props) => props.theme.COLORS.GRAY_500};
+		font-weight: 500;
+	}
+
+	input {
+		width: 1.3rem;
+		height: 1.3rem;
+		border-radius: 50%;
+		border: 1px solid #999;
+		appearance: none;
+		cursor: pointer;
+		transition: background 0.2s;
+		margin-right: 0.5rem;
+	}
+
+	input:checked {
+		background: ${(props) => props.theme.COLORS.LIGHT_BLUE};
+		border: none;
+	}
 `;
 
 export default SignUp;
