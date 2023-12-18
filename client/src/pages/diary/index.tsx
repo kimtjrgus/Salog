@@ -10,6 +10,7 @@ import Test from "../../assets/Test.jpeg";
 import dateAsKor from "src/utils/dateAsKor";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+// import { useScroll } from "src/hooks/useScroll";
 
 interface diaryType {
 	id: number;
@@ -22,6 +23,7 @@ interface diaryType {
 
 const Diary = () => {
 	const [diaries, setDiaries] = useState<diaryType[]>([]);
+	// const { scrollY, containerRef } = useScroll();
 
 	const path = useLocation().pathname;
 	const search = useLocation().search;
@@ -33,7 +35,7 @@ const Diary = () => {
 	};
 
 	const onClickList = (id: number) => {
-		navigate(`/diary/:${id}`);
+		navigate(`/diary/${id}`);
 	};
 
 	const categoryOrganize = () => {
@@ -176,9 +178,8 @@ const Diary = () => {
 
 const Container = styled.div`
 	display: flex;
-	height: 90vh;
-	justify-content: center;
-	overflow: scroll;
+	height: 100%;
+	overflow-y: scroll;
 
 	&::-webkit-scrollbar {
 		display: none;
@@ -187,7 +188,7 @@ const Container = styled.div`
 
 const DiaryContainer = styled.div`
 	margin-top: 3rem;
-	width: 65%;
+	width: 70%;
 
 	hr {
 		width: 100%;
@@ -338,7 +339,7 @@ const NotDataContainer = styled.div`
 const SearchContainer = styled.div`
 	border: 1px solid ${(props) => props.theme.COLORS.GRAY_400};
 	border-radius: 4px;
-	margin-top: 12.4rem;
+	margin-top: 12.8rem;
 	padding: 2rem;
 	display: flex;
 	flex-direction: column;

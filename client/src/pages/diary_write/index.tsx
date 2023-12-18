@@ -111,6 +111,7 @@ const DiaryWrite = () => {
 						</div>
 					</div>
 					<Input
+						className="title_input"
 						placeholder="제목을 입력하세요."
 						type="text"
 						name="title"
@@ -200,6 +201,11 @@ const WriteContainer = styled.div`
 				margin-right: 1.5rem;
 			}
 		}
+	}
+
+	.title_input {
+		font-weight: 600;
+		font-size: 2.4rem;
 	}
 
 	.contour {

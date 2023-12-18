@@ -71,7 +71,7 @@ const Reactquill = (props: propsType) => {
 	);
 };
 
-const QuillContainer = styled.div`
+export const QuillContainer = styled.div`
 	margin-bottom: 5rem;
 	.ql-snow .ql-editor strong {
 		font-weight: Bold;
@@ -89,7 +89,7 @@ const QuillContainer = styled.div`
 
 	.ql-container.ql-snow {
 		border: none;
-		font-size: 1.6rem;
+		font-size: 1.4rem;
 	}
 
 	.ql-container > .ql-editor.ql-blank::before {
