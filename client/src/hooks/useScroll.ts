@@ -1,20 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export function useScroll() {
 	const [scrollY, setScrollY] = useState<number>(0);
+	const containerRef = useRef<HTMLDivElement>(null);
 
 	const listener = () => {
-		setScrollY(window.pageYOffset);
+		if (containerRef.current) {
+			const scrollTop = containerRef.current.scrollTop;
+			setScrollY(scrollTop);
+		}
 	};
 
 	useEffect(() => {
-		window.addEventListener("scroll", listener);
+		if (containerRef.current) {
+			containerRef.current.addEventListener("scroll", listener);
+		}
 		return () => {
-			window.removeEventListener("scroll", listener);
+			if (containerRef.current) {
+				containerRef.current.removeEventListener("scroll", listener);
+			}
 		};
-	});
-
+	}, []);
 	return {
 		scrollY,
+		containerRef,
 	};
 }
