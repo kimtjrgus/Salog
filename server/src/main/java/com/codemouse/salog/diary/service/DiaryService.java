@@ -1,6 +1,7 @@
 package com.codemouse.salog.diary.service;
 
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
+import com.codemouse.salog.auth.utils.TokenBlackListService;
 import com.codemouse.salog.diary.dto.DiaryDto;
 import com.codemouse.salog.diary.entity.Diary;
 import com.codemouse.salog.diary.mapper.DiaryMapper;
@@ -38,11 +39,14 @@ public class DiaryService {
     private final JwtTokenizer jwtTokenizer;
     private final MemberService memberService;
     private final DiaryTagLinkRepository diaryTagLinkRepository;
+    private final TokenBlackListService tokenBlackListService;
 
 
     // post
     @Transactional
     public void postDiary (String token, DiaryDto.Post diaryDto){
+        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
+
         Diary diary = mapper.DiaryPostDtoToDiary(diaryDto);
         Diary savedDiary = repository.save(diary);
 
@@ -82,6 +86,8 @@ public class DiaryService {
     // patch
     @Transactional
     public void patchDiary (String token, Long diaryId, DiaryDto.Patch diaryDto){
+        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
+
         long memberId = jwtTokenizer.getMemberId(token);
         Diary findDiary = findVerifiedDiary(diaryId);
 
@@ -125,7 +131,9 @@ public class DiaryService {
 
     // get 다이어리 상세조회
     public DiaryDto.Response findDiary (String token, Long diaryId){
+        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
+
         Diary diary = findVerifiedDiary(diaryId);
 
         verifiedRequest(diary.getMember().getMemberId(), memberId);
@@ -145,6 +153,7 @@ public class DiaryService {
     @Transactional
     public MultiResponseDto findAllDiaries (String token, int page, int size,
                                             String diaryTag, Integer month, String date){
+        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
 
         Page<Diary> diaryPage;
@@ -201,6 +210,7 @@ public class DiaryService {
     //title List get
     @Transactional
     public MultiResponseDto findTitleDiaries (String token, int page, int size, String title){
+        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
 
         // page 정보 생성
@@ -224,11 +234,10 @@ public class DiaryService {
         return new MultiResponseDto<>(diaryDtoList, diaryPage);
     }
 
-
-
     // delete
     @Transactional
     public void deleteDiary (String token, Long diaryId){
+        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
         Diary diary = findVerifiedDiary(diaryId); // Diary가 존재하는지 확인 후 삭제하기 위함
 
