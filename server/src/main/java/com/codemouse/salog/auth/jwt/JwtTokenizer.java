@@ -1,15 +1,16 @@
 package com.codemouse.salog.auth.jwt;
 
+import com.codemouse.salog.auth.utils.CustomAuthorityUtils;
 import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
+import com.codemouse.salog.members.entity.Member;
+import com.codemouse.salog.members.repository.MemberRepository;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.nio.charset.StandardCharsets;
@@ -26,6 +27,9 @@ public class JwtTokenizer {
 
     @Value("${jwt.refresh-token-expiration-minutes}")
     private int refreshTokenExpirationMinutes;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     // 시크릿키를 UTF-8 형식의 바이트로 변환, Base64 형식으로 인코딩
     public String encodeBase64SecretKey(String secretKey) {
@@ -119,9 +123,35 @@ public class JwtTokenizer {
                     .parseClaimsJws(jws)
                     .getBody();
         }   catch (ExpiredJwtException e) {
-            throw new BusinessLogicException(ExceptionCode.MEMBER_UNAUTHORIZED);
+            throw new BusinessLogicException(ExceptionCode.TOKEN_EXPIRED);
         }
         System.out.println(claims);
         return claims;
+    }
+
+    public String refreshToken(String refreshToken) {
+        // 리프레쉬 토큰 검증
+        Claims claims;
+        try {
+            claims = this.getClaims(refreshToken, this.encodeBase64SecretKey(this.secretKey)).getBody();
+        } catch (ExpiredJwtException e) {
+            throw new BusinessLogicException(ExceptionCode.TOKEN_EXPIRED);
+        } catch (JwtException e) {
+            throw new BusinessLogicException(ExceptionCode.TOKEN_INVALID);
+        }
+
+        // 사용자 정보 조회
+        String email = claims.getSubject();
+        Optional<Member> member = memberRepository.findByEmail(email);
+
+        // 조회된 사용자 정보를 바탕으로 클레임 생성
+        Map<String, Object> newClaims = new HashMap<>();
+        newClaims.put("roles", member.get().getRoles());
+        newClaims.put("memberId", member.get().getMemberId());
+        newClaims.put("username", member.get().getEmail());
+
+        // 새로운 액세스 토큰 발급
+        Date expiration = this.getTokenExpiration(this.accessTokenExpirationMinutes);
+        return this.generateAccessToken(newClaims, email, expiration, this.encodeBase64SecretKey(this.secretKey));
     }
 }
