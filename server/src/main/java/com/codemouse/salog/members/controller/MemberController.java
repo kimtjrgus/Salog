@@ -46,7 +46,7 @@ public class MemberController {
     }
 
     // 비번찾기
-    @PostMapping("/members/findPassword")
+    @PostMapping("/findPassword")
     @ResponseStatus(HttpStatus.OK)
     public void findPassword(@RequestBody EmailRequestDto emailRequestDto) {
         memberService.findPassword(emailRequestDto.getEmail(), emailRequestDto.getNewPassword());
@@ -67,7 +67,7 @@ public class MemberController {
     }
 
     // 이메일 중복 체크
-    @PostMapping("/members/emailcheck")
+    @PostMapping("/emailcheck")
     @ResponseStatus(HttpStatus.OK)
     public void emailCheckMember(@Valid @RequestBody EmailRequestDto requestBody) {
         memberService.isExistEmail(requestBody.getEmail());
