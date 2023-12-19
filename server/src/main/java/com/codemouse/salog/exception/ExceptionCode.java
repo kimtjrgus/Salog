@@ -16,6 +16,8 @@ public enum ExceptionCode {
     EMAIL_EXIST(409, "EMAIL_EXIST 이미 존재하는 이메일"),
     PASSWORD_IDENTICAL(409, "PASSWORD_IDENTICAL 이전 비밀번호와 동일함"),
     LOGOUT(400, "LOGOUT 재로그인 필요"),
+    TOKEN_EXPIRED(400, "TOKEN_EXPIRED 토큰 만료"),
+    TOKEN_INVALID(400, "TOKEN_INVALID 유효하지 않은 토큰"),
 
     // 일기
     MEMBER_MISMATCHED(400, "MEMBER_MISMATCHED MemberId가 일치하지 않음"),
