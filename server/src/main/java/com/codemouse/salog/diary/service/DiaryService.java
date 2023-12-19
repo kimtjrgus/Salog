@@ -14,6 +14,7 @@ import com.codemouse.salog.members.service.MemberService;
 import com.codemouse.salog.tags.dto.TagDto;
 import com.codemouse.salog.tags.entity.DiaryTag;
 import com.codemouse.salog.tags.entity.DiaryTagLink;
+import com.codemouse.salog.tags.mapper.TagMapper;
 import com.codemouse.salog.tags.repository.DiaryTagLinkRepository;
 import com.codemouse.salog.tags.service.TagService;
 import lombok.AllArgsConstructor;
@@ -36,10 +37,11 @@ public class DiaryService {
     private final DiaryRepository repository;
     private final DiaryMapper mapper;
     private final TagService tagService;
-    private final JwtTokenizer jwtTokenizer;
-    private final MemberService memberService;
+    private final TagMapper tagMapper;
     private final DiaryTagLinkRepository diaryTagLinkRepository;
+    private final JwtTokenizer jwtTokenizer;
     private final TokenBlackListService tokenBlackListService;
+    private final MemberService memberService;
 
 
     // post
@@ -57,6 +59,10 @@ public class DiaryService {
         // 태그 생성 후 지정
         List<DiaryTag> createdDiaryTags = new ArrayList<>();
         for(String tagName : diaryDto.getTagList()) {
+            if(tagName == null || tagName.length() == 0) {
+                continue;
+            }
+
             // 기존 태그 검색
             DiaryTag existingDiaryTag = tagService.findDiaryTagByMemberIdAndTagName(token, tagName);
 
@@ -141,8 +147,9 @@ public class DiaryService {
         DiaryDto.Response diaryResponse = mapper.DiaryToDiaryResponseDto(diary);
 
         // 태그 리스트 추가
-        List<String> tagList = diary.getDiaryTagLinks().stream()
-                .map(link -> link.getDiaryTag().getTagName())
+        List<TagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
+                .map(DiaryTagLink::getDiaryTag)
+                .map(tagMapper::TagToDiaryTagResponseDto)
                 .collect(Collectors.toList());
         diaryResponse.setTagList(tagList);
 
@@ -195,8 +202,9 @@ public class DiaryService {
                         DiaryDto.Response response = mapper.DiaryToDiaryResponseDto(diary);
 
                         // 태그 리스트 추가
-                        List<String> tagList = diary.getDiaryTagLinks().stream()
-                                .map(link -> link.getDiaryTag().getTagName())
+                        List<TagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
+                                .map(DiaryTagLink::getDiaryTag)
+                                .map(tagMapper::TagToDiaryTagResponseDto)
                                 .collect(Collectors.toList());
                         response.setTagList(tagList);
 
@@ -222,8 +230,9 @@ public class DiaryService {
                     DiaryDto.Response response = mapper.DiaryToDiaryResponseDto(diary);
 
                     // 태그 리스트 추가
-                    List<String> tagList = diary.getDiaryTagLinks().stream()
-                            .map(link -> link.getDiaryTag().getTagName())
+                    List<TagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
+                            .map(DiaryTagLink::getDiaryTag)
+                            .map(tagMapper::TagToDiaryTagResponseDto)
                             .collect(Collectors.toList());
                     response.setTagList(tagList);
 

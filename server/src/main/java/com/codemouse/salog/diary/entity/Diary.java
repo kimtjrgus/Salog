@@ -28,7 +28,7 @@ public class Diary extends Auditable {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column
     private String body;
 
     @Column
