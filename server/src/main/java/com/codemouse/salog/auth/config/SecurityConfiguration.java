@@ -58,6 +58,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                         .antMatchers(HttpMethod.POST, "/members/signup").permitAll()
                         .antMatchers(HttpMethod.POST, "/members/signup/sendmail").permitAll()
                         .antMatchers(HttpMethod.POST, "/members/login").permitAll()
+                        .antMatchers(HttpMethod.POST, "members/logout").hasRole("USER")
                         .antMatchers(HttpMethod.POST, "/members/emailcheck").permitAll()
                         .antMatchers(HttpMethod.POST, "/members/findPassword").permitAll()
                         .antMatchers(HttpMethod.POST, "/members/findPassword/sendmail").permitAll()

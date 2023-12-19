@@ -15,6 +15,7 @@ public enum ExceptionCode {
     MEMBER_ALREADY_DELETED(409, "MEMBER_ALREADY_DELETED 이미 탈퇴한 회원"),
     EMAIL_EXIST(409, "EMAIL_EXIST 이미 존재하는 이메일"),
     PASSWORD_IDENTICAL(409, "PASSWORD_IDENTICAL 이전 비밀번호와 동일함"),
+    LOGOUT(400, "LOGOUT 재로그인 필요"),
 
     // 일기
     MEMBER_MISMATCHED(400, "MEMBER_MISMATCHED MemberId가 일치하지 않음"),
