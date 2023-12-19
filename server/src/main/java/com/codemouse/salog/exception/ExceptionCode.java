@@ -13,7 +13,13 @@ public enum ExceptionCode {
     ID_MISMATCHED(400,"ID_MISMATCHED 아이디가 일치하지 않음"),
     MEMBER_ALREADY_DELETED(409, "MEMBER_ALREADY_DELETED 이미 탈퇴한 회원"),
     EMAIL_EXIST(409, "EMAIL_EXIST 이미 존재하는 이메일"),
-    PASSWORD_IDENTICAL(409, "PASSWORD_IDENTICAL 이전 비밀번호와 동일함");
+    PASSWORD_IDENTICAL(409, "PASSWORD_IDENTICAL 이전 비밀번호와 동일함"),
+
+    // 석현 작성
+    MEMBER_MISMATCHED(400, "MEMBER_MISMATCHED MemberId가 일치하지 않음"),
+    DIARY_NOT_FOUND(404, "DIARY_NOT_FOUND 존재하지 않는 일기"),
+    DIARY_MISMATCHED(400, "DIARY_MISMATCHED DiaryId가 일치하지 않음"),
+    TAG_MISMATCHED(400, "TAG_MISMATCHED TagId가 일치하지 않음");
 
     private int status;
 
