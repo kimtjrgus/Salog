@@ -1,6 +1,7 @@
 package com.codemouse.salog.tags.service;
 
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
+import com.codemouse.salog.auth.utils.TokenBlackListService;
 import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.members.entity.Member;
@@ -13,6 +14,7 @@ import com.codemouse.salog.tags.repository.DiaryTagRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +26,11 @@ public class TagService {
     private final TagMapper mapper;
     private final JwtTokenizer jwtTokenizer;
     private final MemberService memberService;
+    private final TokenBlackListService tokenBlackListService;
 
     // Diary Post
     public DiaryTag postDiaryTag (String token, TagDto.DiaryPost tagDto){
+        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
         DiaryTag diaryTag = mapper.DiaryTagPostDtoToTag(tagDto);
 
@@ -37,6 +41,7 @@ public class TagService {
 
     // Diary Delete
     public void deleteDiaryTag(String token, Long diaryTagId) {
+        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
         DiaryTag diaryTag = findVerifiedDiaryTag(diaryTagId);
 
@@ -45,6 +50,7 @@ public class TagService {
 
     // All DiaryTagList
     public List<TagDto.DiaryResponse> getAllDiaryTagList(String token){
+        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
         List<DiaryTag> diaryTags = diaryTagRepository.findAllByMemberMemberId(memberId);
 

@@ -1,5 +1,6 @@
 package com.codemouse.salog.members.controller;
 
+import com.codemouse.salog.auth.utils.TokenBlackListService;
 import com.codemouse.salog.dto.SingleResponseDto;
 import com.codemouse.salog.helper.EmailSenderResponse;
 import com.codemouse.salog.members.dto.EmailRequestDto;
@@ -9,6 +10,7 @@ import com.codemouse.salog.members.mapper.MemberMapper;
 import com.codemouse.salog.members.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +26,7 @@ import javax.validation.Valid;
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
+    private final TokenBlackListService tokenBlackListService;
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -35,6 +38,7 @@ public class MemberController {
     @ResponseStatus(HttpStatus.OK)
     public void updateMember(@RequestHeader(name = "Authorization") String token,
                              @Valid @RequestBody MemberDto.Patch requestBody) {
+        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         memberService.updateMember(token, requestBody);
     }
 
@@ -42,11 +46,12 @@ public class MemberController {
     @ResponseStatus(HttpStatus.OK)
     public void changePassword(@RequestHeader(name = "Authorization") String token,
                                @Valid @RequestBody MemberDto.PatchPassword requestBody) {
+        tokenBlackListService.isBlackListed(token);
         memberService.updatePassword(token, requestBody);
     }
 
     // 비번찾기
-    @PostMapping("/members/findPassword")
+    @PostMapping("/findPassword")
     @ResponseStatus(HttpStatus.OK)
     public void findPassword(@RequestBody EmailRequestDto emailRequestDto) {
         memberService.findPassword(emailRequestDto.getEmail(), emailRequestDto.getNewPassword());
@@ -55,7 +60,7 @@ public class MemberController {
     @GetMapping("/get")
     public ResponseEntity getMember(@RequestHeader(name = "Authorization") String token) {
         MemberDto.Response response = memberService.findMember(token);
-
+        tokenBlackListService.isBlackListed(token);
         return new ResponseEntity<>(
                 new SingleResponseDto<>(response), HttpStatus.OK);
     }
@@ -63,11 +68,12 @@ public class MemberController {
     @DeleteMapping("/leaveid")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteMember(@RequestHeader(name = "Authorization") String token) {
+        tokenBlackListService.isBlackListed(token);
         memberService.deleteMember(token);
     }
 
     // 이메일 중복 체크
-    @PostMapping("/members/emailcheck")
+    @PostMapping("/emailcheck")
     @ResponseStatus(HttpStatus.OK)
     public void emailCheckMember(@Valid @RequestBody EmailRequestDto requestBody) {
         memberService.isExistEmail(requestBody.getEmail());
@@ -119,5 +125,12 @@ public class MemberController {
 
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
+    }
+
+    // 로그아웃
+    @PostMapping("/logout")
+    public String logout(@RequestHeader (name="Authorization") String token) {
+        tokenBlackListService.addToBlackList(token);
+        return "redirect:/";
     }
 }
