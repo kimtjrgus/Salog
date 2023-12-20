@@ -1,6 +1,5 @@
 package com.codemouse.salog.auth.jwt;
 
-import com.codemouse.salog.auth.utils.CustomAuthorityUtils;
 import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.members.entity.Member;
@@ -129,7 +128,7 @@ public class JwtTokenizer {
         return claims;
     }
 
-    public String refreshToken(String refreshToken) {
+    public Map<String, String> tokenReissue(String refreshToken) {
         // 리프레쉬 토큰 검증
         Claims claims;
         try {
@@ -152,6 +151,16 @@ public class JwtTokenizer {
 
         // 새로운 액세스 토큰 발급
         Date expiration = this.getTokenExpiration(this.accessTokenExpirationMinutes);
-        return this.generateAccessToken(newClaims, email, expiration, this.encodeBase64SecretKey(this.secretKey));
+        String newAccessToken = this.generateAccessToken(newClaims, email, expiration, this.encodeBase64SecretKey(this.secretKey));
+
+        // 새로운 리프레쉬 토큰 발급
+        expiration = this.getTokenExpiration(this.refreshTokenExpirationMinutes);
+        String newRefreshToken = this.generateRefreshToken(email,expiration, this.encodeBase64SecretKey(this.secretKey));
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("accessToken", "Bearer " + newAccessToken);
+        tokens.put("refreshToken", newRefreshToken);
+
+        return tokens;
     }
 }
