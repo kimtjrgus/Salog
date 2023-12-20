@@ -34,8 +34,8 @@ import java.util.stream.Collectors;
 @Transactional
 @AllArgsConstructor
 public class DiaryService {
-    private final DiaryRepository repository;
-    private final DiaryMapper mapper;
+    private final DiaryRepository diaryRepository;
+    private final DiaryMapper diaryMapper;
     private final TagService tagService;
     private final TagMapper tagMapper;
     private final DiaryTagLinkRepository diaryTagLinkRepository;
@@ -49,8 +49,8 @@ public class DiaryService {
     public void postDiary (String token, DiaryDto.Post diaryDto){
         tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
 
-        Diary diary = mapper.DiaryPostDtoToDiary(diaryDto);
-        Diary savedDiary = repository.save(diary);
+        Diary diary = diaryMapper.DiaryPostDtoToDiary(diaryDto);
+        Diary savedDiary = diaryRepository.save(diary);
 
         // 다이어리에 해당하는 멤버 지정
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
@@ -86,7 +86,7 @@ public class DiaryService {
             savedDiary.getDiaryTagLinks().add(link);
         }
 
-        repository.save(savedDiary);
+        diaryRepository.save(savedDiary);
     }
 
     // patch
@@ -132,7 +132,7 @@ public class DiaryService {
             tagService.deleteUnusedTagsByMemberId(token);
         }
 
-        repository.save(findDiary);
+        diaryRepository.save(findDiary);
     }
 
     // get 다이어리 상세조회
@@ -144,7 +144,7 @@ public class DiaryService {
 
         verifiedRequest(diary.getMember().getMemberId(), memberId);
 
-        DiaryDto.Response diaryResponse = mapper.DiaryToDiaryResponseDto(diary);
+        DiaryDto.Response diaryResponse = diaryMapper.DiaryToDiaryResponseDto(diary);
 
         // 태그 리스트 추가
         List<TagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
@@ -158,7 +158,7 @@ public class DiaryService {
 
     //all List get
     @Transactional
-    public MultiResponseDto findAllDiaries (String token, int page, int size,
+    public MultiResponseDto<DiaryDto.Response> findAllDiaries (String token, int page, int size,
                                             String diaryTag, Integer month, String date){
         tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
@@ -172,25 +172,25 @@ public class DiaryService {
             List<Long> diaryIds = diaryTagLinks.stream()
                     .map(DiaryTagLink::getDiary)
                     .map(Diary::getDiaryId)
-                    .collect(Collectors.toList());;
+                    .collect(Collectors.toList());
 
-            diaryPage = repository.findAllByDiaryIdIn(diaryIds,
+            diaryPage = diaryRepository.findAllByDiaryIdIn(diaryIds,
                     PageRequest.of(page - 1, size, Sort.by("date").descending()));
         }
         // 2. Only month에 대한 쿼리
         else if (month != null && diaryTag == null && date == null) {
-            diaryPage = repository.findAllByMonth(memberId, month,
+            diaryPage = diaryRepository.findAllByMonth(memberId, month,
                     PageRequest.of(page - 1, size, Sort.by("date").descending()));
         }
         // 3. Only date에 대한 쿼리
         else if (date != null && diaryTag == null && month == null) {
-            diaryPage = repository.findAllByMemberMemberIdAndDate(memberId, LocalDate.parse(date),
+            diaryPage = diaryRepository.findAllByMemberMemberIdAndDate(memberId, LocalDate.parse(date),
                     PageRequest.of(page - 1, size, Sort.by("date").descending()));
         }
 
         // 4. 모두 null인 경우 전체 리스트 조회
-        else if(diaryTag == null && month == null && date == null){
-            diaryPage = repository.findAllByMemberMemberId(memberId,
+        else if(diaryTag == null && date == null){
+            diaryPage = diaryRepository.findAllByMemberMemberId(memberId,
                     PageRequest.of(page - 1, size, Sort.by("date").descending()));
         }
         else {
@@ -199,7 +199,7 @@ public class DiaryService {
 
         List<DiaryDto.Response> diaryDtoList = diaryPage.getContent().stream()
                     .map(diary -> {
-                        DiaryDto.Response response = mapper.DiaryToDiaryResponseDto(diary);
+                        DiaryDto.Response response = diaryMapper.DiaryToDiaryResponseDto(diary);
 
                         // 태그 리스트 추가
                         List<TagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
@@ -217,17 +217,17 @@ public class DiaryService {
 
     //title List get
     @Transactional
-    public MultiResponseDto findTitleDiaries (String token, int page, int size, String title){
+    public MultiResponseDto<DiaryDto.Response> findTitleDiaries (String token, int page, int size, String title){
         tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
 
         // page 정보 생성
-        Page<Diary> diaryPage = repository.findAllByMemberMemberIdAndTitleContaining(memberId,title,
+        Page<Diary> diaryPage = diaryRepository.findAllByMemberMemberIdAndTitleContaining(memberId,title,
                 PageRequest.of(page -1, size, Sort.by("date").descending()));
 
         List<DiaryDto.Response> diaryDtoList = diaryPage.getContent().stream()
                 .map(diary -> {
-                    DiaryDto.Response response = mapper.DiaryToDiaryResponseDto(diary);
+                    DiaryDto.Response response = diaryMapper.DiaryToDiaryResponseDto(diary);
 
                     // 태그 리스트 추가
                     List<TagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
@@ -265,12 +265,12 @@ public class DiaryService {
             }
         }
 
-        repository.deleteById(diaryId);
+        diaryRepository.deleteById(diaryId);
     }
 
     // 해당 다이어리가 유효한지 검증
     public Diary findVerifiedDiary(long diaryId){
-        return repository.findById(diaryId).orElseThrow(
+        return diaryRepository.findById(diaryId).orElseThrow(
                 () -> new BusinessLogicException(ExceptionCode.DIARY_MISMATCHED));
     }
 

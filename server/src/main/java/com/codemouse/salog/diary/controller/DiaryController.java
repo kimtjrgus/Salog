@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/diary")
@@ -54,28 +57,36 @@ public class DiaryController {
 
     // total list get
     @GetMapping
-    public ResponseEntity getAllDiarys (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity getAllDiaries (@RequestHeader(name = "Authorization") String token,
                                         @Positive @RequestParam int page,
                                         @Positive @RequestParam int size,
                                         @Valid @RequestParam(required = false) String diaryTag,
                                         @Positive @RequestParam(required = false) Integer month,
                                         @RequestParam(required = false) String date){
-        MultiResponseDto pageDiarys =
-                diaryService.findAllDiaries(token, page, size, diaryTag, month, date);
+        // UTF-8로 디코딩
+        String decodedTag = URLDecoder.decode(diaryTag, StandardCharsets.UTF_8);
+        log.info("#DecodedTag To UTF-8 : {}", decodedTag);
 
-        return new ResponseEntity<>(pageDiarys, HttpStatus.OK);
+        MultiResponseDto<DiaryDto.Response> pageDiaries =
+                diaryService.findAllDiaries(token, page, size, decodedTag, month, date);
+
+        return new ResponseEntity<>(pageDiaries, HttpStatus.OK);
     }
 
     // title list get
     @GetMapping("/search")
-    public ResponseEntity getTitleDiarys (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity getTitleDiaries (@RequestHeader(name = "Authorization") String token,
                                           @Positive @RequestParam int page,
                                           @Positive @RequestParam int size,
                                           @Valid @RequestParam String title){
-        MultiResponseDto pageDiarys =
-                diaryService.findTitleDiaries(token, page, size, title);
+        // UTF-8로 디코딩
+        String decodedTitle = URLDecoder.decode(title, StandardCharsets.UTF_8);
+        log.info("#DecodedTitle To UTF-8 : {}", decodedTitle);
 
-        return new ResponseEntity<>(pageDiarys, HttpStatus.OK);
+        MultiResponseDto<DiaryDto.Response> pageDiaries =
+                diaryService.findTitleDiaries(token, page, size, decodedTitle);
+
+        return new ResponseEntity<>(pageDiaries, HttpStatus.OK);
     }
 
     // delete

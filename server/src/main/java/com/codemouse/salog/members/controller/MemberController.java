@@ -59,8 +59,8 @@ public class MemberController {
 
     @GetMapping("/get")
     public ResponseEntity getMember(@RequestHeader(name = "Authorization") String token) {
-        MemberDto.Response response = memberService.findMember(token);
         tokenBlackListService.isBlackListed(token);
+        MemberDto.Response response = memberService.findMember(token);
         return new ResponseEntity<>(
                 new SingleResponseDto<>(response), HttpStatus.OK);
     }
@@ -127,6 +127,7 @@ public class MemberController {
         }
     }
 
+    // todo 2023-12-20 로그아웃 시 토큰 블랙리스트에 리프레쉬도 추가해야함 (리프레쉬 탈취 방지)
     // 로그아웃
     @PostMapping("/logout")
     public String logout(@RequestHeader (name="Authorization") String token) {
