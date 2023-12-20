@@ -2,6 +2,7 @@ package com.codemouse.salog.auth.controller;
 
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
 import com.codemouse.salog.auth.utils.TokenBlackListService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.jsonwebtoken.Claims;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@AllArgsConstructor
 public class TokenController {
-    @Autowired
-    private JwtTokenizer jwtTokenizer;
-    @Autowired
-    private TokenBlackListService tokenBlackListService;
+    private final JwtTokenizer jwtTokenizer;
+    private final TokenBlackListService tokenBlackListService;
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody Map<String, String> payload) {
