@@ -18,6 +18,7 @@ import com.codemouse.salog.tags.mapper.TagMapper;
 import com.codemouse.salog.tags.repository.DiaryTagLinkRepository;
 import com.codemouse.salog.tags.service.TagService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,8 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
 @AllArgsConstructor
@@ -187,8 +190,12 @@ public class DiaryService {
 
         // 1. Only diaryTag에 대한 쿼리
         if (diaryTag != null && month == null && date == null) {
+            // UTF-8로 디코딩
+            String decodedTag = URLDecoder.decode(diaryTag, StandardCharsets.UTF_8);
+            log.info("DecodedTag To UTF-8 : {}", decodedTag);
+
             List<DiaryTagLink> diaryTagLinks = diaryTagLinkRepository.findByDiaryTagTagNameAndDiaryTagMember(
-                    diaryTag, memberService.findVerifiedMember(memberId));
+                    decodedTag, memberService.findVerifiedMember(memberId));
             List<Long> diaryIds = diaryTagLinks.stream()
                     .map(DiaryTagLink::getDiary)
                     .map(Diary::getDiaryId)
@@ -241,8 +248,12 @@ public class DiaryService {
         tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
 
+        // UTF-8로 디코딩
+        String decodedTitle = URLDecoder.decode(title, StandardCharsets.UTF_8);
+        log.info("DecodedTitle To UTF-8 : {}", decodedTitle);
+
         // page 정보 생성
-        Page<Diary> diaryPage = diaryRepository.findAllByMemberMemberIdAndTitleContaining(memberId,title,
+        Page<Diary> diaryPage = diaryRepository.findAllByMemberMemberIdAndTitleContaining(memberId, decodedTitle,
                 PageRequest.of(page -1, size, Sort.by("date").descending()));
 
         List<DiaryDto.Response> diaryDtoList = diaryPage.getContent().stream()
