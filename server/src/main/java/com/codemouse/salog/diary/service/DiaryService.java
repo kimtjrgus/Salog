@@ -18,16 +18,21 @@ import com.codemouse.salog.tags.mapper.TagMapper;
 import com.codemouse.salog.tags.repository.DiaryTagLinkRepository;
 import com.codemouse.salog.tags.service.TagService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +43,8 @@ public class DiaryService {
     private final DiaryMapper diaryMapper;
     private final TagService tagService;
     private final TagMapper tagMapper;
+    @Autowired
+    private final Validator validator; // 일기태그 유효성 검사
     private final DiaryTagLinkRepository diaryTagLinkRepository;
     private final JwtTokenizer jwtTokenizer;
     private final TokenBlackListService tokenBlackListService;
@@ -73,6 +80,13 @@ public class DiaryService {
             } else {
                 // 새 태그 생성
                 TagDto.DiaryPost diaryPost = new TagDto.DiaryPost(tagName);
+
+                // 추가: diaryPost에 대한 유효성 검사
+                Set<ConstraintViolation<TagDto.DiaryPost>> violations = validator.validate(diaryPost);
+                if (!violations.isEmpty()) {
+                    throw new BusinessLogicException(ExceptionCode.TAG_UNVALIDATED);
+                }
+
                 diaryTagToUse = tagService.postDiaryTag(token, diaryPost);
             }
             createdDiaryTags.add(diaryTagToUse);
@@ -110,8 +124,6 @@ public class DiaryService {
 
             // 새로운 태그 생성 및 연결
             for(String tagName : diaryDto.getTagList()) {
-                TagDto.DiaryPost diaryPost = new TagDto.DiaryPost(tagName);
-
                 // 기존 태그 검색
                 DiaryTag existingDiaryTag = tagService.findDiaryTagByMemberIdAndTagName(token, tagName);
 
@@ -121,6 +133,14 @@ public class DiaryService {
                     diaryTagToUse = existingDiaryTag;
                 } else {
                     // 새 태그 생성
+                    TagDto.DiaryPost diaryPost = new TagDto.DiaryPost(tagName);
+
+                    // 추가: diaryPost에 대한 유효성 검사
+                    Set<ConstraintViolation<TagDto.DiaryPost>> violations = validator.validate(diaryPost);
+                    if (!violations.isEmpty()) {
+                        throw new BusinessLogicException(ExceptionCode.TAG_UNVALIDATED);
+                    }
+
                     diaryTagToUse = tagService.postDiaryTag(token, diaryPost);
                 }
                 DiaryTagLink link = new DiaryTagLink();
