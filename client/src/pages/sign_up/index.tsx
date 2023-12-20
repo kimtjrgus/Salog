@@ -27,6 +27,7 @@ interface errorType {
 
 export interface confirmType {
 	isOpen: boolean;
+	auth: string;
 	minutes: number;
 	seconds: number;
 }
@@ -37,6 +38,7 @@ interface alarmType {
 }
 
 const SignUp = () => {
+	// 입력해야 하는 값들
 	const [values, setValues] = useState<inputType>({
 		email: "",
 		password: "",
@@ -53,7 +55,6 @@ const SignUp = () => {
 		webAlarm: false,
 		emailAlarm: false,
 	});
-	console.log(alarm);
 
 	// 입력값 검사 통과 여부(email은 유효성, 중복 검사 및 인증번호까지 포함)
 	const [isAuth, setIsAuth] = useState<boolean>(false);
@@ -67,6 +68,7 @@ const SignUp = () => {
 
 	const [isConfirm, setIsConfirm] = useState<confirmType>({
 		isOpen: false,
+		auth: "",
 		minutes: 5,
 		seconds: 0,
 	}); // 인증번호 발송 시 상태 (서버 기능 구현 전까지는 클릭하면 true로)
@@ -85,7 +87,8 @@ const SignUp = () => {
 				if (!checkPassword(value)) {
 					setErrorMsg({
 						...errorMsg,
-						[name]: "8~16자의 영문 대/소문자, 숫자, 특수문자를 사용해 주세요.",
+						[name]:
+							"8자 이상의 영문 대/소문자, 숫자, 특수문자를 사용해 주세요.",
 					});
 				} else {
 					setErrorMsg({ ...errorMsg, [name]: "" });
@@ -131,15 +134,47 @@ const SignUp = () => {
 
 	const onClickAuthBtn = () => {
 		// 인증번호 발송 로직 구현해야함.
-		// 발송 되면 모달 띄우기
-		setIsConfirm({ isOpen: true, minutes: 5, seconds: 0 });
+		axios
+			.post(`${process.env.REACT_APP_SERVER_URL}/members/emailcheck`, {
+				email: values.email,
+			})
+			.then(() => {
+				axios
+					.post(`${process.env.REACT_APP_SERVER_URL}/members/signup/sendmail`, {
+						email: values.email,
+					})
+					.then((res) => {
+						// 발송 되면 모달 띄우기
+						setIsConfirm({
+							...isConfirm,
+							isOpen: true,
+							auth: res.data.message,
+							minutes: 5,
+							seconds: 0,
+						});
+					})
+					.catch((error) => {
+						console.log(error);
+					});
+			})
+			.catch((error) => {
+				console.log(error);
+				setErrorMsg({
+					...errorMsg,
+					email: "이미 존재하는 이메일입니다.",
+				});
+			});
 	};
 
 	const onClickCerBtn = () => {
 		// 인증번호가 일치하다면
-		// 인증완료 토스트 창 띄우고
-		setIsAuth(true);
-		setIsConfirm({ ...isConfirm, isOpen: false });
+		if (isConfirm.auth === values.authNum) {
+			// 인증완료 토스트 창 띄우고
+			setIsAuth(true);
+			setIsConfirm({ ...isConfirm, isOpen: false });
+		} else {
+			setErrorMsg({ ...errorMsg, authNum: "인증번호가 일치하지 않습니다." });
+		}
 	};
 
 	const checkValues = useCallback(
@@ -168,7 +203,7 @@ const SignUp = () => {
 
 	const onClickSubmitBtn = () => {
 		axios
-			.post("http://localhost:8000/register", {
+			.post(`${process.env.REACT_APP_SERVER_URL}/members/signup`, {
 				email: values.email,
 				password: values.password,
 				webAlarm: alarm.webAlarm,
@@ -233,7 +268,7 @@ const SignUp = () => {
 						인증
 					</CerBtnBlue>
 				</InputContainer>
-				<WarningTitle>이미 존재하는 이메일입니다.</WarningTitle>
+				<WarningTitle>{errorMsg.email}</WarningTitle>
 				{isConfirm.isOpen ? (
 					<>
 						<Title>인증번호</Title>
@@ -258,6 +293,7 @@ const SignUp = () => {
 								<CerBtnBlue onClick={onClickCerBtn}>확인</CerBtnBlue>
 							)}
 						</InputContainer>
+						<WarningTitle>{errorMsg.authNum}</WarningTitle>
 					</>
 				) : null}
 				<Title>비밀번호</Title>

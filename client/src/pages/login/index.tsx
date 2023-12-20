@@ -33,9 +33,10 @@ const Login = () => {
 	const onClickLoginBtn = () => {
 		// 유효성 검사가 true라면
 		axios
-			.post("http://localhost:8000/login", values)
+			.post(`${process.env.REACT_APP_SERVER_URL}/members/login`, values)
 			.then((res) => {
 				setCookie("accessToken", res.data.accessToken, { path: "/" });
+				setCookie("refreshToken", res.data.refreshToken, { path: "/" });
 				navigate("/");
 			})
 			.catch((error) => {

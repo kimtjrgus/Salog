@@ -12,6 +12,7 @@ const PasswordFind = () => {
 	const [isDisabled, setIsDisabled] = useState<boolean>(true);
 	const [isConfirm, setIsConfirm] = useState<confirmType>({
 		isOpen: false,
+		auth: "",
 		minutes: 5,
 		seconds: 0,
 	}); // 인증번호 발송 시 상태 (서버 기능 구현 전까지는 클릭하면 true로)
@@ -24,7 +25,7 @@ const PasswordFind = () => {
 	const onClickAuthBtn = () => {
 		// 이메일이 존재하는 경우
 		// 인증번호 발송
-		setIsConfirm({ isOpen: true, minutes: 5, seconds: 0 });
+		setIsConfirm({ ...isConfirm, isOpen: true, minutes: 5, seconds: 0 });
 		// 존재하지 않으면 메세지 띄우기
 	};
 
