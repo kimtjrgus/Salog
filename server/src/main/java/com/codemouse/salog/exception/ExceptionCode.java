@@ -23,7 +23,9 @@ public enum ExceptionCode {
     MEMBER_MISMATCHED(400, "MEMBER_MISMATCHED MemberId가 일치하지 않음"),
     DIARY_NOT_FOUND(404, "DIARY_NOT_FOUND 존재하지 않는 일기"),
     DIARY_MISMATCHED(400, "DIARY_MISMATCHED DiaryId가 일치하지 않음"),
-    TAG_MISMATCHED(400, "TAG_MISMATCHED TagId가 일치하지 않음");
+    TAG_MISMATCHED(400, "TAG_MISMATCHED TagId가 일치하지 않음"),
+    TAG_UNVALIDATED(400, "TAG_UNVALIDATED 유효하지않은 태그, 10글자이내로 입력바람");
+
 
     private int status;
 
