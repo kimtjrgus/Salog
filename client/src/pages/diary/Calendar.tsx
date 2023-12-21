@@ -69,12 +69,17 @@ const CalendarComponent: React.FC<MyComponentProps> = ({
 CalendarComponent.propTypes = {
 	diaries: PropTypes.arrayOf(
 		PropTypes.shape({
-			id: PropTypes.number.isRequired,
+			diaryId: PropTypes.number.isRequired,
 			date: PropTypes.string.isRequired,
 			title: PropTypes.string.isRequired,
 			body: PropTypes.string.isRequired,
 			img: PropTypes.string.isRequired,
-			diaryTag: PropTypes.arrayOf(PropTypes.string).isRequired,
+			tagList: PropTypes.arrayOf(
+				PropTypes.shape({
+					diaryTagId: PropTypes.number.isRequired,
+					tagName: PropTypes.string.isRequired,
+				}),
+			).isRequired,
 		}),
 	).isRequired as InferProps<MyComponentProps>["diaries"],
 	setDiaries: PropTypes.func.isRequired,
