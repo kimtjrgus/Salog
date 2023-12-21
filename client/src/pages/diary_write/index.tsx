@@ -6,7 +6,9 @@ import Toast, { ToastType } from "src/components/Layout/Toast";
 import dateAsKor from "src/utils/dateAsKor";
 import { styled } from "styled-components";
 import { Input } from "../login";
-import Reactquill from "./textEditor";
+import Reactquill from "./TextEditor";
+import moment from "moment";
+import { getCookie } from "src/utils/cookie";
 
 export interface valuesType {
 	title: string;
@@ -18,6 +20,7 @@ const DiaryWrite = () => {
 	const [categories, setCategories] = useState<string[]>([]);
 	const [category, setCategory] = useState<string>("");
 	const [isOpen, setIsOpen] = useState<boolean>(false);
+	const [tagModal, setTagModal] = useState<string>("false");
 
 	const navigate = useNavigate();
 
@@ -32,6 +35,14 @@ const DiaryWrite = () => {
 
 	const onChangeCategory = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCategory(e.target.value);
+	};
+
+	const onFocusInput = () => {
+		setTagModal("true");
+	};
+
+	const onBlurInput = () => {
+		setTagModal("false");
 	};
 
 	const onKeyUpEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -83,12 +94,22 @@ const DiaryWrite = () => {
 			Toast(ToastType.error, "내용을 10자 이상 입력해주세요");
 		} else {
 			axios
-				.post("http://localhost:8000/diary", {
-					date: new Date().toDateString(),
-					title: values.title,
-					body: values.body,
-					diaryTag: categories,
-				})
+				.post(
+					`${process.env.REACT_APP_SERVER_URL}/diary/post`,
+					{
+						date: moment().format("YYYY-MM-DD"),
+						title: values.title,
+						body: values.body,
+						img: "",
+						diaryTag: categories,
+					},
+					{
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `${getCookie("access")}`,
+						},
+					},
+				)
 				.then(() => {
 					navigate("/diary");
 				})
@@ -133,12 +154,18 @@ const DiaryWrite = () => {
 							);
 						})}
 						<Input
-							placeholder={"카테고리를 입력하세요."}
+							placeholder={"태그를 입력하세요."}
 							onChange={onChangeCategory}
+							onFocus={onFocusInput}
+							onBlur={onBlurInput}
 							onKeyUp={onKeyUpEvent}
 							onKeyDown={onKeyDownEvent}
 							value={category}
 						/>
+						<TagModal isopen={tagModal}>
+							{`엔터 혹은 쉼표를 입력하여 태그를 등록할 수 있습니다.\n 등록된
+							요소를 클릭하면 삭제됩니다.`}
+						</TagModal>
 					</CategoryList>
 					<Reactquill body={values.body} onChangeBody={onChangeBody} />
 				</WriteContainer>
@@ -227,6 +254,7 @@ const WriteContainer = styled.div`
 `;
 
 const CategoryList = styled.div`
+	position: relative;
 	display: flex;
 	flex-wrap: wrap;
 	margin: 1.5rem 0;
@@ -276,6 +304,20 @@ const CategoryList = styled.div`
 		padding-left: 0;
 		font-size: 1.6rem;
 	}
+`;
+
+const TagModal = styled.span<{ isopen: string }>`
+	z-index: 40;
+	position: absolute;
+	bottom: -5rem;
+	width: 31rem;
+	padding: 1.3rem;
+	font-size: 1.2rem;
+	background: #484848;
+	color: white;
+	font-weight: 400;
+	display: ${(props) => (props.isopen === "false" ? "none" : "block")};
+	transition: all 0.125s ease-in 0s;
 `;
 
 const Calculate = styled.div`
