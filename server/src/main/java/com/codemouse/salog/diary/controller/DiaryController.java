@@ -63,12 +63,8 @@ public class DiaryController {
                                         @Valid @RequestParam(required = false) String diaryTag,
                                         @Positive @RequestParam(required = false) Integer month,
                                         @RequestParam(required = false) String date){
-        // UTF-8로 디코딩
-        String decodedTag = URLDecoder.decode(diaryTag, StandardCharsets.UTF_8);
-        log.info("#DecodedTag To UTF-8 : {}", decodedTag);
-
         MultiResponseDto<DiaryDto.Response> pageDiaries =
-                diaryService.findAllDiaries(token, page, size, decodedTag, month, date);
+                diaryService.findAllDiaries(token, page, size, diaryTag, month, date);
 
         return new ResponseEntity<>(pageDiaries, HttpStatus.OK);
     }
@@ -79,12 +75,9 @@ public class DiaryController {
                                           @Positive @RequestParam int page,
                                           @Positive @RequestParam int size,
                                           @Valid @RequestParam String title){
-        // UTF-8로 디코딩
-        String decodedTitle = URLDecoder.decode(title, StandardCharsets.UTF_8);
-        log.info("#DecodedTitle To UTF-8 : {}", decodedTitle);
 
         MultiResponseDto<DiaryDto.Response> pageDiaries =
-                diaryService.findTitleDiaries(token, page, size, decodedTitle);
+                diaryService.findTitleDiaries(token, page, size, title);
 
         return new ResponseEntity<>(pageDiaries, HttpStatus.OK);
     }
