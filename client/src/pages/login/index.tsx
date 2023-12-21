@@ -174,6 +174,10 @@ export const Input = styled.input.attrs({ required: true })`
 	&.placeholder {
 		color: ${(props) => props.theme.COLORS.GRAY_300};
 	}
+
+	&:focus {
+		border: 1px solid ${(props) => props.theme.COLORS.LIGHT_BLUE};
+	}
 `;
 
 const Title = styled.p`
