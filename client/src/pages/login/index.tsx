@@ -35,8 +35,18 @@ const Login = () => {
 		axios
 			.post(`${process.env.REACT_APP_SERVER_URL}/members/login`, values)
 			.then((res) => {
-				setCookie("accessToken", res.data.accessToken, { path: "/" });
-				setCookie("refreshToken", res.data.refreshToken, { path: "/" });
+				const current = new Date();
+				current.setMinutes(current.getMinutes() + 30);
+
+				setCookie("accessToken", res.data.accessToken, {
+					path: "/",
+					expires: current,
+				});
+				current.setMinutes(current.getMinutes() + 1440);
+				setCookie("refreshToken", res.data.refreshToken, {
+					path: "/",
+					expires: current,
+				});
 				navigate("/");
 			})
 			.catch((error) => {
