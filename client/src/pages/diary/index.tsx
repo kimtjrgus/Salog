@@ -3,7 +3,6 @@ import { styled } from "styled-components";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
-import axios from "axios";
 import NotData from "../../assets/NotData.png";
 import { Input } from "../login";
 import Test from "../../assets/Test.jpeg";
@@ -11,16 +10,22 @@ import dateAsKor from "src/utils/dateAsKor";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CalendarComponent from "./Calendar";
-import { getCookie } from "src/utils/cookie";
+import useTokenCheck from "src/hooks/useTokenCheck";
+import { api } from "src/utils/refreshToken";
 // import { useScroll } from "src/hooks/useScroll";
 
 export interface diaryType {
-	id: number;
+	diaryId: number;
 	date: string;
 	title: string;
 	body: string;
 	img: string;
-	diaryTag: string[];
+	tagList: TagList[];
+}
+
+interface TagList {
+	diaryTagId: number;
+	tagName: string;
 }
 
 const Diary = () => {
@@ -31,7 +36,7 @@ const Diary = () => {
 	const search = useLocation().search;
 	const decodeUrl = decodeURI(search).split("=")[1];
 	const navigate = useNavigate();
-	console.log(`${process.env.REACT_APP_SERVER_URL}${path}${search}`);
+	useTokenCheck();
 
 	const onClickWriteBtn = () => {
 		navigate("/diary/post");
@@ -45,11 +50,11 @@ const Diary = () => {
 		const map = new Map();
 		const arr = [];
 		diaries.forEach((diary) => {
-			const category = diary.diaryTag;
+			const category = diary.tagList;
 			category.forEach((tag) => {
-				map.get(tag) !== undefined
-					? map.set(tag, map.get(tag) + 1)
-					: map.set(tag, 1);
+				map.get(tag.tagName) !== undefined
+					? map.set(tag.tagName, map.get(tag.tagName) + 1)
+					: map.set(tag.tagName, 1);
 			});
 		});
 
@@ -82,20 +87,17 @@ const Diary = () => {
 	// }, []);
 
 	useEffect(() => {
-		axios
-			.get(`${process.env.REACT_APP_SERVER_URL}${path}?page=1&size=10`, {
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `${getCookie("accessToken")}`,
-				},
-			})
+		api
+			.get(`${path}?page=1&size=10${search.replace("?", "&")}`)
 			.then((res) => {
+				console.log(`${path}?page=1&size=10${search.replace("?", "&")}`);
+				console.log(res.data);
 				setDiaries(res.data.data);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
-	}, []);
+	}, [search]);
 
 	return (
 		<Container>
@@ -117,23 +119,25 @@ const Diary = () => {
 						{search === "" ? (
 							<h3>분류 전체보기 ({diaries.length})</h3>
 						) : (
-							<h3>{decodeUrl}</h3>
+							<h3>
+								{decodeUrl} ({diaries.length})
+							</h3>
 						)}
 						<ListContainer>
 							{diaries?.map((diary) => {
 								return (
 									<List
-										key={diary.id}
+										key={diary.diaryId}
 										onClick={() => {
-											onClickList(diary.id);
+											onClickList(diary.diaryId);
 										}}
 									>
 										<ListMain>
 											<h4>{diary.title}</h4>
 											<p>{diary.body.replace(/(<([^>]+)>)/gi, "")}</p>
 											<Tags>
-												{diary.diaryTag.map((tag, idx) => {
-													return <Tag key={idx}>{tag}</Tag>;
+												{diary.tagList.map((tag) => {
+													return <Tag key={tag.diaryTagId}>{tag.tagName}</Tag>;
 												})}
 											</Tags>
 											<Info>
@@ -185,7 +189,7 @@ const Diary = () => {
 								component={CategoryOutlinedIcon}
 								sx={{ stroke: "#ffffff", strokeWidth: 1 }}
 							/>
-							<h3>카테고리</h3>
+							<h3>태그</h3>
 						</div>
 						<hr />
 						<NavStyle to="/diary" className={search === "" ? "active" : ""}>
@@ -311,6 +315,7 @@ const ListMain = styled.div`
 	}
 
 	p {
+		min-height: 3rem;
 		font-size: 1.2rem;
 		margin-top: 1.2rem;
 		line-height: 1.2;
