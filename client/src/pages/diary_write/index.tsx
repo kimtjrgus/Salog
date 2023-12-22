@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "src/components/Layout/Modal";
@@ -8,7 +7,7 @@ import { styled } from "styled-components";
 import { Input } from "../login";
 import Reactquill from "./TextEditor";
 import moment from "moment";
-import { getCookie } from "src/utils/cookie";
+import { api } from "src/utils/refreshToken";
 
 export interface valuesType {
 	title: string;
@@ -20,7 +19,7 @@ const DiaryWrite = () => {
 	const [categories, setCategories] = useState<string[]>([]);
 	const [category, setCategory] = useState<string>("");
 	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const [tagModal, setTagModal] = useState<string>("false");
+	const [tagModal, setTagModal] = useState<boolean>(false);
 
 	const navigate = useNavigate();
 
@@ -38,11 +37,11 @@ const DiaryWrite = () => {
 	};
 
 	const onFocusInput = () => {
-		setTagModal("true");
+		setTagModal(true);
 	};
 
 	const onBlurInput = () => {
-		setTagModal("false");
+		setTagModal(false);
 	};
 
 	const onKeyUpEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -93,23 +92,14 @@ const DiaryWrite = () => {
 		} else if (values.body.replace(/(<([^>]+)>)/gi, "").length < 10) {
 			Toast(ToastType.error, "내용을 10자 이상 입력해주세요");
 		} else {
-			axios
-				.post(
-					`${process.env.REACT_APP_SERVER_URL}/diary/post`,
-					{
-						date: moment().format("YYYY-MM-DD"),
-						title: values.title,
-						body: values.body,
-						img: "",
-						diaryTag: categories,
-					},
-					{
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `${getCookie("access")}`,
-						},
-					},
-				)
+			api
+				.post(`/diary/post`, {
+					date: moment().format("YYYY-MM-DD"),
+					title: values.title,
+					body: values.body,
+					img: "",
+					tagList: categories,
+				})
 				.then(() => {
 					navigate("/diary");
 				})
@@ -131,7 +121,7 @@ const DiaryWrite = () => {
 							<button onClick={onClickWriteBtn}>작성 완료</button>
 						</div>
 					</div>
-					<Input
+					<WriteInput
 						className="title_input"
 						placeholder="제목을 입력하세요."
 						type="text"
@@ -153,7 +143,7 @@ const DiaryWrite = () => {
 								</div>
 							);
 						})}
-						<Input
+						<WriteInput
 							placeholder={"태그를 입력하세요."}
 							onChange={onChangeCategory}
 							onFocus={onFocusInput}
@@ -162,7 +152,7 @@ const DiaryWrite = () => {
 							onKeyDown={onKeyDownEvent}
 							value={category}
 						/>
-						<TagModal isopen={tagModal}>
+						<TagModal open={Boolean(tagModal)}>
 							{`엔터 혹은 쉼표를 입력하여 태그를 등록할 수 있습니다.\n 등록된
 							요소를 클릭하면 삭제됩니다.`}
 						</TagModal>
@@ -253,6 +243,10 @@ const WriteContainer = styled.div`
 	}
 `;
 
+const WriteInput = styled(Input)`
+	border: none !important;
+`;
+
 const CategoryList = styled.div`
 	position: relative;
 	display: flex;
@@ -306,7 +300,7 @@ const CategoryList = styled.div`
 	}
 `;
 
-const TagModal = styled.span<{ isopen: string }>`
+const TagModal = styled.span<{ open: boolean }>`
 	z-index: 40;
 	position: absolute;
 	bottom: -5rem;
@@ -316,7 +310,7 @@ const TagModal = styled.span<{ isopen: string }>`
 	background: #484848;
 	color: white;
 	font-weight: 400;
-	display: ${(props) => (props.isopen === "false" ? "none" : "block")};
+	display: ${(props) => (!props.open ? "none" : "block")};
 	transition: all 0.125s ease-in 0s;
 `;
 
