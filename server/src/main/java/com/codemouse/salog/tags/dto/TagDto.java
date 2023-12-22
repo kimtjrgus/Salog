@@ -3,14 +3,14 @@ package com.codemouse.salog.tags.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 
 public class TagDto {
     @AllArgsConstructor
     @Getter
     public static class DiaryPost {
-        @Pattern(regexp = "^.{1,10}$")
+        @Size(min = 1, max = 10)
         private String tagName;
     }
 
