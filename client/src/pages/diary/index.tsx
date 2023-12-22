@@ -7,11 +7,12 @@ import NotData from "../../assets/NotData.png";
 import { Input } from "../login";
 import Test from "../../assets/Test.jpeg";
 import dateAsKor from "src/utils/dateAsKor";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CalendarComponent from "./Calendar";
 import useTokenCheck from "src/hooks/useTokenCheck";
 import { api } from "src/utils/refreshToken";
+import { v4 as uuidv4 } from "uuid";
 // import { useScroll } from "src/hooks/useScroll";
 
 export interface diaryType {
@@ -23,20 +24,27 @@ export interface diaryType {
 	tagList: TagList[];
 }
 
-interface TagList {
+export interface TagList {
 	diaryTagId: number;
 	tagName: string;
 }
 
 const Diary = () => {
+	useTokenCheck();
+
 	const [diaries, setDiaries] = useState<diaryType[]>([]);
+	const [filterDiary, setFilterDiary] = useState<diaryType[]>([]);
+	const [searchVal, setSearchVal] = useState<string>("");
+	console.log(searchVal);
+
 	// const { scrollY, containerRef } = useScroll();
+	const mapArray = filterDiary.length > 0 ? filterDiary : diaries;
 
 	const path = useLocation().pathname;
 	const search = useLocation().search;
 	const decodeUrl = decodeURI(search).split("=")[1];
+
 	const navigate = useNavigate();
-	useTokenCheck();
 
 	const onClickWriteBtn = () => {
 		navigate("/diary/post");
@@ -44,6 +52,10 @@ const Diary = () => {
 
 	const onClickList = (id: number) => {
 		navigate(`/diary/${id}`);
+	};
+
+	const onChangeSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchVal(e.target.value);
 	};
 
 	const categoryOrganize = () => {
@@ -61,9 +73,8 @@ const Diary = () => {
 		for (const [key, value] of map) {
 			arr.push(
 				<NavStyle
-					to={`/diary?category=${key}`}
-					// key는 서버 연동 후 id가 생기면 변경 예정
-					key={Math.floor(Math.random() * 1000000000000000)}
+					to={`/diary?diaryTag=${key}`}
+					key={uuidv4()}
 					className={decodeUrl === key ? "active" : ""}
 				>
 					<p>{key}</p>
@@ -75,28 +86,32 @@ const Diary = () => {
 		return arr;
 	};
 
-	// useEffect(() => {
-	// 	axios
-	// 		.get(`http://localhost:8000${path}${search}`)
-	// 		.then((res) => {
-	// 			setDiaries(res.data);
-	// 		})
-	// 		.catch((error) => {
-	// 			console.log(error);
-	// 		});
-	// }, []);
-
 	useEffect(() => {
 		api
-			.get(`${path}?page=1&size=10${search.replace("?", "&")}`)
+			.get(`${path}?page=1&size=20`)
 			.then((res) => {
-				console.log(`${path}?page=1&size=10${search.replace("?", "&")}`);
-				console.log(res.data);
 				setDiaries(res.data.data);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
+	}, []);
+
+	useEffect(() => {
+		if (search !== "") {
+			console.log(`search는 ${search} 입니다.`);
+
+			api
+				.get(`${path}?page=1&size=10${search.replace("?", "&")}`)
+				.then((res) => {
+					setFilterDiary(res.data.data);
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		} else {
+			setFilterDiary([]); // search가 빈 문자열인 경우 filterDiary를 빈 배열로 초기화
+		}
 	}, [search]);
 
 	return (
@@ -120,11 +135,11 @@ const Diary = () => {
 							<h3>분류 전체보기 ({diaries.length})</h3>
 						) : (
 							<h3>
-								{decodeUrl} ({diaries.length})
+								{decodeUrl} ({filterDiary.length})
 							</h3>
 						)}
 						<ListContainer>
-							{diaries?.map((diary) => {
+							{mapArray?.map((diary) => {
 								return (
 									<List
 										key={diary.diaryId}
@@ -174,7 +189,7 @@ const Diary = () => {
 						</div>
 						<hr />
 						<div className="search_input">
-							<Input placeholder="게시글 검색" />
+							<Input placeholder="게시글 검색" onChange={onChangeSearchInput} />
 							<button>
 								<SvgIcon
 									component={SearchOutlinedIcon}
