@@ -66,7 +66,7 @@ public class TagService {
     // 해당 다이어리태그가 유효한지 검증
     public DiaryTag findVerifiedDiaryTag(long DiaryTagId){
         return diaryTagRepository.findById(DiaryTagId).orElseThrow(
-                () -> new BusinessLogicException(ExceptionCode.TAG_MISMATCHED));
+                () -> new BusinessLogicException(ExceptionCode.TAG_NOT_FOUND));
     }
 
     // 멤버와 다이어리태그이름에 해당하는 객체

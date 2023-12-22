@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -13,7 +14,9 @@ public class DiaryDto {
     @Getter
     public static class Post {
         private LocalDate date;
+        @Size(min = 1, max = 30)
         private String title;
+        @Size(max = 3000)
         private String body;
         private String img;
         private List<String> tagList;
@@ -22,7 +25,9 @@ public class DiaryDto {
     @AllArgsConstructor
     @Getter
     public static class Patch {
+        @Size(min = 1, max = 30)
         private String title;
+        @Size(max = 3000)
         private String body;
         private String img;
         private List<String> tagList;
