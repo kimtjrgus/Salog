@@ -12,6 +12,7 @@ import Login from "./pages/login";
 import PasswordFind from "./pages/password";
 import SignUp from "./pages/sign_up";
 import PublicRoute from "./components/Common/PublicRoute";
+import DiaryUpdate from "./pages/diary_update";
 
 function App() {
 	return (
@@ -24,6 +25,7 @@ function App() {
 						<Route path={"/history"} element={<History />} />
 						<Route path={"/diary"} element={<Diary />} />
 						<Route path={"/diary/:id"} element={<DiaryDetail />} />
+						<Route path={"/diary/:id/update"} element={<DiaryUpdate />} />
 						<Route path={"/diary/post"} element={<DiaryWrite />} />
 					</Route>
 				</Route>
