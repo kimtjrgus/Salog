@@ -302,7 +302,7 @@ public class DiaryService {
     // 해당 다이어리가 유효한지 검증
     public Diary findVerifiedDiary(long diaryId){
         return diaryRepository.findById(diaryId).orElseThrow(
-                () -> new BusinessLogicException(ExceptionCode.DIARY_MISMATCHED));
+                () -> new BusinessLogicException(ExceptionCode.DIARY_NOT_FOUND));
     }
 
     // 다이어리를 작성한 멤버가 맞는지 확인하는 메서드
