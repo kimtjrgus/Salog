@@ -10,7 +10,10 @@ import { useNavigate } from "react-router-dom";
 import { debounce } from "src/utils/timeFunc";
 import axios from "axios";
 import { setCookie } from "src/utils/cookie";
-interface inputType {
+import Toast, { ToastType } from "src/components/Layout/Toast";
+import Modal from "src/components/Layout/Modal";
+
+export interface inputType {
 	[key: string]: any;
 	email: string;
 	password: string;
@@ -18,7 +21,7 @@ interface inputType {
 	authNum: string;
 }
 
-interface errorType {
+export interface errorType {
 	email: string;
 	password: string;
 	passwordCheck: string;
@@ -51,6 +54,7 @@ const SignUp = () => {
 		passwordCheck: "",
 		authNum: "",
 	});
+
 	const [alarm, setAlarm] = useState<alarmType>({
 		webAlarm: false,
 		emailAlarm: false,
@@ -69,9 +73,10 @@ const SignUp = () => {
 	const [isConfirm, setIsConfirm] = useState<confirmType>({
 		isOpen: false,
 		auth: "",
-		minutes: 5,
+		minutes: 0,
 		seconds: 0,
 	}); // 인증번호 발송 시 상태 (서버 기능 구현 전까지는 클릭하면 true로)
+	const [isOpen, setIsOpen] = useState<boolean>(false);
 
 	const navigate = useNavigate();
 
@@ -83,47 +88,35 @@ const SignUp = () => {
 			case "email":
 				checkEmail(value) ? setIsDisabled(false) : setIsDisabled(true);
 				break;
-			case "password":
-				if (!checkPassword(value)) {
-					setErrorMsg({
-						...errorMsg,
-						[name]:
-							"8자 이상의 영문 대/소문자, 숫자, 특수문자를 사용해 주세요.",
-					});
-				} else {
-					setErrorMsg({ ...errorMsg, [name]: "" });
-				}
-				// 비밀번호 확인 값을 입력한 뒤 비밀번호를 변경할 때 예외처리
-				if (values.passwordCheck !== "") {
-					if (values.passwordCheck !== value) {
-						setErrorMsg({
-							...errorMsg,
-							passwordCheck: "비밀번호가 일치하지 않습니다.",
-						});
-					} else {
-						setErrorMsg({ ...errorMsg, passwordCheck: "" });
-					}
-				}
-				break;
 			case "passwordCheck":
-				if (values.password !== value) {
-					setErrorMsg({ ...errorMsg, [name]: "비밀번호가 일치하지 않습니다." });
-				} else {
+				if (values.password === value) {
 					setErrorMsg({ ...errorMsg, [name]: "" });
+				} else {
+					setErrorMsg({ ...errorMsg, [name]: "비밀번호가 일치하지 않습니다." });
 				}
-				break;
 		}
 	};
 
-	// 패스워드 확인 입력창 클릭 시 일치하는지 확인
-	const checkPwdCheckInput = () => {
-		if (values.password.length) {
-			values.password !== values.passwordCheck
-				? setErrorMsg({
-						...errorMsg,
-						passwordCheck: "비밀번호가 일치하지 않습니다.",
-				  })
-				: setErrorMsg({ ...errorMsg, passwordCheck: "" });
+	const onBlurInputs = (e: React.FocusEvent<HTMLInputElement>) => {
+		console.log(e);
+
+		const msg = { password: "", passwordCheck: "" };
+		const { password, passwordCheck } = values;
+
+		if (!checkPassword(password)) {
+			msg.password =
+				"8자 이상의 영문+숫자+특수문자($@!%*#?&) 조합으로 구성되어야 합니다.";
+			if (passwordCheck !== "" && password !== passwordCheck) {
+				msg.passwordCheck = "비밀번호가 일치하지 않습니다.";
+				setErrorMsg({ ...errorMsg, ...msg });
+			} else {
+				setErrorMsg({ ...errorMsg, ...msg });
+			}
+		} else if (passwordCheck !== "" && password !== passwordCheck) {
+			msg.passwordCheck = "비밀번호가 일치하지 않습니다.";
+			setErrorMsg({ ...errorMsg, ...msg });
+		} else {
+			setErrorMsg({ ...errorMsg, ...msg });
 		}
 	};
 
@@ -145,8 +138,12 @@ const SignUp = () => {
 					})
 					.then((res) => {
 						// 발송 되면 모달 띄우기
+						setErrorMsg({
+							...errorMsg,
+							email: "",
+						});
+						Toast(ToastType.success, "인증번호가 발송되었습니다.");
 						setIsConfirm({
-							...isConfirm,
 							isOpen: true,
 							auth: res.data.message,
 							minutes: 5,
@@ -169,12 +166,37 @@ const SignUp = () => {
 	const onClickCerBtn = () => {
 		// 인증번호가 일치하다면
 		if (isConfirm.auth === values.authNum) {
-			// 인증완료 토스트 창 띄우고
+			setIsOpen(true);
 			setIsAuth(true);
 			setIsConfirm({ ...isConfirm, isOpen: false });
 		} else {
 			setErrorMsg({ ...errorMsg, authNum: "인증번호가 일치하지 않습니다." });
 		}
+	};
+
+	// 재전송 버튼을 누르면 실행되는 함수
+	const onClickReCerBtn = () => {
+		axios
+			.post(`${process.env.REACT_APP_SERVER_URL}/members/signup/sendmail`, {
+				email: values.email,
+			})
+			.then((res) => {
+				// 발송 되면 모달 띄우기
+				setErrorMsg({
+					...errorMsg,
+					email: "",
+				});
+				Toast(ToastType.success, "인증번호가 발송되었습니다.");
+				setIsConfirm({
+					isOpen: true,
+					auth: res.data.message,
+					minutes: 5,
+					seconds: 0,
+				});
+			})
+			.catch((error) => {
+				console.log(error);
+			});
 	};
 
 	const checkValues = useCallback(
@@ -245,112 +267,136 @@ const SignUp = () => {
 		return () => {
 			clearInterval(countDown!);
 		};
-	}, [isConfirm.isOpen]);
+	}, [isConfirm.isOpen, isConfirm.minutes === 5]);
 
 	useEffect(() => {
 		checkValues(values, isAuth);
 	}, [values, isAuth]);
 
 	return (
-		<Container>
-			<SignUpContainer>
-				<Logo />
-				<h3>회원가입</h3>
-				<Title>이메일</Title>
-				<InputContainer>
-					<InputW80
-						type="email"
-						name="email"
-						onChange={onChangeValues}
-						disabled={isAuth}
-					/>
-					<CerBtnBlue disabled={isDisabled || isAuth} onClick={onClickAuthBtn}>
-						인증
-					</CerBtnBlue>
-				</InputContainer>
-				<WarningTitle>{errorMsg.email}</WarningTitle>
-				{isConfirm.isOpen ? (
-					<>
-						<Title>인증번호</Title>
-						<InputContainer>
-							<InputW80
-								type="text"
-								name="authNum"
-								onChange={onChangeValues}
-								disabled={isAuth}
-							/>
-							{isConfirm.isOpen ? (
-								<span>
-									{isConfirm.minutes}:
-									{isConfirm.seconds < 10
-										? `0${isConfirm.seconds}`
-										: isConfirm.seconds}
-								</span>
-							) : null}
-							{isConfirm.minutes === 0 && isConfirm.seconds === 0 ? (
-								<CerBtnRed>재발송</CerBtnRed>
+		<>
+			<Container>
+				<SignUpContainer>
+					<Logo />
+					<h3>회원가입</h3>
+					<Title>이메일</Title>
+					<InputContainer>
+						<InputW80
+							type="email"
+							name="email"
+							onChange={onChangeValues}
+							disabled={isAuth || isConfirm.minutes !== 0}
+						/>
+						<CerBtnBlue
+							disabled={isDisabled || isAuth}
+							onClick={onClickAuthBtn}
+						>
+							인증
+						</CerBtnBlue>
+					</InputContainer>
+					<WarningTitle>{errorMsg.email}</WarningTitle>
+					{isConfirm.isOpen ? (
+						<>
+							<Title>인증번호</Title>
+							<InputContainer>
+								<InputW80
+									type="text"
+									name="authNum"
+									onChange={onChangeValues}
+									disabled={isAuth}
+								/>
+								{isConfirm.isOpen ? (
+									<span>
+										{isConfirm.minutes}:
+										{isConfirm.seconds < 10
+											? `0${isConfirm.seconds}`
+											: isConfirm.seconds}
+									</span>
+								) : null}
+								{isConfirm.minutes === 0 && isConfirm.seconds === 0 ? (
+									<CerBtnRed onClick={onClickReCerBtn}>재발송</CerBtnRed>
+								) : (
+									<CerBtnBlue onClick={onClickCerBtn}>확인</CerBtnBlue>
+								)}
+							</InputContainer>
+							<WarningTitle>{errorMsg.authNum}</WarningTitle>
+						</>
+					) : null}
+					<Title>비밀번호</Title>
+					<PasswordLabel>
+						<Input
+							type={isVisible ? "text" : "password"}
+							name="password"
+							onChange={onChangeValues}
+							onBlur={onBlurInputs}
+						/>
+						<button onClick={onClickVisibleBtn}>
+							{isVisible ? (
+								<SvgIcon
+									component={VisibilityOffRoundedIcon}
+									sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+								/>
 							) : (
-								<CerBtnBlue onClick={onClickCerBtn}>확인</CerBtnBlue>
+								<SvgIcon
+									component={VisibilityRoundedIcon}
+									sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+								/>
 							)}
-						</InputContainer>
-						<WarningTitle>{errorMsg.authNum}</WarningTitle>
-					</>
-				) : null}
-				<Title>비밀번호</Title>
-				<PasswordLabel>
+						</button>
+					</PasswordLabel>
+					<WarningTitle>{errorMsg.password}</WarningTitle>
+					<Title>비밀번호 확인</Title>
 					<Input
-						type={isVisible ? "text" : "password"}
-						name="password"
+						type="password"
+						name="passwordCheck"
 						onChange={onChangeValues}
+						onBlur={onBlurInputs}
+						// onClick={checkPwdCheckInput}
 					/>
-					<button onClick={onClickVisibleBtn}>
-						{isVisible ? (
-							<SvgIcon
-								component={VisibilityOffRoundedIcon}
-								sx={{ stroke: "#ffffff", strokeWidth: 1 }}
-							/>
-						) : (
-							<SvgIcon
-								component={VisibilityRoundedIcon}
-								sx={{ stroke: "#ffffff", strokeWidth: 1 }}
-							/>
-						)}
-					</button>
-				</PasswordLabel>
-				<WarningTitle>{errorMsg.password}</WarningTitle>
-				<Title>비밀번호 확인</Title>
-				<Input
-					type="password"
-					name="passwordCheck"
-					onChange={onChangeValues}
-					onClick={checkPwdCheckInput}
-				/>
-				<WarningTitle>{errorMsg.passwordCheck}</WarningTitle>
-				<Radio>
-					<input type="checkbox" name="webAlarm" onChange={onChangeCheckBox} />
-					<span>웹 알림 수신 동의 (선택)</span>
-					<input
-						type="checkbox"
-						name="emailAlarm"
-						onChange={onChangeCheckBox}
-					/>
-					<span>이메일 알림 수신 동의 (선택)</span>
-				</Radio>
-				<SmallTitle>
-					이미 계정이 있으신가요?{" "}
-					<span
-						onClick={() => {
-							navigate("/login");
-						}}
-					>
-						로그인 화면으로 이동
-					</span>
-				</SmallTitle>
-				<SubmitBtn disabled={empty} onClick={onClickSubmitBtn}>
-					<p>회원가입</p>
-				</SubmitBtn>
-			</SignUpContainer>
-		</Container>
+					<WarningTitle>{errorMsg.passwordCheck}</WarningTitle>
+					<Radio>
+						<input
+							type="checkbox"
+							name="webAlarm"
+							onChange={onChangeCheckBox}
+						/>
+						<span>웹 알림 수신 동의 (선택)</span>
+						<input
+							type="checkbox"
+							name="emailAlarm"
+							onChange={onChangeCheckBox}
+						/>
+						<span>이메일 알림 수신 동의 (선택)</span>
+					</Radio>
+					<SmallTitle>
+						이미 계정이 있으신가요?{" "}
+						<span
+							onClick={() => {
+								navigate("/login");
+							}}
+						>
+							로그인 화면으로 이동
+						</span>
+					</SmallTitle>
+					<SubmitBtn disabled={empty} onClick={onClickSubmitBtn}>
+						<p>회원가입</p>
+					</SubmitBtn>
+				</SignUpContainer>
+			</Container>
+			<Modal
+				state={isOpen}
+				setState={setIsOpen}
+				msgTitle="이메일 인증이 완료되었습니다."
+			>
+				<button
+					onClick={() => {
+						setIsOpen(false);
+					}}
+				>
+					확인
+				</button>
+			</Modal>
+		</>
 	);
 };
 
@@ -364,7 +410,7 @@ const Container = styled.div`
 
 const SignUpContainer = styled.div`
 	width: 47rem;
-	height: 85vh;
+	height: 90vh;
 	display: flex;
 	flex-direction: column;
 
@@ -413,6 +459,10 @@ export const InputContainer = styled.div`
 const InputW80 = styled(Input)`
 	width: 80%;
 	height: 3.8rem;
+
+	&:focus {
+		border: 1px solid ${(props) => props.theme.COLORS.LIGHT_BLUE};
+	}
 `;
 
 const CerBtnBlue = styled.button`
@@ -433,7 +483,7 @@ const CerBtnRed = styled(CerBtnBlue)`
 	background-color: ${(props) => props.theme.COLORS.LIGHT_RED};
 `;
 
-const WarningTitle = styled.p`
+export const WarningTitle = styled.p`
 	font-size: 1.2rem;
 	margin-top: 0.5rem;
 	color: ${(props) => props.theme.COLORS.LIGHT_RED};
