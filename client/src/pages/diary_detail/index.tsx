@@ -5,23 +5,30 @@ import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import ScheduleOutlinedIcon from "@mui/icons-material/ScheduleOutlined";
 import dateAsKor from "src/utils/dateAsKor";
 import ReactQuill from "react-quill";
-import { QuillContainer } from "../diary_write/textEditor";
+import { QuillContainer } from "../diary_write/TextEditor";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { api } from "src/utils/refreshToken";
+import Modal from "src/components/Layout/Modal";
 
 interface detailType {
-	id: number;
+	diaryId: number;
 	date: string;
 	title: string;
 	body: string;
 	img: string;
-	diaryTag: string[];
+	tagList: TagList[];
 	// 가계부 관련 타입도 추가 예정
+}
+
+interface TagList {
+	diaryTagId: number;
+	tagName: string;
 }
 
 const DiaryDetail = () => {
 	const [diary, setDiary] = useState<detailType | null>(null);
+	const [isOpen, setIsOpen] = useState<boolean>(false);
 
 	const id = useParams().id;
 	const navigate = useNavigate();
@@ -30,11 +37,30 @@ const DiaryDetail = () => {
 		navigate("/diary");
 	};
 
+	const onClickUpdateBtn = () => {
+		navigate(`/diary/${id}/update`);
+	};
+
+	const onClickDeleteBtn = () => {
+		setIsOpen(true);
+	};
+
+	const onClickCloseBtn = () => {
+		api
+			.delete(`/diary/${id}/delete`)
+			.then(() => {
+				navigate("/diary");
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	};
+
 	useEffect(() => {
-		axios
-			.get(`http://localhost:8000/diary/${id}`)
+		api
+			.get(`/diary/${id}`)
 			.then((res) => {
-				setDiary(res.data);
+				setDiary(res.data.data);
 			})
 			.catch((error) => {
 				console.log(error);
@@ -42,45 +68,68 @@ const DiaryDetail = () => {
 	}, []);
 
 	return (
-		<Container>
-			<DetailContainer>
-				<div className="go_back" onClick={onClickBackBtn}>
-					<SvgIcon
-						component={ChevronLeftOutlinedIcon}
-						sx={{ stroke: "#ffffff", strokeWidth: 1 }}
-					/>
-					<p>일기 조회로 돌아가기</p>
-				</div>
-				<h2>{diary?.title}</h2>
-				<div className="diary_header">
-					<div className="diary_subtitle">
+		<>
+			<Container>
+				<DetailContainer>
+					<div className="go_back" onClick={onClickBackBtn}>
 						<SvgIcon
-							component={CategoryOutlinedIcon}
+							component={ChevronLeftOutlinedIcon}
 							sx={{ stroke: "#ffffff", strokeWidth: 1 }}
 						/>
-						{diary?.diaryTag.map((tag, idx) => (
-							<span key={idx}>
-								{diary?.diaryTag.length - 1 !== idx ? `${tag}, ` : `${tag}`}
+						<p>일기 조회로 돌아가기</p>
+					</div>
+					<h2>{diary?.title}</h2>
+					<div className="diary_header">
+						<div className="diary_subtitle">
+							<SvgIcon
+								component={CategoryOutlinedIcon}
+								sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+							/>
+							{diary?.tagList.map((tag, idx) => (
+								<span key={tag.diaryTagId}>
+									{diary?.tagList.length - 1 !== idx
+										? `${tag.tagName},`
+										: `${tag.tagName} `}
+								</span>
+							))}
+						</div>
+						<div className="diary_subtitle">
+							<SvgIcon
+								component={ScheduleOutlinedIcon}
+								sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
+							/>
+							<span>
+								{diary?.date !== undefined ? dateAsKor(diary?.date) : null}
 							</span>
-						))}
+						</div>
+						<div className="update_delete">
+							<span onClick={onClickUpdateBtn}>수정</span>
+							<span onClick={onClickDeleteBtn}>삭제</span>
+						</div>
 					</div>
-					<div className="diary_subtitle">
-						<SvgIcon
-							component={ScheduleOutlinedIcon}
-							sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
-						/>
-						<span>
-							{diary?.date !== undefined ? dateAsKor(diary?.date) : null}
-						</span>
-					</div>
-				</div>
-				<hr />
-				<Quill>
-					<ReactQuill theme="snow" value={diary?.body} readOnly={true} />
-				</Quill>
-			</DetailContainer>
-			<BookContainer>안녕</BookContainer>
-		</Container>
+					<hr />
+					<Quill>
+						<ReactQuill theme="snow" value={diary?.body} readOnly={true} />
+					</Quill>
+				</DetailContainer>
+				<BookContainer>1</BookContainer>
+			</Container>
+			<Modal
+				state={isOpen}
+				setState={setIsOpen}
+				msgTitle="작성한 글을 삭제하시겠습니까?"
+				msgBody="삭제한 글은 복구할 수 없습니다."
+			>
+				<button
+					onClick={() => {
+						setIsOpen((prev) => !prev);
+					}}
+				>
+					취소
+				</button>
+				<button onClick={onClickCloseBtn}>확인</button>
+			</Modal>
+		</>
 	);
 };
 
@@ -138,9 +187,10 @@ const DetailContainer = styled.div`
 
 	.diary_header {
 		display: flex;
+		position: relative;
 		gap: 5rem;
 		justify-content: center;
-		margin-top: 2.3rem;
+		margin-top: 3rem;
 	}
 
 	.diary_subtitle {
@@ -154,6 +204,22 @@ const DetailContainer = styled.div`
 		span {
 			align-self: center;
 			font-size: 1.4rem;
+			margin-right: 0.3rem;
+		}
+	}
+
+	.update_delete {
+		position: absolute;
+		right: 0;
+		span {
+			margin-right: 1rem;
+			color: ${(props) => props.theme.COLORS.GRAY_500};
+			font-size: 1.4rem;
+			cursor: pointer;
+
+			&:hover {
+				text-decoration: underline;
+			}
 		}
 	}
 
