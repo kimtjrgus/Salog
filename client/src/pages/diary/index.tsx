@@ -13,6 +13,7 @@ import CalendarComponent from "./Calendar";
 import useTokenCheck from "src/hooks/useTokenCheck";
 import { api } from "src/utils/refreshToken";
 import { v4 as uuidv4 } from "uuid";
+import useDebounce from "src/hooks/useDebounce";
 // import { useScroll } from "src/hooks/useScroll";
 
 export interface diaryType {
@@ -35,10 +36,11 @@ const Diary = () => {
 	const [diaries, setDiaries] = useState<diaryType[]>([]);
 	const [filterDiary, setFilterDiary] = useState<diaryType[]>([]);
 	const [searchVal, setSearchVal] = useState<string>("");
-	console.log(searchVal);
+	const debouncedSearchVal = useDebounce(searchVal, 300); // 300ms 딜레이로 디바운스 적용
+
+	const mapArray = filterDiary.length > 0 ? filterDiary : diaries;
 
 	// const { scrollY, containerRef } = useScroll();
-	const mapArray = filterDiary.length > 0 ? filterDiary : diaries;
 
 	const path = useLocation().pathname;
 	const search = useLocation().search;
@@ -56,6 +58,16 @@ const Diary = () => {
 
 	const onChangeSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchVal(e.target.value);
+	};
+
+	const onClickSearchBtn = () => {
+		navigate(`${path}?title=${searchVal}`);
+	};
+
+	const onKeyDownSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Enter") {
+			onClickSearchBtn();
+		}
 	};
 
 	const categoryOrganize = () => {
@@ -91,6 +103,7 @@ const Diary = () => {
 			.get(`${path}?page=1&size=20`)
 			.then((res) => {
 				setDiaries(res.data.data);
+				setFilterDiary(res.data.data);
 			})
 			.catch((error) => {
 				console.log(error);
@@ -98,11 +111,13 @@ const Diary = () => {
 	}, []);
 
 	useEffect(() => {
-		if (search !== "") {
-			console.log(`search는 ${search} 입니다.`);
-
+		if (search !== "" && search !== "?title=") {
 			api
-				.get(`${path}?page=1&size=10${search.replace("?", "&")}`)
+				.get(
+					`${path}${
+						search.includes("?title") ? "/search" : ""
+					}?page=1&size=10${search.replace("?", "&")}`,
+				)
 				.then((res) => {
 					setFilterDiary(res.data.data);
 				})
@@ -110,9 +125,17 @@ const Diary = () => {
 					console.log(error);
 				});
 		} else {
-			setFilterDiary([]); // search가 빈 문자열인 경우 filterDiary를 빈 배열로 초기화
+			setFilterDiary(diaries); // search가 빈 문자열인 경우 filterDiary를 빈 배열로 초기화
 		}
 	}, [search]);
+
+	useEffect(() => {
+		if (debouncedSearchVal === "") {
+			navigate(`${path}`);
+		} else {
+			navigate(`${path}?title=${debouncedSearchVal}`);
+		}
+	}, [debouncedSearchVal]);
 
 	return (
 		<Container>
@@ -129,7 +152,7 @@ const Diary = () => {
 				</DiaryTitle>
 				<SubTitle>일기를 기록하여 하루를 정리해보세요!</SubTitle>
 				<hr />
-				{diaries?.length !== 0 ? (
+				{filterDiary?.length !== 0 ? (
 					<>
 						{search === "" ? (
 							<h3>분류 전체보기 ({diaries.length})</h3>
@@ -189,8 +212,12 @@ const Diary = () => {
 						</div>
 						<hr />
 						<div className="search_input">
-							<Input placeholder="게시글 검색" onChange={onChangeSearchInput} />
-							<button>
+							<Input
+								placeholder="게시글 검색"
+								onChange={onChangeSearchInput}
+								onKeyDown={onKeyDownSearch}
+							/>
+							<button onClick={onClickSearchBtn}>
 								<SvgIcon
 									component={SearchOutlinedIcon}
 									sx={{ stroke: "#ffffff", strokeWidth: 1 }}
@@ -212,7 +239,7 @@ const Diary = () => {
 						</NavStyle>
 						{categoryOrganize()}
 					</CategoryContainer>
-					<CalendarComponent diaries={diaries} setDiaries={setDiaries} />
+					<CalendarComponent diaries={diaries} />
 				</RemainContainer>
 			</div>
 		</Container>
@@ -343,6 +370,7 @@ const ListMain = styled.div`
 const Tags = styled.ul`
 	display: flex;
 	margin-top: 0.5rem;
+	min-height: 3rem;
 `;
 
 const Tag = styled.li`
