@@ -17,6 +17,7 @@ interface userType {
 
 const Login = () => {
 	const [values, setValues] = useState<userType>({ email: "", password: "" });
+	const [error, setError] = useState<userType>({ email: "", password: "" });
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 	const navigate = useNavigate();
 
@@ -33,13 +34,28 @@ const Login = () => {
 	const onClickLoginBtn = () => {
 		// 유효성 검사가 true라면
 		axios
-			.post("http://localhost:8000/login", values)
+			.post(`${process.env.REACT_APP_SERVER_URL}/members/login`, values)
 			.then((res) => {
-				setCookie("accessToken", res.data.accessToken, { path: "/" });
+				const current = new Date();
+				current.setMinutes(current.getMinutes() + 30);
+
+				setCookie("accessToken", res.data.accessToken, {
+					path: "/",
+					expires: current,
+				});
+				current.setMinutes(current.getMinutes() + 1440);
+				setCookie("refreshToken", res.data.refreshToken, {
+					path: "/",
+					expires: current,
+				});
 				navigate("/");
 			})
 			.catch((error) => {
-				console.log(error);
+				// 404 : 회원이 존재하지 않음 , 400 : 비밀번호가 일치하지 않음
+				if (error.response.data.status === 404)
+					setError({ ...error, email: "존재하지 않는 계정입니다." });
+				if (error.response.data.status === 400)
+					setError({ ...error, password: "비밀번호가 일치하지 않습니다." });
 			});
 	};
 
@@ -50,6 +66,7 @@ const Login = () => {
 				<LoginDiv>
 					<Title>이메일</Title>
 					<Input type="email" name="email" onChange={onChangeValues} />
+					<span>{error.email}</span>
 					<Title>비밀번호</Title>
 					<PasswordLabel>
 						<Input
@@ -71,13 +88,20 @@ const Login = () => {
 							)}
 						</button>
 					</PasswordLabel>
+					<span>{error.password}</span>
 					<SubmitBtn onClick={onClickLoginBtn}>
 						<p>로그인</p>
 					</SubmitBtn>
 				</LoginDiv>
 				<RedirectContainer>
 					<p>비밀번호를 잊으셨나요?</p>
-					<span>비밀번호 찾기</span>
+					<span
+						onClick={() => {
+							navigate("/findPassword");
+						}}
+					>
+						비밀번호 찾기
+					</span>
 				</RedirectContainer>
 				<RedirectContainer>
 					<p>아직 회원이 아니신가요?</p>
@@ -140,6 +164,12 @@ const LoginDiv = styled.div`
 	p {
 		font-size: 1.4rem;
 	}
+
+	span {
+		font-size: 1.2rem;
+		margin-top: 0.5rem;
+		color: ${(props) => props.theme.COLORS.LIGHT_RED};
+	}
 `;
 
 export const PasswordLabel = styled.label`
@@ -147,7 +177,7 @@ export const PasswordLabel = styled.label`
 
 	button {
 		position: absolute;
-		top: 47%;
+		top: 28%;
 		right: 2rem;
 
 		svg {
@@ -166,6 +196,10 @@ export const Input = styled.input.attrs({ required: true })`
 
 	&.placeholder {
 		color: ${(props) => props.theme.COLORS.GRAY_300};
+	}
+
+	&:focus {
+		border: 1px solid ${(props) => props.theme.COLORS.LIGHT_BLUE};
 	}
 `;
 

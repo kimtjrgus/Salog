@@ -23,7 +23,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true, // switch 구문을 쓰면서 자주하는 실수를 잡아 줍 (break 미사용)
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noEmit": true,

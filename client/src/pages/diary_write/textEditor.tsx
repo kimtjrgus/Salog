@@ -14,7 +14,7 @@ interface propsType {
 	onChangeBody: (value: string) => void;
 }
 
-const Reactquill = (props: propsType) => {
+const ReactQuillComponent = (props: propsType) => {
 	const modules = React.useMemo(
 		() => ({
 			imageActions: {},
@@ -23,11 +23,13 @@ const Reactquill = (props: propsType) => {
 				[{ header: [1, 2, 3, false] }],
 				["bold", "italic", "underline", "strike"],
 				[{ list: "ordered" }, { list: "bullet" }],
-				["link", "image"],
+				["image"],
 				[{ align: [] }, { color: [] }],
 				["clean"],
 			],
+			//   handlers: { image: imageHandler },
 			// ImageResize: { modules: ["Resize"] },
+			// imageDrop: true,
 		}),
 		[],
 	);
@@ -40,7 +42,6 @@ const Reactquill = (props: propsType) => {
 		"strike",
 		"list",
 		"bullet",
-		"link",
 		"image",
 		"align",
 		"color",
@@ -69,7 +70,7 @@ const Reactquill = (props: propsType) => {
 	);
 };
 
-const QuillContainer = styled.div`
+export const QuillContainer = styled.div`
 	margin-bottom: 5rem;
 	.ql-snow .ql-editor strong {
 		font-weight: Bold;
@@ -87,7 +88,7 @@ const QuillContainer = styled.div`
 
 	.ql-container.ql-snow {
 		border: none;
-		font-size: 1.6rem;
+		font-size: 1.4rem;
 	}
 
 	.ql-container > .ql-editor.ql-blank::before {
@@ -138,4 +139,4 @@ const QuillContainer = styled.div`
 	}
 `;
 
-export default Reactquill;
+export default ReactQuillComponent;

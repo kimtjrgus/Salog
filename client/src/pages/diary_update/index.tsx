@@ -1,21 +1,21 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Modal from "src/components/Layout/Modal";
 import Toast, { ToastType } from "src/components/Layout/Toast";
 import dateAsKor from "src/utils/dateAsKor";
 import { styled } from "styled-components";
 import { Input } from "../login";
-import Reactquill from "./TextEditor";
-import moment from "moment";
+import ReactQuillComponent from "../diary_write/TextEditor";
 import { api } from "src/utils/refreshToken";
 import useTokenCheck from "src/hooks/useTokenCheck";
-
+import { type diaryType, type TagList } from "../diary";
 export interface valuesType {
 	title: string;
 	body: string;
 }
 
 const DiaryWrite = () => {
+	const [diary, setDiary] = useState<diaryType[]>([]);
 	const [values, setValues] = useState<valuesType>({ title: "", body: "" });
 	const [categories, setCategories] = useState<string[]>([]);
 	const [category, setCategory] = useState<string>("");
@@ -23,7 +23,9 @@ const DiaryWrite = () => {
 	const [tagModal, setTagModal] = useState<boolean>(false);
 	useTokenCheck();
 
-	console.log(categories);
+	console.log(diary, values);
+
+	const id = useParams().id;
 
 	const navigate = useNavigate();
 
@@ -50,30 +52,17 @@ const DiaryWrite = () => {
 
 	const onKeyUpEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		const inputElement = e.target as HTMLInputElement;
-
 		if (inputElement.value.trim() !== "" && inputElement.value !== ",") {
 			if (e.key === ",") {
-				if (
-					!categories.includes(
-						inputElement.value.slice(0, inputElement.value.length - 1),
-					)
-				) {
-					setCategories([
-						...categories,
-						inputElement.value.slice(0, inputElement.value.length - 1).trim(),
-					]);
-					setCategory("");
-				} else {
-					setCategory("");
-				}
+				setCategories([
+					...categories,
+					inputElement.value.slice(0, inputElement.value.length - 1).trim(),
+				]);
+				setCategory("");
 			}
 			if (e.key === "Enter") {
-				if (!categories.includes(inputElement.value)) {
-					setCategories([...categories, inputElement.value.trim()]);
-					setCategory("");
-				} else {
-					setCategory("");
-				}
+				setCategories([...categories, inputElement.value.trim()]);
+				setCategory("");
 			}
 		}
 	};
@@ -94,7 +83,7 @@ const DiaryWrite = () => {
 	};
 
 	const onClickCloseBtn = () => {
-		navigate("/diary");
+		navigate(`/diary/${id}`);
 	};
 
 	const onClickWriteBtn = () => {
@@ -110,21 +99,34 @@ const DiaryWrite = () => {
 			Toast(ToastType.error, "내용을 10자 이상 입력해주세요");
 		} else {
 			api
-				.post(`/diary/post`, {
-					date: moment().format("YYYY-MM-DD"),
+				.patch(`/diary/${id}/update`, {
 					title: values.title,
 					body: values.body,
-					img: "",
 					tagList: categories,
 				})
 				.then(() => {
-					navigate("/diary");
+					navigate(`/diary/${id}`);
 				})
 				.catch((error) => {
 					console.log(error);
 				});
 		}
 	};
+
+	useEffect(() => {
+		api
+			.get(`/diary/${id}`)
+			.then((res) => {
+				setDiary(res.data.data);
+				setValues({ title: res.data.data.title, body: res.data.data.body });
+				res.data.data.tagList.forEach((tagObj: TagList) => {
+					setCategories([...categories, tagObj.tagName]);
+				});
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	}, []);
 
 	const nowDate = dateAsKor(new Date().toDateString());
 	return (
@@ -134,8 +136,8 @@ const DiaryWrite = () => {
 					<div className="header">
 						<h3>{nowDate}</h3>
 						<div className="header_btn">
-							<button onClick={onClickCancelBtn}>작성 취소</button>
-							<button onClick={onClickWriteBtn}>작성 완료</button>
+							<button onClick={onClickCancelBtn}>수정 취소</button>
+							<button onClick={onClickWriteBtn}>수정 완료</button>
 						</div>
 					</div>
 					<WriteInput
@@ -143,6 +145,7 @@ const DiaryWrite = () => {
 						placeholder="제목을 입력하세요."
 						type="text"
 						name="title"
+						value={values.title}
 						onChange={onChangeValues}
 					/>
 					<div className="contour"></div>
@@ -162,7 +165,6 @@ const DiaryWrite = () => {
 						})}
 						<WriteInput
 							placeholder={"태그를 입력하세요."}
-							maxLength={10}
 							onChange={onChangeCategory}
 							onFocus={onFocusInput}
 							onBlur={onBlurInput}
@@ -175,15 +177,14 @@ const DiaryWrite = () => {
 							요소를 클릭하면 삭제됩니다.`}
 						</TagModal>
 					</CategoryList>
-					<Reactquill body={values.body} onChangeBody={onChangeBody} />
+					<ReactQuillComponent body={values.body} onChangeBody={onChangeBody} />
 				</WriteContainer>
 				<Calculate></Calculate>
 			</Container>
 			<Modal
 				state={isOpen}
 				setState={setIsOpen}
-				msgTitle="작성을 취소하시겠습니까?"
-				msgBody="이미 작성한 내용은 저장되지 않습니다."
+				msgTitle="내용 수정을 취소하시겠습니까?"
 			>
 				<button
 					onClick={() => {
@@ -280,7 +281,6 @@ const CategoryList = styled.div`
 		border: none;
 		height: 2.5rem;
 		margin-right: 0.5rem;
-		margin-bottom: 1rem;
 		padding: 0.5rem 1rem;
 		cursor: pointer;
 		background-color: ${(props) => props.theme.COLORS.GRAY_200};

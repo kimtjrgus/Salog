@@ -3,53 +3,90 @@ import { styled } from "styled-components";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
-import axios from "axios";
 import NotData from "../../assets/NotData.png";
 import { Input } from "../login";
 import Test from "../../assets/Test.jpeg";
 import dateAsKor from "src/utils/dateAsKor";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import CalendarComponent from "./Calendar";
+import useTokenCheck from "src/hooks/useTokenCheck";
+import { api } from "src/utils/refreshToken";
+import { v4 as uuidv4 } from "uuid";
+import useDebounce from "src/hooks/useDebounce";
+// import { useScroll } from "src/hooks/useScroll";
 
-interface diaryType {
-	id: number;
+export interface diaryType {
+	diaryId: number;
 	date: string;
 	title: string;
 	body: string;
 	img: string;
-	diaryTag: string[];
+	tagList: TagList[];
+}
+
+export interface TagList {
+	diaryTagId: number;
+	tagName: string;
 }
 
 const Diary = () => {
+	useTokenCheck();
+
 	const [diaries, setDiaries] = useState<diaryType[]>([]);
+	const [filterDiary, setFilterDiary] = useState<diaryType[]>([]);
+	const [searchVal, setSearchVal] = useState<string>("");
+	const debouncedSearchVal = useDebounce(searchVal, 300); // 300ms 딜레이로 디바운스 적용
+
+	const mapArray = filterDiary.length > 0 ? filterDiary : diaries;
+
+	// const { scrollY, containerRef } = useScroll();
 
 	const path = useLocation().pathname;
 	const search = useLocation().search;
 	const decodeUrl = decodeURI(search).split("=")[1];
+
 	const navigate = useNavigate();
 
 	const onClickWriteBtn = () => {
 		navigate("/diary/post");
 	};
 
+	const onClickList = (id: number) => {
+		navigate(`/diary/${id}`);
+	};
+
+	const onChangeSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchVal(e.target.value);
+	};
+
+	const onClickSearchBtn = () => {
+		navigate(`${path}?title=${searchVal}`);
+	};
+
+	const onKeyDownSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === "Enter") {
+			onClickSearchBtn();
+		}
+	};
+
 	const categoryOrganize = () => {
 		const map = new Map();
 		const arr = [];
 		diaries.forEach((diary) => {
-			const category = diary.diaryTag;
+			const category = diary.tagList;
 			category.forEach((tag) => {
-				map.get(tag) !== undefined
-					? map.set(tag, map.get(tag) + 1)
-					: map.set(tag, 1);
+				map.get(tag.tagName) !== undefined
+					? map.set(tag.tagName, map.get(tag.tagName) + 1)
+					: map.set(tag.tagName, 1);
 			});
 		});
 
 		for (const [key, value] of map) {
 			arr.push(
 				<NavStyle
-					to={`/diary?category=${key}`}
-					// key는 서버 연동 후 id가 생기면 변경 예정
-					key={Math.floor(Math.random() * 1000000000000000)}
+					to={`/diary?diaryTag=${key}`}
+					key={uuidv4()}
 					className={decodeUrl === key ? "active" : ""}
 				>
 					<p>{key}</p>
@@ -62,15 +99,43 @@ const Diary = () => {
 	};
 
 	useEffect(() => {
-		axios
-			.get(`http://localhost:8000${path}${search}`)
+		api
+			.get(`${path}?page=1&size=20`)
 			.then((res) => {
-				setDiaries(res.data);
+				setDiaries(res.data.data);
+				setFilterDiary(res.data.data);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
 	}, []);
+
+	useEffect(() => {
+		if (search !== "" && search !== "?title=") {
+			api
+				.get(
+					`${path}${
+						search.includes("?title") ? "/search" : ""
+					}?page=1&size=10${search.replace("?", "&")}`,
+				)
+				.then((res) => {
+					setFilterDiary(res.data.data);
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		} else {
+			setFilterDiary(diaries); // search가 빈 문자열인 경우 filterDiary를 빈 배열로 초기화
+		}
+	}, [search]);
+
+	useEffect(() => {
+		if (debouncedSearchVal === "") {
+			navigate(`${path}`);
+		} else {
+			navigate(`${path}?title=${debouncedSearchVal}`);
+		}
+	}, [debouncedSearchVal]);
 
 	return (
 		<Container>
@@ -87,28 +152,36 @@ const Diary = () => {
 				</DiaryTitle>
 				<SubTitle>일기를 기록하여 하루를 정리해보세요!</SubTitle>
 				<hr />
-				{diaries?.length !== 0 ? (
+				{filterDiary?.length !== 0 ? (
 					<>
 						{search === "" ? (
 							<h3>분류 전체보기 ({diaries.length})</h3>
 						) : (
-							<h3>{decodeUrl}</h3>
+							<h3>
+								{decodeUrl} ({filterDiary.length})
+							</h3>
 						)}
 						<ListContainer>
-							{diaries.map((diary) => {
+							{mapArray?.map((diary) => {
 								return (
-									<List key={diary.id}>
+									<List
+										key={diary.diaryId}
+										onClick={() => {
+											onClickList(diary.diaryId);
+										}}
+									>
 										<ListMain>
 											<h4>{diary.title}</h4>
 											<p>{diary.body.replace(/(<([^>]+)>)/gi, "")}</p>
 											<Tags>
-												{diary.diaryTag.map((tag, idx) => {
-													return <Tag key={idx}>{tag}</Tag>;
+												{diary.tagList.map((tag) => {
+													return <Tag key={tag.diaryTagId}>{tag.tagName}</Tag>;
 												})}
 											</Tags>
 											<Info>
 												<p>{dateAsKor(diary.date)}</p>
-												<p>지출 내역: 4개 / 수입 내역: 0개</p>
+												{/* 리팩토링으로 건의 예정 */}
+												{/* <p>지출 내역: 4개 / 수입 내역: 0개</p> */}
 											</Info>
 										</ListMain>
 										<img src={Test} alt="이미지" />
@@ -126,59 +199,74 @@ const Diary = () => {
 					</NotDataContainer>
 				)}
 			</DiaryContainer>
-			<RemainContainer>
-				<SearchContainer>
-					<div className="header">
-						<SvgIcon
-							component={SearchOutlinedIcon}
-							sx={{ stroke: "#ffffff", strokeWidth: 1 }}
-						/>
-						<h3>검색</h3>
-					</div>
-					<hr />
-					<div className="search_input">
-						<Input placeholder="게시글 검색" />
-						<button>
+			<div className="remain">
+				<div className="blank"></div>
+				<RemainContainer>
+					<SearchContainer>
+						<div className="header">
 							<SvgIcon
 								component={SearchOutlinedIcon}
 								sx={{ stroke: "#ffffff", strokeWidth: 1 }}
 							/>
-						</button>
-					</div>
-				</SearchContainer>
-				<CategoryContainer>
-					<div className="header">
-						<SvgIcon
-							component={CategoryOutlinedIcon}
-							sx={{ stroke: "#ffffff", strokeWidth: 1 }}
-						/>
-						<h3>카테고리</h3>
-					</div>
-					<hr />
-					<NavStyle to="/diary" className={search === "" ? "active" : ""}>
-						<p>전체보기</p>&nbsp;<span>{`(${diaries.length})`}</span>
-					</NavStyle>
-					{categoryOrganize()}
-				</CategoryContainer>
-			</RemainContainer>
+							<h3>검색</h3>
+						</div>
+						<hr />
+						<div className="search_input">
+							<Input
+								placeholder="게시글 검색"
+								onChange={onChangeSearchInput}
+								onKeyDown={onKeyDownSearch}
+							/>
+							<button onClick={onClickSearchBtn}>
+								<SvgIcon
+									component={SearchOutlinedIcon}
+									sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+								/>
+							</button>
+						</div>
+					</SearchContainer>
+					<CategoryContainer>
+						<div className="header">
+							<SvgIcon
+								component={CategoryOutlinedIcon}
+								sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+							/>
+							<h3>태그</h3>
+						</div>
+						<hr />
+						<NavStyle to="/diary" className={search === "" ? "active" : ""}>
+							<p>전체보기</p>&nbsp;<span>{`(${diaries.length})`}</span>
+						</NavStyle>
+						{categoryOrganize()}
+					</CategoryContainer>
+					<CalendarComponent diaries={diaries} />
+				</RemainContainer>
+			</div>
 		</Container>
 	);
 };
 
 const Container = styled.div`
 	display: flex;
-	height: 90vh;
-	justify-content: center;
-	overflow: scroll;
+	height: 100%;
+	overflow-y: scroll;
 
 	&::-webkit-scrollbar {
 		display: none;
+	}
+
+	.remain {
+		width: 30%;
+	}
+
+	.blank {
+		height: 12.8rem;
 	}
 `;
 
 const DiaryContainer = styled.div`
 	margin-top: 3rem;
-	width: 65%;
+	width: 70%;
 
 	hr {
 		width: 100%;
@@ -200,7 +288,8 @@ const DiaryContainer = styled.div`
 const RemainContainer = styled.div`
 	margin-top: 3rem;
 	margin-left: 3rem;
-	width: 30%;
+	overflow-y: auto;
+	/* width: 30%; */
 `;
 
 const ListContainer = styled.ul`
@@ -254,6 +343,7 @@ const List = styled.li`
 	margin-bottom: 1rem;
 	border-radius: 4px;
 	box-shadow: 1px 1px 1px rgb(0, 0, 0, 25%);
+	cursor: pointer;
 `;
 
 const ListMain = styled.div`
@@ -267,6 +357,7 @@ const ListMain = styled.div`
 	}
 
 	p {
+		min-height: 3rem;
 		font-size: 1.2rem;
 		margin-top: 1.2rem;
 		line-height: 1.2;
@@ -279,6 +370,7 @@ const ListMain = styled.div`
 const Tags = styled.ul`
 	display: flex;
 	margin-top: 0.5rem;
+	min-height: 3rem;
 `;
 
 const Tag = styled.li`
@@ -304,6 +396,7 @@ const NotDataContainer = styled.div`
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	margin-top: 15rem;
 
 	.img_background {
 		width: 100px;
@@ -328,7 +421,7 @@ const NotDataContainer = styled.div`
 const SearchContainer = styled.div`
 	border: 1px solid ${(props) => props.theme.COLORS.GRAY_400};
 	border-radius: 4px;
-	margin-top: 12.4rem;
+	/* margin-top: 12.8rem; */
 	padding: 2rem;
 	display: flex;
 	flex-direction: column;

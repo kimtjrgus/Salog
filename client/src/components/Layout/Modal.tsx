@@ -82,7 +82,7 @@ interface ModalProps {
 	setState: (state: boolean) => void;
 	icon?: string;
 	msgTitle: string;
-	msgBody: string;
+	msgBody?: string;
 	children: React.ReactNode;
 }
 
