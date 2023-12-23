@@ -10,13 +10,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 interface MyComponentProps {
 	diaries: diaryType[];
-	setDiaries: React.Dispatch<React.SetStateAction<diaryType[]>>;
 }
 
-const CalendarComponent: React.FC<MyComponentProps> = ({
-	diaries,
-	setDiaries,
-}) => {
+const CalendarComponent: React.FC<MyComponentProps> = ({ diaries }) => {
 	const [value, onChange] = useState(new Date());
 
 	const path = useLocation().pathname;
@@ -28,7 +24,7 @@ const CalendarComponent: React.FC<MyComponentProps> = ({
 			Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
 		);
 		const dateString = selectedDate.toISOString().split("T")[0];
-		navigate(`${path}?${dateString}`);
+		navigate(`${path}?date=${dateString}`);
 		// axios
 		// 	.get(`${process.env.REACT_APP_SERVER_URL}${path}${search}`)
 		// 	.then((res) => {
@@ -82,7 +78,6 @@ CalendarComponent.propTypes = {
 			).isRequired,
 		}),
 	).isRequired as InferProps<MyComponentProps>["diaries"],
-	setDiaries: PropTypes.func.isRequired,
 };
 
 const Container = styled.div`
