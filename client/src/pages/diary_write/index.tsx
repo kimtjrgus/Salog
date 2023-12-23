@@ -8,6 +8,7 @@ import { Input } from "../login";
 import Reactquill from "./TextEditor";
 import moment from "moment";
 import { api } from "src/utils/refreshToken";
+import useTokenCheck from "src/hooks/useTokenCheck";
 
 export interface valuesType {
 	title: string;
@@ -20,6 +21,9 @@ const DiaryWrite = () => {
 	const [category, setCategory] = useState<string>("");
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [tagModal, setTagModal] = useState<boolean>(false);
+	useTokenCheck();
+
+	console.log(categories);
 
 	const navigate = useNavigate();
 
@@ -46,17 +50,30 @@ const DiaryWrite = () => {
 
 	const onKeyUpEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		const inputElement = e.target as HTMLInputElement;
+
 		if (inputElement.value.trim() !== "" && inputElement.value !== ",") {
 			if (e.key === ",") {
-				setCategories([
-					...categories,
-					inputElement.value.slice(0, inputElement.value.length - 1).trim(),
-				]);
-				setCategory("");
+				if (
+					!categories.includes(
+						inputElement.value.slice(0, inputElement.value.length - 1),
+					)
+				) {
+					setCategories([
+						...categories,
+						inputElement.value.slice(0, inputElement.value.length - 1).trim(),
+					]);
+					setCategory("");
+				} else {
+					setCategory("");
+				}
 			}
 			if (e.key === "Enter") {
-				setCategories([...categories, inputElement.value.trim()]);
-				setCategory("");
+				if (!categories.includes(inputElement.value)) {
+					setCategories([...categories, inputElement.value.trim()]);
+					setCategory("");
+				} else {
+					setCategory("");
+				}
 			}
 		}
 	};
@@ -145,6 +162,7 @@ const DiaryWrite = () => {
 						})}
 						<WriteInput
 							placeholder={"태그를 입력하세요."}
+							maxLength={10}
 							onChange={onChangeCategory}
 							onFocus={onFocusInput}
 							onBlur={onBlurInput}
@@ -262,6 +280,7 @@ const CategoryList = styled.div`
 		border: none;
 		height: 2.5rem;
 		margin-right: 0.5rem;
+		margin-bottom: 1rem;
 		padding: 0.5rem 1rem;
 		cursor: pointer;
 		background-color: ${(props) => props.theme.COLORS.GRAY_200};
