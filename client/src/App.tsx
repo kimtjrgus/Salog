@@ -13,10 +13,12 @@ import PasswordFind from "./pages/password";
 import SignUp from "./pages/sign_up";
 import PublicRoute from "./components/Common/PublicRoute";
 import DiaryUpdate from "./pages/diary_update";
+import ScrollToTop from "./utils/scrollToTop";
 
 function App() {
 	return (
 		<>
+			<ScrollToTop />
 			<Routes>
 				{/* 로그인 한 유저만 접근 가능 */}
 				<Route element={<PrivateRoute />}>
