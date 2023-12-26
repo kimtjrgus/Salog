@@ -56,7 +56,7 @@ public class IncomeController {
         MultiResponseDto<IncomeDto.Response> pages =
                 incomeService.getIncomes(token, page, size, incomeTag, date);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(pages, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{income-id}")
