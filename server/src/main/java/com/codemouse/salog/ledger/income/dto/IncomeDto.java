@@ -3,7 +3,7 @@ package com.codemouse.salog.ledger.income.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class IncomeDto {
     @AllArgsConstructor
@@ -12,6 +12,7 @@ public class IncomeDto {
         private int money;
         private String incomeName;
         private String memo;
+        private LocalDate date;
     }
 
     @AllArgsConstructor
@@ -20,6 +21,8 @@ public class IncomeDto {
         private int money;
         private String incomeName;
         private String memo;
+        //todo 2024-01-03 다이어리 핸들링
+        private long diaryId;
     }
 
     @AllArgsConstructor
@@ -29,6 +32,6 @@ public class IncomeDto {
         private int money;
         private String incomeName;
         private String memo;
-        private LocalDateTime createdAt;
+        private LocalDate date;
     }
 }

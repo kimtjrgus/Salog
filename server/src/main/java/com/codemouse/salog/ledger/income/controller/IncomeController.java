@@ -6,7 +6,6 @@ import com.codemouse.salog.ledger.income.dto.IncomeDto;
 import com.codemouse.salog.ledger.income.service.IncomeService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/income")
@@ -49,7 +47,7 @@ public class IncomeController {
                                             @Positive @RequestParam int page,
                                             @Positive @RequestParam int size,
                                             @Valid @RequestParam(required = false) String incomeTag,
-                                            @DateTimeFormat @RequestParam(required = false) LocalDateTime date) {
+                                            @RequestParam(required = false) String date) { // 날짜는 스트링으로 입력받고, 서비스에서 핸들링 (월별 조회 00 처리 시)
 
         tokenBlackListService.isBlackListed(token);
 
