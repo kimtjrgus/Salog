@@ -1,8 +1,8 @@
-package com.codemouse.salog.tags.repository;
+package com.codemouse.salog.tags.diaryTags.repository;
 
 import com.codemouse.salog.members.entity.Member;
-import com.codemouse.salog.tags.entity.DiaryTag;
-import com.codemouse.salog.tags.entity.DiaryTagLink;
+import com.codemouse.salog.tags.diaryTags.entity.DiaryTag;
+import com.codemouse.salog.tags.diaryTags.entity.DiaryTagLink;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

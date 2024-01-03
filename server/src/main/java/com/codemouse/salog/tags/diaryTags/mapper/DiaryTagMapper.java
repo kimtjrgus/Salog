@@ -1,7 +1,7 @@
-package com.codemouse.salog.tags.mapper;
+package com.codemouse.salog.tags.diaryTags.mapper;
 
-import com.codemouse.salog.tags.dto.DiaryTagDto;
-import com.codemouse.salog.tags.entity.DiaryTag;
+import com.codemouse.salog.tags.diaryTags.dto.DiaryTagDto;
+import com.codemouse.salog.tags.diaryTags.entity.DiaryTag;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

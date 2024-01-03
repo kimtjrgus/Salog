@@ -1,4 +1,4 @@
-package com.codemouse.salog.tags.service;
+package com.codemouse.salog.tags.diaryTags.service;
 
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
 import com.codemouse.salog.auth.utils.TokenBlackListService;
@@ -6,15 +6,14 @@ import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.service.MemberService;
-import com.codemouse.salog.tags.dto.DiaryTagDto;
-import com.codemouse.salog.tags.entity.DiaryTag;
-import com.codemouse.salog.tags.mapper.DiaryTagMapper;
-import com.codemouse.salog.tags.repository.DiaryTagLinkRepository;
-import com.codemouse.salog.tags.repository.DiaryTagRepository;
+import com.codemouse.salog.tags.diaryTags.dto.DiaryTagDto;
+import com.codemouse.salog.tags.diaryTags.entity.DiaryTag;
+import com.codemouse.salog.tags.diaryTags.mapper.DiaryTagMapper;
+import com.codemouse.salog.tags.diaryTags.repository.DiaryTagLinkRepository;
+import com.codemouse.salog.tags.diaryTags.repository.DiaryTagRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 

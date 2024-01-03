@@ -1,4 +1,4 @@
-package com.codemouse.salog.tags.dto;
+package com.codemouse.salog.tags.diaryTags.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
