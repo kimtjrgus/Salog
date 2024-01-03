@@ -6,9 +6,9 @@ import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.service.MemberService;
-import com.codemouse.salog.tags.dto.TagDto;
+import com.codemouse.salog.tags.dto.DiaryTagDto;
 import com.codemouse.salog.tags.entity.DiaryTag;
-import com.codemouse.salog.tags.mapper.TagMapper;
+import com.codemouse.salog.tags.mapper.DiaryTagMapper;
 import com.codemouse.salog.tags.repository.DiaryTagLinkRepository;
 import com.codemouse.salog.tags.repository.DiaryTagRepository;
 import lombok.AllArgsConstructor;
@@ -20,19 +20,19 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class TagService {
+public class DiaryTagService {
     private final DiaryTagRepository diaryTagRepository;
     private final DiaryTagLinkRepository diaryTagLinkRepository;
-    private final TagMapper mapper;
+    private final DiaryTagMapper mapper;
     private final JwtTokenizer jwtTokenizer;
     private final MemberService memberService;
     private final TokenBlackListService tokenBlackListService;
 
     // Diary Post
-    public DiaryTag postDiaryTag (String token, TagDto.DiaryPost tagDto){
+    public DiaryTag postDiaryTag (String token, DiaryTagDto.DiaryPost tagDto){
         tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
-        DiaryTag diaryTag = mapper.DiaryTagPostDtoToTag(tagDto);
+        DiaryTag diaryTag = mapper.DiaryTagPostDtoToDiaryTag(tagDto);
 
         diaryTag.setMember(member);
 
@@ -49,14 +49,14 @@ public class TagService {
     }
 
     // All DiaryTagList
-    public List<TagDto.DiaryResponse> getAllDiaryTagList(String token){
+    public List<DiaryTagDto.DiaryResponse> getAllDiaryTagList(String token){
         tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
         List<DiaryTag> diaryTags = diaryTagRepository.findAllByMemberMemberId(memberId);
 
-        List<TagDto.DiaryResponse> tagList = new ArrayList<>();
+        List<DiaryTagDto.DiaryResponse> tagList = new ArrayList<>();
         for (DiaryTag diaryTag : diaryTags) {
-            TagDto.DiaryResponse tagDto = mapper.TagToDiaryTagResponseDto(diaryTag);
+            DiaryTagDto.DiaryResponse tagDto = mapper.DiaryTagToDiaryTagResponseDto(diaryTag);
             tagList.add(tagDto);
         }
 

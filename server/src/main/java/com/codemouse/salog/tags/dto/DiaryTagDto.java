@@ -6,7 +6,7 @@ import lombok.Getter;
 import javax.validation.constraints.Size;
 
 
-public class TagDto {
+public class DiaryTagDto {
     @AllArgsConstructor
     @Getter
     public static class DiaryPost {
