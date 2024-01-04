@@ -1,6 +1,6 @@
 import { ResponsivePie } from "@nivo/pie";
 
-const PieChart = () => {
+const PieChart = ({ stat }: any) => {
 	const handle = {
 		padClick: (data: any) => {
 			console.log(data);
@@ -16,11 +16,13 @@ const PieChart = () => {
 			/**
 			 * chart에 사용될 데이터
 			 */
-			data={[
-				{ id: "식비", value: 300000 },
-				{ id: "주거비", value: 425000 },
-				{ id: "생활비", value: 150000 },
-			]}
+			data={[...stat.data.tags].map((tag) => {
+				const obj = {
+					id: tag.tagName,
+					value: tag.tagSum,
+				};
+				return obj;
+			})}
 			/**
 			 * chart margin
 			 */
@@ -40,7 +42,13 @@ const PieChart = () => {
 			/**
 			 * chart 색상
 			 */
-			colors={["#F7532E", "#FA785B", "#FF9680", "#FFB5A4"]} // 커스터하여 사용할 때
+			colors={
+				stat.title === "이번 달 지출"
+					? ["#F7532E", "#FA785B", "#FF9680", "#FFB5A4"]
+					: stat.title === "이번 달 수입"
+					  ? ["#5F82FE", "#839DFA", "#BECCFF", "#CDD8FF"]
+					  : ["#00935D", "#15BD7F", "#76DBB6", "#9AF3D2"]
+			} // 커스터하여 사용할 때
 			// colors={{ scheme: "nivo" }} // nivo에서 제공해주는 색상 조합 사용할 때
 			/**
 			 * pad border 두께 설정
