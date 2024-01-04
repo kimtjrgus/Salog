@@ -157,9 +157,9 @@ const Dashboard = () => {
 					</BarChartContainer>
 				</StatList>
 			</StatContainer>
-			<MainContatiner>
+			<MainContainer>
 				<DashboardCalendar />
-			</MainContatiner>
+			</MainContainer>
 		</Container>
 	);
 };
@@ -175,7 +175,7 @@ const StatContainer = styled.ul`
 	height: 22rem;
 `;
 
-const MainContatiner = styled.div`
+const MainContainer = styled.div`
 	display: flex;
 `;
 
