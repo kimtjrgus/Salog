@@ -13,6 +13,7 @@ public class IncomeDto {
         private String incomeName;
         private String memo;
         private LocalDate date;
+        private String incomeTag;
     }
 
     @AllArgsConstructor
@@ -23,6 +24,7 @@ public class IncomeDto {
         private String memo;
         //todo 2024-01-03 다이어리 핸들링
         private long diaryId;
+        private String incomeTag;
     }
 
     @AllArgsConstructor
@@ -33,5 +35,6 @@ public class IncomeDto {
         private String incomeName;
         private String memo;
         private LocalDate date;
+        private String incomeTag;
     }
 }

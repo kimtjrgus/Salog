@@ -1,6 +1,7 @@
 package com.codemouse.salog.tags.ledgerTags.entity;
 
 import com.codemouse.salog.ledger.income.entity.Income;
+import com.codemouse.salog.ledger.outgo.entity.Outgo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,9 +21,9 @@ public class LedgerTagLink {
     @JoinColumn(name = "INCOME_ID")
     private Income income;
 
-//    @ManyToOne
-//    @JoinColumn(name = "OUTGO_ID")
-//    private Outgo outgo;
+    @ManyToOne
+    @JoinColumn(name = "OUTGO_ID")
+    private Outgo outgo;
 
     @ManyToOne
     @JoinColumn(name = "LEDGERTAG_ID")

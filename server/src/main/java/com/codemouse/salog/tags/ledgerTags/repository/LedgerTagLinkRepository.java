@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface LedgerTagLinkRepository extends JpaRepository<DiaryTagLink, Long> {
+public interface LedgerTagLinkRepository extends JpaRepository<LedgerTagLink, Long> {
     List<LedgerTagLink> findByLedgerTagTagNameAndLedgerTagMember(String tagName, Member member);
     Long countByLedgerTag(LedgerTag ledgerTag);
 }

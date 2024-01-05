@@ -62,7 +62,7 @@ public class OutgoService {
         Optional.ofNullable(outgoDTO.getOutgoName()).ifPresent(findOutgo::setOutgoName);
         Optional.ofNullable(outgoDTO.getMoney()).ifPresent(findOutgo::setMoney);
         Optional.ofNullable(outgoDTO.getMemo()).ifPresent(findOutgo::setMemo);
-        Optional.ofNullable(outgoDTO.getOutgoTag()).ifPresent(findOutgo::setOutgoTag);
+        Optional.ofNullable(outgoDTO.getOutgoTag()).ifPresent(findOutgo::setLedgerTagLinks);
         Optional.ofNullable(outgoDTO.getReceiptImg()).ifPresent(findOutgo::setReceiptImg);
         Optional.ofNullable(outgoDTO.getWasteList()).ifPresent(findOutgo::setWasteList);
 

@@ -2,12 +2,15 @@ package com.codemouse.salog.ledger.income.entity;
 
 import com.codemouse.salog.diary.entity.Diary;
 import com.codemouse.salog.members.entity.Member;
+import com.codemouse.salog.tags.ledgerTags.entity.LedgerTagLink;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -37,4 +40,7 @@ public class Income {
     @ManyToOne
     @JoinColumn(name = "DIARY_ID")
     private Diary diary;
+
+    @OneToMany(mappedBy = "income", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LedgerTagLink> ledgerTagLinks = new ArrayList<>();
 }
