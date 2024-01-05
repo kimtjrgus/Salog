@@ -16,15 +16,15 @@ import java.time.LocalDate;
 public class Outgo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long outgoId;
+    private long outgoId;
 
     @Column(nullable = false)
     private LocalDate date;
 
     @Column(nullable = false)
-    private Integer money;
+    private Long money;
 
-    @Column(nullable = false)
+    @Column
     private String outgoName;
 
     @Column(nullable = false)

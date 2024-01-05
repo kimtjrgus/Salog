@@ -1,12 +1,11 @@
 package com.codemouse.salog.ledger.outgo.controller;
 
-import com.codemouse.salog.dto.SingleResponseDto;
+import com.codemouse.salog.dto.MultiResponseDto;
 import com.codemouse.salog.ledger.outgo.dto.OutgoDto;
 import com.codemouse.salog.ledger.outgo.service.OutgoService;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,15 +42,14 @@ public class OutgoController {
 
     // GET All List
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public SingleResponseDto<String> getOutgoLists (@RequestHeader(name = "Authorization") String token,
-                                            @Positive @RequestParam int page,
-                                            @Positive @RequestParam int size,
-                                            @Valid @RequestParam(required = false) String outgoTag,
-                                            @Valid @RequestParam(required = false) String date){
+    public ResponseEntity getOutgoLists (@RequestHeader(name = "Authorization") String token,
+                                         @Positive @RequestParam int page,
+                                         @Positive @RequestParam int size,
+                                         @Valid @RequestParam String date,
+                                         @Valid @RequestParam(required = false) String outgoTag){
 
-        String response = service.findAllOutgos(token, page, size, outgoTag, date);
-        return new SingleResponseDto<>(response);
+        MultiResponseDto<OutgoDto.Response> outgoPages = service.findAllOutgos(token, page, size, date, outgoTag);
+        return new ResponseEntity<>(outgoPages, HttpStatus.OK);
     }
 
     // DELETE
