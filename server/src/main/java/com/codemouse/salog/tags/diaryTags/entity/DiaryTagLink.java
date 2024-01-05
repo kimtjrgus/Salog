@@ -1,4 +1,4 @@
-package com.codemouse.salog.tags.entity;
+package com.codemouse.salog.tags.diaryTags.entity;
 
 import com.codemouse.salog.diary.entity.Diary;
 import lombok.Getter;

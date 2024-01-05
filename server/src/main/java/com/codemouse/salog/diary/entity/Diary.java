@@ -2,7 +2,7 @@ package com.codemouse.salog.diary.entity;
 
 import com.codemouse.salog.audit.Auditable;
 import com.codemouse.salog.members.entity.Member;
-import com.codemouse.salog.tags.entity.DiaryTagLink;
+import com.codemouse.salog.tags.diaryTags.entity.DiaryTagLink;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

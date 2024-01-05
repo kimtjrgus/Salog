@@ -1,6 +1,5 @@
-package com.codemouse.salog.tags.entity;
+package com.codemouse.salog.tags.diaryTags.entity;
 
-import com.codemouse.salog.diary.entity.Diary;
 import com.codemouse.salog.members.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

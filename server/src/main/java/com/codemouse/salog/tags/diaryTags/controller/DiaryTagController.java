@@ -1,8 +1,8 @@
-package com.codemouse.salog.tags.controller;
+package com.codemouse.salog.tags.diaryTags.controller;
 
 import com.codemouse.salog.dto.SingleResponseDto;
-import com.codemouse.salog.tags.dto.TagDto;
-import com.codemouse.salog.tags.service.TagService;
+import com.codemouse.salog.tags.diaryTags.dto.DiaryTagDto;
+import com.codemouse.salog.tags.diaryTags.service.DiaryTagService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,12 +18,12 @@ import java.util.List;
 @Validated
 @Slf4j
 @AllArgsConstructor
-public class TagController {
-    private final TagService service;
+public class DiaryTagController {
+    private final DiaryTagService service;
 
     @GetMapping("/diaryTags")
     public ResponseEntity getAllDiaryTags (@RequestHeader(name = "Authorization") String token){
-        List<TagDto.DiaryResponse> response = service.getAllDiaryTagList(token);
+        List<DiaryTagDto.Response> response = service.getAllDiaryTagList(token);
 
         return new ResponseEntity<>(new SingleResponseDto<>(response), HttpStatus.OK);
     }
