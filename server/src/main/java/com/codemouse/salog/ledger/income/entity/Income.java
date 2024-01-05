@@ -31,7 +31,7 @@ public class Income {
     private LocalDate date; // 타입 안정성과 쿼리 호환을 위해 LocalDate 타입으로
 
     @ManyToOne
-    @JoinColumn(name = "MEMBER_ID")
+    @JoinColumn(name = "MEMBER_ID", nullable = false)
     private Member member;
 
     @ManyToOne

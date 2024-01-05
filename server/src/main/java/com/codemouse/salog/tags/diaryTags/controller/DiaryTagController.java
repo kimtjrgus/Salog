@@ -23,7 +23,7 @@ public class DiaryTagController {
 
     @GetMapping("/diaryTags")
     public ResponseEntity getAllDiaryTags (@RequestHeader(name = "Authorization") String token){
-        List<DiaryTagDto.DiaryResponse> response = service.getAllDiaryTagList(token);
+        List<DiaryTagDto.Response> response = service.getAllDiaryTagList(token);
 
         return new ResponseEntity<>(new SingleResponseDto<>(response), HttpStatus.OK);
     }

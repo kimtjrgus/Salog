@@ -20,6 +20,10 @@ public class LedgerTagLink {
     @JoinColumn(name = "INCOME_ID")
     private Income income;
 
+//    @ManyToOne
+//    @JoinColumn(name = "OUTGO_ID")
+//    private Outgo outgo;
+
     @ManyToOne
     @JoinColumn(name = "LEDGERTAG_ID")
     private LedgerTag ledgerTag;

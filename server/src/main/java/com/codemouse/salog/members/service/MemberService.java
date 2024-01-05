@@ -158,4 +158,11 @@ public class MemberService {
 
         return verificationCode;
     }
+
+    // 회원이 해당 서비스의 소유자인지 파악
+    public void verifiedRequest(String token, long serviceMemberId) {
+        if (jwtTokenizer.getMemberId(token) != serviceMemberId) {
+            throw new BusinessLogicException(ExceptionCode.MEMBER_MISMATCHED);
+        }
+    }
 }

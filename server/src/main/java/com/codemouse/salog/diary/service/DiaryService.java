@@ -82,10 +82,10 @@ public class DiaryService {
                 diaryTagToUse = existingDiaryTag;
             } else {
                 // 새 태그 생성
-                DiaryTagDto.DiaryPost diaryPost = new DiaryTagDto.DiaryPost(tagName);
+                DiaryTagDto.Post diaryPost = new DiaryTagDto.Post(tagName);
 
                 // 추가: diaryPost에 대한 유효성 검사
-                Set<ConstraintViolation<DiaryTagDto.DiaryPost>> violations = validator.validate(diaryPost);
+                Set<ConstraintViolation<DiaryTagDto.Post>> violations = validator.validate(diaryPost);
                 if (!violations.isEmpty()) {
                     throw new BusinessLogicException(ExceptionCode.TAG_UNVALIDATED);
                 }
@@ -136,10 +136,10 @@ public class DiaryService {
                     diaryTagToUse = existingDiaryTag;
                 } else {
                     // 새 태그 생성
-                    DiaryTagDto.DiaryPost diaryPost = new DiaryTagDto.DiaryPost(tagName);
+                    DiaryTagDto.Post diaryPost = new DiaryTagDto.Post(tagName);
 
                     // 추가: diaryPost에 대한 유효성 검사
-                    Set<ConstraintViolation<DiaryTagDto.DiaryPost>> violations = validator.validate(diaryPost);
+                    Set<ConstraintViolation<DiaryTagDto.Post>> violations = validator.validate(diaryPost);
                     if (!violations.isEmpty()) {
                         throw new BusinessLogicException(ExceptionCode.TAG_UNVALIDATED);
                     }
@@ -170,7 +170,7 @@ public class DiaryService {
         DiaryDto.Response diaryResponse = diaryMapper.DiaryToDiaryResponseDto(diary);
 
         // 태그 리스트 추가
-        List<DiaryTagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
+        List<DiaryTagDto.Response> tagList = diary.getDiaryTagLinks().stream()
                 .map(DiaryTagLink::getDiaryTag)
                 .map(tagMapper::DiaryTagToDiaryTagResponseDto)
                 .collect(Collectors.toList());
@@ -229,7 +229,7 @@ public class DiaryService {
                         DiaryDto.Response response = diaryMapper.DiaryToDiaryResponseDto(diary);
 
                         // 태그 리스트 추가
-                        List<DiaryTagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
+                        List<DiaryTagDto.Response> tagList = diary.getDiaryTagLinks().stream()
                                 .map(DiaryTagLink::getDiaryTag)
                                 .map(tagMapper::DiaryTagToDiaryTagResponseDto)
                                 .collect(Collectors.toList());
@@ -261,7 +261,7 @@ public class DiaryService {
                     DiaryDto.Response response = diaryMapper.DiaryToDiaryResponseDto(diary);
 
                     // 태그 리스트 추가
-                    List<DiaryTagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
+                    List<DiaryTagDto.Response> tagList = diary.getDiaryTagLinks().stream()
                             .map(DiaryTagLink::getDiaryTag)
                             .map(tagMapper::DiaryTagToDiaryTagResponseDto)
                             .collect(Collectors.toList());

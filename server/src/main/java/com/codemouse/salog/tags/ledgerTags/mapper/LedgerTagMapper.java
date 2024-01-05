@@ -7,7 +7,7 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface LedgerTagMapper {
-    LedgerTag ledgerTagPostDtoToLedgerTag(LedgerTagDto.LedgerPost requestBody);
+    LedgerTag ledgerTagPostDtoToLedgerTag(LedgerTagDto.Post requestBody);
 
-    LedgerTagDto ledgerTagToLedgerTagResponseDto(LedgerTag ledgerTag);
+    LedgerTagDto.Response ledgerTagToLedgerTagResponseDto(LedgerTag ledgerTag);
 }

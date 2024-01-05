@@ -28,8 +28,7 @@ public class DiaryTagService {
     private final TokenBlackListService tokenBlackListService;
 
     // Diary Post
-    public DiaryTag postDiaryTag (String token, DiaryTagDto.DiaryPost tagDto){
-        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
+    public DiaryTag postDiaryTag (String token, DiaryTagDto.Post tagDto){
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
         DiaryTag diaryTag = mapper.DiaryTagPostDtoToDiaryTag(tagDto);
 
@@ -40,7 +39,6 @@ public class DiaryTagService {
 
     // Diary Delete
     public void deleteDiaryTag(String token, Long diaryTagId) {
-        tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
         DiaryTag diaryTag = findVerifiedDiaryTag(diaryTagId);
 
@@ -48,14 +46,14 @@ public class DiaryTagService {
     }
 
     // All DiaryTagList
-    public List<DiaryTagDto.DiaryResponse> getAllDiaryTagList(String token){
+    public List<DiaryTagDto.Response> getAllDiaryTagList(String token){
         tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
         List<DiaryTag> diaryTags = diaryTagRepository.findAllByMemberMemberId(memberId);
 
-        List<DiaryTagDto.DiaryResponse> tagList = new ArrayList<>();
+        List<DiaryTagDto.Response> tagList = new ArrayList<>();
         for (DiaryTag diaryTag : diaryTags) {
-            DiaryTagDto.DiaryResponse tagDto = mapper.DiaryTagToDiaryTagResponseDto(diaryTag);
+            DiaryTagDto.Response tagDto = mapper.DiaryTagToDiaryTagResponseDto(diaryTag);
             tagList.add(tagDto);
         }
 
@@ -63,8 +61,8 @@ public class DiaryTagService {
     }
 
     // 해당 다이어리태그가 유효한지 검증
-    public DiaryTag findVerifiedDiaryTag(long DiaryTagId){
-        return diaryTagRepository.findById(DiaryTagId).orElseThrow(
+    public DiaryTag findVerifiedDiaryTag(long diaryTagId){
+        return diaryTagRepository.findById(diaryTagId).orElseThrow(
                 () -> new BusinessLogicException(ExceptionCode.TAG_NOT_FOUND));
     }
 

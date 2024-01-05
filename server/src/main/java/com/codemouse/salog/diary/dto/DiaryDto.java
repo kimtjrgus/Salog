@@ -42,6 +42,6 @@ public class DiaryDto {
         private String title;
         private String body;
         private String img;
-        private List<DiaryTagDto.DiaryResponse> tagList;
+        private List<DiaryTagDto.Response> tagList;
     }
 }

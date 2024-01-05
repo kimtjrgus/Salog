@@ -7,9 +7,9 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface DiaryTagMapper {
-    DiaryTag DiaryTagPostDtoToDiaryTag(DiaryTagDto.DiaryPost requestBody);
+    DiaryTag DiaryTagPostDtoToDiaryTag(DiaryTagDto.Post requestBody);
 
 
     // Response
-    DiaryTagDto.DiaryResponse DiaryTagToDiaryTagResponseDto(DiaryTag diaryTag);
+    DiaryTagDto.Response DiaryTagToDiaryTagResponseDto(DiaryTag diaryTag);
 }

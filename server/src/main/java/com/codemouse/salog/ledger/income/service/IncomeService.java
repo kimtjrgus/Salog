@@ -46,7 +46,7 @@ public class IncomeService {
     }
 
     public void updateIncome(String token, long incomeId, IncomeDto.Patch incomePatchDto) {
-        verifiedRequest(token, incomeId);
+        memberService.verifiedRequest(token, incomeId);
 
         Income income = incomeMapper.incomePatchDtoToIncome(incomePatchDto);
         Income findIncome = findVerifiedIncome(incomeId);
@@ -76,13 +76,23 @@ public class IncomeService {
 
         Page<Income> incomes;
 
-        if (day == 0) {
-            incomes = incomeRepository.findByMonth(memberId, year, month,
-                    PageRequest.of(page - 1, size, Sort.by("date").descending()));
-        } else {
-            incomes = incomeRepository.findByDate(memberId, year, month, day,
-                    PageRequest.of(page - 1, size, Sort.by("date").descending()));
-        }
+//        if (incomeTag != null) {
+//            if (day == 0) {
+//                incomes = incomeRepository.findByMonthAndTag(memberId, year, month, incomeTag,
+//                        PageRequest.of(page - 1, size, Sort.by("date").descending()));
+//            } else {
+//                incomes = incomeRepository.findByDateAndTag(memberId, year, month, day, incomeTag,
+//                        PageRequest.of(page - 1, size, Sort.by("date").descending()));
+//            }
+//        } else {
+            if (day == 0) {
+                incomes = incomeRepository.findByMonth(memberId, year, month,
+                        PageRequest.of(page - 1, size, Sort.by("date").descending()));
+            } else {
+                incomes = incomeRepository.findByDate(memberId, year, month, day,
+                        PageRequest.of(page - 1, size, Sort.by("date").descending()));
+            }
+//        }
 
         List<IncomeDto.Response> incomeList = incomes.getContent().stream()
                 .map(incomeMapper::incomeToIncomeResponseDto).collect(Collectors.toList());
@@ -91,7 +101,7 @@ public class IncomeService {
     }
 
     public void deleteIncome(String token, long incomeId) {
-        verifiedRequest(token, incomeId);
+        memberService.verifiedRequest(token, incomeId);
 
         incomeRepository.delete(findVerifiedIncome(incomeId));
     }
@@ -101,11 +111,5 @@ public class IncomeService {
                 .orElseThrow(
                         () -> new BusinessLogicException(ExceptionCode.INCOME_NOT_FOUND)
                 );
-    }
-
-    public void verifiedRequest(String token, long incomeId) {
-        if (jwtTokenizer.getMemberId(token) != (findVerifiedIncome(incomeId).getMember().getMemberId())) {
-            throw new BusinessLogicException(ExceptionCode.MEMBER_MISMATCHED);
-        }
     }
 }
