@@ -26,9 +26,11 @@ public enum ExceptionCode {
     TAG_UNVALIDATED(400, "TAG_UNVALIDATED 유효하지않은 태그, 10글자이내로 입력바람"),
 
     // 수입
-    INCOME_NOT_FOUND(404, "INCOME_NOT_FOUND 존재하지 않는 수입");
+    INCOME_NOT_FOUND(404, "INCOME_NOT_FOUND 존재하지 않는 수입"),
 
 
+    // 지출
+    OUTGO_NOT_FOUND(404, "OUTGO_NOT_FOUND 존재하지 않는 지출");
 
     private int status;
 
