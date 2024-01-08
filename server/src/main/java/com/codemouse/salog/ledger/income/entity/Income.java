@@ -41,6 +41,6 @@ public class Income {
     @JoinColumn(name = "DIARY_ID")
     private Diary diary;
 
-    @OneToMany(mappedBy = "income", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "income", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<LedgerTagLink> ledgerTagLinks = new ArrayList<>();
 }
