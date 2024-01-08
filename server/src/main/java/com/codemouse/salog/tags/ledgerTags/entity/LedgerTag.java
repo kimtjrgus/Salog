@@ -1,5 +1,7 @@
 package com.codemouse.salog.tags.ledgerTags.entity;
 
+import com.codemouse.salog.ledger.income.entity.Income;
+import com.codemouse.salog.ledger.outgo.entity.Outgo;
 import com.codemouse.salog.members.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,9 +31,6 @@ public class LedgerTag {
     @JoinColumn(name = "MEMBER_ID", nullable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "ledgerTag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LedgerTagLink> ledgerTagLinks = new ArrayList<>();
-
     @Getter
     public enum Group {
         INCOME("수입 태그"),
@@ -43,4 +42,10 @@ public class LedgerTag {
             this.group = group;
         }
     }
+
+    @OneToMany(mappedBy = "ledgerTag")
+    private List<Income> incomes;
+
+    @OneToMany(mappedBy = "ledgerTag")
+    private List<Outgo> outgos;
 }
