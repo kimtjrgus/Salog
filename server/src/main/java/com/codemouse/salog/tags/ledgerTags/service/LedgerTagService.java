@@ -1,20 +1,13 @@
 package com.codemouse.salog.tags.ledgerTags.service;
 
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
-import com.codemouse.salog.auth.utils.TokenBlackListService;
 import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.service.MemberService;
-import com.codemouse.salog.tags.diaryTags.dto.DiaryTagDto;
-import com.codemouse.salog.tags.diaryTags.entity.DiaryTag;
-import com.codemouse.salog.tags.diaryTags.mapper.DiaryTagMapper;
-import com.codemouse.salog.tags.diaryTags.repository.DiaryTagLinkRepository;
-import com.codemouse.salog.tags.diaryTags.repository.DiaryTagRepository;
 import com.codemouse.salog.tags.ledgerTags.dto.LedgerTagDto;
 import com.codemouse.salog.tags.ledgerTags.entity.LedgerTag;
 import com.codemouse.salog.tags.ledgerTags.mapper.LedgerTagMapper;
-import com.codemouse.salog.tags.ledgerTags.repository.LedgerTagLinkRepository;
 import com.codemouse.salog.tags.ledgerTags.repository.LedgerTagRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +21,6 @@ import java.util.List;
 @Slf4j
 public class LedgerTagService {
     private final LedgerTagRepository ledgerTagRepository;
-    private final LedgerTagLinkRepository ledgerTagLinkRepository;
     private final LedgerTagMapper mapper;
     private final JwtTokenizer jwtTokenizer;
     private final MemberService memberService;
@@ -98,7 +90,7 @@ public class LedgerTagService {
 
         for (LedgerTag tag : allTags) {
             // 태그와 연결된 다이어리 개수 조회
-            long ledgerCount = ledgerTagLinkRepository.countByLedgerTag(tag);
+            long ledgerCount = ledgerTagRepository.countByLedgerTag(tag);
 
             if (ledgerCount == 0) {
                 // 다이어리와 연결점이 없는 경우 태그 삭제
