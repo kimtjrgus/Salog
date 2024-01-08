@@ -3,6 +3,8 @@ package com.codemouse.salog.tags.ledgerTags.service;
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
 import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
+import com.codemouse.salog.ledger.income.repository.IncomeRepository;
+import com.codemouse.salog.ledger.outgo.repository.OutgoRepository;
 import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.service.MemberService;
 import com.codemouse.salog.tags.ledgerTags.dto.LedgerTagDto;
@@ -24,6 +26,8 @@ public class LedgerTagService {
     private final LedgerTagMapper mapper;
     private final JwtTokenizer jwtTokenizer;
     private final MemberService memberService;
+    private final IncomeRepository incomeRepository;
+    private final OutgoRepository outgoRepository;
 
     public LedgerTag postLedgerTag (String token, LedgerTagDto.Post tagDto){
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
@@ -83,17 +87,29 @@ public class LedgerTagService {
     }
 
     // 잉여태그 삭제
-    public void deleteUnusedTagsByMemberId(String token) {
+    public void deleteUnusedIncomeTagsByMemberId(String token) {
         // 멤버 아이디로 모든 태그 검색
         long memberId = jwtTokenizer.getMemberId(token);
         List<LedgerTag> allTags = ledgerTagRepository.findAllByMemberMemberId(memberId);
 
         for (LedgerTag tag : allTags) {
-            // 태그와 연결된 다이어리 개수 조회
-            long ledgerCount = ledgerTagRepository.countByLedgerTag(tag);
+            long incomeCount = incomeRepository.countByLedgerTag(tag);
 
-            if (ledgerCount == 0) {
-                // 다이어리와 연결점이 없는 경우 태그 삭제
+            if (incomeCount == 0) {
+                ledgerTagRepository.delete(tag);
+            }
+        }
+    }
+
+    public void deleteUnusedOutgoTagsByMemberId(String token) {
+        // 멤버 아이디로 모든 태그 검색
+        long memberId = jwtTokenizer.getMemberId(token);
+        List<LedgerTag> allTags = ledgerTagRepository.findAllByMemberMemberId(memberId);
+
+        for (LedgerTag tag : allTags) {
+            long incomeCount = outgoRepository.countByLedgerTag(tag);
+
+            if (incomeCount == 0) {
                 ledgerTagRepository.delete(tag);
             }
         }

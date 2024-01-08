@@ -1,6 +1,5 @@
 package com.codemouse.salog.tags.ledgerTags.repository;
 
-import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.tags.ledgerTags.entity.LedgerTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,8 +10,4 @@ public interface LedgerTagRepository extends JpaRepository<LedgerTag, Long> {
 
     // memberId와 tagName에 맞는 다이어리 태그 찾기
     LedgerTag findByMemberMemberIdAndTagName(Long memberId, String tagName);
-
-    Long countByLedgerTag(LedgerTag ledgerTag);
-
-    List<LedgerTag> findByLedgerTagTagNameAndLedgerTagMember(String tagName, Member member);
 }
