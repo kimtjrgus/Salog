@@ -1,9 +1,12 @@
 package com.codemouse.salog.ledger.income.dto;
 
+import com.codemouse.salog.tags.ledgerTags.dto.LedgerTagDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class IncomeDto {
     @AllArgsConstructor
@@ -13,7 +16,7 @@ public class IncomeDto {
         private String incomeName;
         private String memo;
         private LocalDate date;
-        private String incomeTag;
+        private List<String> incomeTag;
     }
 
     @AllArgsConstructor
@@ -24,17 +27,18 @@ public class IncomeDto {
         private String memo;
         //todo 2024-01-03 다이어리 핸들링
         private long diaryId;
-        private String incomeTag;
+        private List<String> incomeTag;
     }
 
     @AllArgsConstructor
     @Getter
+    @Setter
     public static class Response {
         private long incomeId;
         private int money;
         private String incomeName;
         private String memo;
         private LocalDate date;
-        private String incomeTag;
+        private List<LedgerTagDto.Response> incomeTag;
     }
 }

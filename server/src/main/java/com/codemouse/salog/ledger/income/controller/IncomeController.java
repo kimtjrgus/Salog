@@ -47,7 +47,7 @@ public class IncomeController {
                                             @Positive @RequestParam int page,
                                             @Positive @RequestParam int size,
                                             @Valid @RequestParam(required = false) String incomeTag,
-                                            @RequestParam(required = false) String date) { // 날짜는 스트링으로 입력받고, 서비스에서 핸들링 (월별 조회 00 처리 시)
+                                            @RequestParam String date) { // 날짜는 스트링으로 입력받고, 서비스에서 핸들링 (월별 조회 00 처리 시)
 
         tokenBlackListService.isBlackListed(token);
 
