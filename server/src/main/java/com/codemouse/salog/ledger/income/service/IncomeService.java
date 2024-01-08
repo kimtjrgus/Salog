@@ -1,7 +1,6 @@
 package com.codemouse.salog.ledger.income.service;
 
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
-import com.codemouse.salog.diary.entity.Diary;
 import com.codemouse.salog.diary.service.DiaryService;
 import com.codemouse.salog.dto.MultiResponseDto;
 import com.codemouse.salog.exception.BusinessLogicException;
@@ -14,8 +13,6 @@ import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.service.MemberService;
 import com.codemouse.salog.tags.ledgerTags.dto.LedgerTagDto;
 import com.codemouse.salog.tags.ledgerTags.entity.LedgerTag;
-import com.codemouse.salog.tags.ledgerTags.entity.LedgerTagLink;
-import com.codemouse.salog.tags.ledgerTags.mapper.LedgerTagMapper;
 import com.codemouse.salog.tags.ledgerTags.service.LedgerTagService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +41,6 @@ public class IncomeService {
     private final DiaryService diaryService;
     private final LedgerTagService tagService;
     private final Validator validator;
-    private final LedgerTagMapper tagMapper;
 
     public void createIncome(String token, IncomeDto.Post incomePostDto) {
         Income income = incomeMapper.incomePostDtoToIncome(incomePostDto);
@@ -53,42 +49,7 @@ public class IncomeService {
         income.setMember(member);
 
         // 태그
-        List<LedgerTag> createdLedgerTag = new ArrayList<>();
-        for (String tagName : incomePostDto.getIncomeTag()) {
-            if (tagName == null || tagName.isEmpty()) {
-                continue;
-            }
-
-            LedgerTag existTag = tagService.findLedgerTagByMemberIdAndTagName(token, tagName);
-
-            LedgerTag ledgerTag;
-
-            if (existTag != null) {
-                if (existTag.getCategory() != LedgerTag.Group.INCOME)
-                    continue;
-                ledgerTag = existTag;
-            } else {
-                LedgerTagDto.Post tagPost = new LedgerTagDto.Post(tagName, LedgerTag.Group.INCOME);
-
-                Set<ConstraintViolation<LedgerTagDto.Post>> violations = validator.validate(tagPost);
-                if (!violations.isEmpty()) {
-                    throw new BusinessLogicException(ExceptionCode.TAG_UNVALIDATED);
-                }
-
-                ledgerTag = tagService.postLedgerTag(token, tagPost);
-            }
-
-            createdLedgerTag.add(ledgerTag);
-        }
-
-        for (LedgerTag ledgerTag : createdLedgerTag) {
-            LedgerTagLink ledgerTagLink = new LedgerTagLink();
-            ledgerTagLink.setIncome(income);
-            ledgerTagLink.setLedgerTag(ledgerTag);
-            income.getLedgerTagLinks().add(ledgerTagLink);
-        }
-
-        incomeRepository.save(income);
+        tagHandler(incomePostDto.getIncomeTag(), token, income);
     }
 
     public void updateIncome(String token, long incomeId, IncomeDto.Patch incomePatchDto) {
@@ -109,39 +70,7 @@ public class IncomeService {
 //                .ifPresent(findIncome::setDiary);
 
         // 태그
-        if (incomePatchDto.getIncomeTag() != null) {
-            findIncome.getLedgerTagLinks().clear();
-
-            for (String tagName : incomePatchDto.getIncomeTag()) {
-                LedgerTag existTag = tagService.findLedgerTagByMemberIdAndTagName(token, tagName);
-
-                LedgerTag ledgerTag;
-
-                if (existTag != null) {
-                    if (existTag.getCategory() != LedgerTag.Group.INCOME)
-                        continue;
-                    ledgerTag = existTag;
-                } else {
-                    LedgerTagDto.Post tagPost = new LedgerTagDto.Post(tagName, LedgerTag.Group.INCOME);
-
-                    Set<ConstraintViolation<LedgerTagDto.Post>> violations = validator.validate(tagPost);
-                    if (!violations.isEmpty()) {
-                        throw new BusinessLogicException(ExceptionCode.TAG_UNVALIDATED);
-                    }
-
-                    ledgerTag = tagService.postLedgerTag(token, tagPost);
-                }
-
-                LedgerTagLink ledgerTagLink = new LedgerTagLink();
-                ledgerTagLink.setIncome(findIncome);
-                ledgerTagLink.setLedgerTag(ledgerTag);
-                findIncome.getLedgerTagLinks().add(ledgerTagLink);
-            }
-
-            tagService.deleteUnusedTagsByMemberId(token);
-        }
-
-        incomeRepository.save(findIncome);
+        tagHandler(incomePatchDto.getIncomeTag(), token, findIncome);
     }
 
     public MultiResponseDto<IncomeDto.Response> getIncomes(String token, int page, int size, String incomeTag, String date) {
@@ -177,18 +106,8 @@ public class IncomeService {
 
 
         List<IncomeDto.Response> incomeList = incomes.getContent().stream()
-                .map(income -> {
-                    IncomeDto.Response response = incomeMapper.incomeToIncomeResponseDto(income);
-
-                    List<LedgerTagDto.Response> tagList = income.getLedgerTagLinks().stream()
-                            .map(LedgerTagLink::getLedgerTag)
-                            .filter(tag -> tag.getCategory() == LedgerTag.Group.INCOME)
-                            .map(tagMapper::ledgerTagToLedgerTagResponseDto)
-                            .collect(Collectors.toList());
-                    response.setIncomeTag(tagList);
-
-                    return response;
-                }).collect(Collectors.toList());
+                .map(incomeMapper::incomeToIncomeResponseDto)
+                .collect(Collectors.toList());
 
         return new MultiResponseDto<>(incomeList, incomes);
     }
@@ -199,18 +118,15 @@ public class IncomeService {
 
         memberService.verifiedRequest(token, income.getMember().getMemberId());
 
+        LedgerTag ledgerTag = income.getLedgerTag();
 
-        List<LedgerTag> ledgerTags = income.getLedgerTagLinks().stream()
-                        .map(LedgerTagLink::getLedgerTag)
-                        .collect(Collectors.toList());
-
-        for (LedgerTag ledgerTag : ledgerTags) {
-            List<LedgerTagLink> links = ledgerTag.getLedgerTagLinks();
-            links.removeIf(link -> link.getIncome().getIncomeId() == incomeId);
-            if (links.isEmpty()) {
-                tagService.deleteLedgerTag(token, ledgerTag.getLedgerTagId());
-            }
+        // 삭제하려는 수입에만 연결된 태그인 경우, 태그 삭제
+        if (ledgerTag != null && ledgerTag.getIncomes().size() == 1) {
+            tagService.deleteLedgerTag(token, ledgerTag.getLedgerTagId());
         }
+
+        // 수입과 태그의 연결을 끊음
+        income.setLedgerTag(null);
 
         incomeRepository.delete(income);
     }
@@ -220,5 +136,40 @@ public class IncomeService {
                 .orElseThrow(
                         () -> new BusinessLogicException(ExceptionCode.INCOME_NOT_FOUND)
                 );
+    }
+
+    // 태그 등록, 중복 체크
+    private void tagHandler(String incomePostDto, String token, Income income) {
+        LedgerTag ledgerTag = null;
+
+        if (incomePostDto != null) {
+            String tagName = incomePostDto;
+
+            LedgerTag existTag = tagService.findLedgerTagByMemberIdAndTagName(token, tagName);
+
+            if (existTag != null) {
+                if (existTag.getCategory() == LedgerTag.Group.INCOME) {
+                    ledgerTag = existTag;
+                }
+            } else {
+                LedgerTagDto.Post tagPost = new LedgerTagDto.Post(tagName, LedgerTag.Group.INCOME);
+
+                Set<ConstraintViolation<LedgerTagDto.Post>> violations = validator.validate(tagPost);
+                if (!violations.isEmpty()) {
+                    throw new BusinessLogicException(ExceptionCode.TAG_UNVALIDATED);
+                }
+
+                ledgerTag = tagService.postLedgerTag(token, tagPost);
+            }
+        }
+
+        // 만약 ledgerTag가 null이 아니라면 Income 객체에 설정
+        if (ledgerTag != null) {
+            income.setLedgerTag(ledgerTag);
+        }
+
+        incomeRepository.save(income);
+
+        tagService.deleteUnusedIncomeTagsByMemberId(token);
     }
 }

@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public class IncomeDto {
     @AllArgsConstructor
@@ -16,7 +15,7 @@ public class IncomeDto {
         private String incomeName;
         private String memo;
         private LocalDate date;
-        private List<String> incomeTag;
+        private String incomeTag;
     }
 
     @AllArgsConstructor
@@ -27,7 +26,7 @@ public class IncomeDto {
         private String memo;
         //todo 2024-01-03 다이어리 핸들링
         private long diaryId;
-        private List<String> incomeTag;
+        private String incomeTag;
     }
 
     @AllArgsConstructor
@@ -39,6 +38,6 @@ public class IncomeDto {
         private String incomeName;
         private String memo;
         private LocalDate date;
-        private List<LedgerTagDto.Response> incomeTag;
+        private LedgerTagDto.Response incomeTag;
     }
 }

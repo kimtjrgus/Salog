@@ -43,6 +43,8 @@ public class LedgerTag {
         }
     }
 
+    // todo 2024-01-08 cascade 전략(ALL)을 적용 시 income delete 요청을 두 번 보내야 완벽히 삭제됨
+    // 처음 요청은 태그와 연결을 끊고, 다음 요청은 income 이 DB에서 삭제됨
     @OneToMany(mappedBy = "ledgerTag")
     private List<Income> incomes;
 
