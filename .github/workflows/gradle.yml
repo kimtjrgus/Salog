@@ -29,14 +29,6 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      # Github secrets로부터 데이터를 받아서, 워크 플로우에 파일을 생성
-      - name: Make application.properties
-        run: |
-          cd ./server/src/main/resources
-          touch application.properties
-          echo "${{ secrets.PROPERTIES }}" > application.properties
-        shell: bash
-
       - name: Build with Gradle
         run: |
           cd ./server/
@@ -61,5 +53,5 @@ jobs:
           script: |
             docker rm -f $(docker ps -aq)
             docker pull ${{ secrets.DOCKER_REPO }}/salog
-            docker run -d -p 80:80 ${{ secrets.DOCKER_REPO }}/salog
+            docker run -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} -e EMAIL=${{ secrets.EMAIL }} -e EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} -d -p 80:80 ${{ secrets.DOCKER_REPO }}/salog
             docker image prune -f
