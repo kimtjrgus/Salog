@@ -24,8 +24,6 @@ public class IncomeDto {
         private int money;
         private String incomeName;
         private String memo;
-        //todo 2024-01-03 다이어리 핸들링
-        private long diaryId;
         private String incomeTag;
     }
 

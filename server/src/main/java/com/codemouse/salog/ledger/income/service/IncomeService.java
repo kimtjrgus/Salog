@@ -65,9 +65,6 @@ public class IncomeService {
                 .ifPresent(findIncome::setIncomeName);
         Optional.of(income.getMemo())
                 .ifPresent(findIncome::setMemo);
-        // todo 2024-01-03 다이어리 핸들링
-//        Optional.of(diary)
-//                .ifPresent(findIncome::setDiary);
 
         // 태그
         tagHandler(incomePatchDto.getIncomeTag(), token, findIncome);
