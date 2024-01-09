@@ -4,6 +4,8 @@ import PieChart from "./PieChart";
 import { useEffect, useState } from "react";
 import DashboardCalendar from "./Calendar";
 import axios from "axios";
+import Schedule from "./Schedule";
+import WriteModal from "./WriteModal";
 
 export interface outgoType {
 	month: number;
@@ -34,6 +36,12 @@ export interface tagType {
 	tagSum: number;
 }
 
+export interface modalType {
+	dayTile: boolean;
+	writeIcon: boolean;
+	day: string;
+}
+
 const Dashboard = () => {
 	const [monthlyOutgo, setMonthlyOutgo] = useState<outgoType>({
 		month: 0,
@@ -55,6 +63,14 @@ const Dashboard = () => {
 		totalOutgo: 0,
 		dayRemain: 0,
 	});
+
+	const [isOpen, setIsOpen] = useState<modalType>({
+		dayTile: false,
+		writeIcon: false,
+		day: "",
+	});
+
+	console.log(isOpen);
 
 	const statLists = [
 		{
@@ -123,44 +139,48 @@ const Dashboard = () => {
 	}, []);
 
 	return (
-		<Container>
-			<StatContainer>
-				{statLists.map((stat, index) => (
-					<StatList key={index}>
-						<h3>{stat.title}</h3>
-						<h4>{stat.sum.toLocaleString()}원</h4>
+		<>
+			<Container>
+				<StatContainer>
+					{statLists.map((stat, index) => (
+						<StatList key={index}>
+							<h3>{stat.title}</h3>
+							<h4>{stat.sum.toLocaleString()}원</h4>
+							<hr />
+							<div className="PieChartContainer">
+								<PieChart stat={stat} />
+							</div>
+						</StatList>
+					))}
+					<StatList>
+						<h3>예산</h3>
+						<h4>{monthlyBudget.budget.toLocaleString()}원</h4>
 						<hr />
-						<div className="PieChartContainer">
-							<PieChart stat={stat} />
-						</div>
+						<BarChartContainer
+							width={`${Math.floor(
+								(monthlyBudget.totalOutgo / monthlyBudget.budget) * 100,
+							)}`}
+						>
+							<div className="legends">
+								<div className="legend__square"></div>
+								<p>예산</p>
+								<div className="legend__square"></div>
+								<p>지출</p>
+							</div>
+							<div className="bar">
+								<div className="bar__item"></div>
+								<span>{monthlyBudget.totalOutgo.toLocaleString()}원</span>
+							</div>
+						</BarChartContainer>
 					</StatList>
-				))}
-				<StatList>
-					<h3>예산</h3>
-					<h4>{monthlyBudget.budget.toLocaleString()}원</h4>
-					<hr />
-					<BarChartContainer
-						width={`${Math.floor(
-							(monthlyBudget.totalOutgo / monthlyBudget.budget) * 100,
-						)}`}
-					>
-						<div className="legends">
-							<div className="legend__square"></div>
-							<p>예산</p>
-							<div className="legend__square"></div>
-							<p>지출</p>
-						</div>
-						<div className="bar">
-							<div className="bar__item"></div>
-							<span>{monthlyBudget.totalOutgo.toLocaleString()}원</span>
-						</div>
-					</BarChartContainer>
-				</StatList>
-			</StatContainer>
-			<MainContainer>
-				<DashboardCalendar />
-			</MainContainer>
-		</Container>
+				</StatContainer>
+				<MainContainer>
+					<DashboardCalendar isOpen={isOpen} setIsOpen={setIsOpen} />
+					<Schedule />
+					<WriteModal isOpen={isOpen} />
+				</MainContainer>
+			</Container>
+		</>
 	);
 };
 
