@@ -1,9 +1,10 @@
 import axios from "axios";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { styled } from "styled-components";
+import { type modalType } from ".";
 
 interface calendarType {
 	date: string;
@@ -11,9 +12,30 @@ interface calendarType {
 	totalIncome: number;
 }
 
-const DashboardCalendar = () => {
+interface propsType {
+	isOpen: modalType;
+	setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
+}
+
+const DashboardCalendar = ({ isOpen, setIsOpen }: propsType) => {
 	const [value, onChange] = useState(new Date());
 	const [calendar, setCalendar] = useState<calendarType[]>([]);
+
+	const onClickTile = () => {
+		console.log("타일 클릭");
+	};
+
+	const onClickWriteBtn = (
+		e: React.MouseEvent<HTMLSpanElement, MouseEvent> | undefined,
+		date: { date: Date },
+	) => {
+		e?.stopPropagation();
+		setIsOpen({
+			...isOpen,
+			writeIcon: true,
+			day: new Date(date.date).toLocaleString(),
+		});
+	};
 
 	useEffect(() => {
 		axios
@@ -38,6 +60,7 @@ const DashboardCalendar = () => {
 				onChange={(value) => {
 					onChange(value as Date);
 				}}
+				onClickDay={onClickTile}
 				value={value}
 				next2Label={null}
 				prev2Label={null}
@@ -74,9 +97,18 @@ const DashboardCalendar = () => {
 						);
 					}
 					// 오늘 날짜에 가계부 수정 아이콘 표시
-					if (new Date(date).getDate() === new Date().getDate()) {
+					if (
+						new Date(date).getFullYear() === new Date().getFullYear() &&
+						new Date(date).getMonth() === new Date().getMonth() &&
+						new Date(date).getDate() === new Date().getDate()
+					) {
 						return (
-							<div className="write__icon">
+							<div
+								className="write__icon"
+								onClick={(e) => {
+									onClickWriteBtn(e, { date });
+								}}
+							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									width="16"
@@ -100,11 +132,12 @@ const DashboardCalendar = () => {
 								new Date(date).getDate() === new Date().getDate()
 							}
 							data-cy={`calendar-day-${new Date(date).getDate()}`}
-							onMouseOver={() => {
-								console.log(date);
-							}}
 						>
-							<span>
+							<span
+								onClick={(e) => {
+									onClickWriteBtn(e, { date });
+								}}
+							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									width="16"
@@ -136,7 +169,7 @@ const Container = styled.div`
     .color__info {
         display: flex;
         align-items:center;
-        margin-top: 2rem;
+        margin-top: 2.2rem;
         margin-left: 1.5rem;
         font-size: 1.2rem;
         position: absolute;
@@ -164,17 +197,18 @@ const Container = styled.div`
 
     .write__icon {
         margin-left: 6.5rem;
+		z-index: 70;
 
         &:hover {
             transition: all 0.5s;
             transform: scale(1.05);
+			border: 1px solid gray;
         }
     }
 
 	.react-calendar {
 		width: 770px;
-		border: none;
-		padding: 1.5rem;
+		padding: 0 1.5rem;
 		border-radius: 8px;
 		border: 1px solid #d9d9d9;
 		font-family: "Pretendard-Regular";
@@ -203,6 +237,7 @@ const Container = styled.div`
 		height: 25px;
 		border-radius: 20px 20px 0 0;
         justify-content: center;
+		margin-top:1.5rem;
 
 		span {
 			font-size: 1.6rem;
