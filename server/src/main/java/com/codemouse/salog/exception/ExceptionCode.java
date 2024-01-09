@@ -28,6 +28,8 @@ public enum ExceptionCode {
     // 수입
     INCOME_NOT_FOUND(404, "INCOME_NOT_FOUND 존재하지 않는 수입"),
 
+    // 고정 수입
+    FIXED_INCOME_NOT_FOUND(404, "FIXED_INCOME_NOT_FOUND 존재하지 않는 고정 수입"),
 
     // 지출
     OUTGO_NOT_FOUND(404, "OUTGO_NOT_FOUND 존재하지 않는 지출");
