@@ -1,16 +1,13 @@
 package com.codemouse.salog.ledger.outgo.entity;
 
-import com.codemouse.salog.diary.entity.Diary;
 import com.codemouse.salog.members.entity.Member;
-import com.codemouse.salog.tags.ledgerTags.entity.LedgerTagLink;
+import com.codemouse.salog.tags.ledgerTags.entity.LedgerTag;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -44,9 +41,6 @@ public class Outgo {
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "DIARY_ID", nullable = true) // 기본적으로 지정안하면 nullable 이라고 함
-    private Diary diary;
-
-    @OneToMany(mappedBy = "outgo", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LedgerTagLink> ledgerTagLinks = new ArrayList<>();
+    @JoinColumn(name = "LEDGER_TAG_ID", nullable = false)
+    private LedgerTag ledgerTag;
 }
