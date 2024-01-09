@@ -1,5 +1,6 @@
 package com.codemouse.salog.ledger.outgo.dto;
 
+import com.codemouse.salog.tags.ledgerTags.dto.LedgerTagDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -49,12 +50,11 @@ public class OutgoDto {
     @Getter
     public static class Response {
         private long outgoId;
-        private Long diaryId;
         private LocalDate date;
         private long money;
         private String outgoName;
         private String memo;
-        private String outgoTag;
+        private LedgerTagDto.Response outgoTag;
         private boolean wasteList;
         private String receiptImg;
     }

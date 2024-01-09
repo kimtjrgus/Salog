@@ -14,7 +14,7 @@ public class LedgerTagDto {
     public static class Post {
         @Size(min = 1, max = 10)
         private String tagName;
-        private LedgerTag.Group category;
+        private LedgerTag.Group category; // TODO dto안에 엔티티 객체가 들어있는 것에 대하여
     }
 
     @AllArgsConstructor
