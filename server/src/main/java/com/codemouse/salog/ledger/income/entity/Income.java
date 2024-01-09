@@ -36,10 +36,6 @@ public class Income {
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "DIARY_ID")
-    private Diary diary;
-
-    @ManyToOne
     @JoinColumn(name = "LEDGER_TAG_ID")
     private LedgerTag ledgerTag;
 }
