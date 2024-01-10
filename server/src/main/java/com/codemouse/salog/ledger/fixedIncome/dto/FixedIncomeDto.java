@@ -1,21 +1,17 @@
-package com.codemouse.salog.ledger.income.dto;
+package com.codemouse.salog.ledger.fixedIncome.dto;
 
-import com.codemouse.salog.tags.ledgerTags.dto.LedgerTagDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
 
-public class IncomeDto {
+public class FixedIncomeDto {
     @AllArgsConstructor
     @Getter
     public static class Post {
         private int money;
         private String incomeName;
-        private String memo;
         private LocalDate date;
-        private String incomeTag;
     }
 
     @AllArgsConstructor
@@ -23,19 +19,15 @@ public class IncomeDto {
     public static class Patch {
         private int money;
         private String incomeName;
-        private String memo;
-        private String incomeTag;
+        private LocalDate date;
     }
 
     @AllArgsConstructor
     @Getter
-    @Setter
     public static class Response {
-        private long incomeId;
+        private long fixedIncomeId;
         private int money;
         private String incomeName;
-        private String memo;
         private LocalDate date;
-        private LedgerTagDto.Response incomeTag;
     }
 }

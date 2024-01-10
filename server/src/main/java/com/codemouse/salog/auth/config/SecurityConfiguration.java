@@ -73,6 +73,12 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                         .antMatchers(HttpMethod.GET, "/income").hasRole("USER")
                         .antMatchers(HttpMethod.DELETE, "/income/delete").hasRole("USER")
 
+                        // 고정 수입
+                        .antMatchers(HttpMethod.POST, "/fixedIncome/post").hasRole("USER")
+                        .antMatchers(HttpMethod.PATCH, "/fixedIncome/update").hasRole("USER")
+                        .antMatchers(HttpMethod.GET, "/fixedIncome/get").hasRole("USER")
+                        .antMatchers(HttpMethod.DELETE, "/fixedIncome/delete").hasRole("USER")
+
                         // 태그
                         .antMatchers(HttpMethod.GET, "/ledgerTags").hasRole("USER")
 
