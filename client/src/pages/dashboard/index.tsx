@@ -6,6 +6,8 @@ import DashboardCalendar from "./Calendar";
 import axios from "axios";
 import Schedule from "./Schedule";
 import WriteModal from "./WriteModal";
+import { useSelector } from "react-redux";
+import { type RootState } from "src/store";
 
 export interface outgoType {
 	month: number;
@@ -43,6 +45,10 @@ export interface modalType {
 }
 
 const Dashboard = () => {
+	const member = useSelector((state: RootState) => state.persistedReducer.user);
+	console.log(member);
+
+	// member에 태그가 추가되면 화면 제작
 	const [monthlyOutgo, setMonthlyOutgo] = useState<outgoType>({
 		month: 0,
 		monthlyOutgo: 0,
@@ -69,8 +75,6 @@ const Dashboard = () => {
 		writeIcon: false,
 		day: "",
 	});
-
-	console.log(isOpen);
 
 	const statLists = [
 		{
@@ -177,7 +181,7 @@ const Dashboard = () => {
 				<MainContainer>
 					<DashboardCalendar isOpen={isOpen} setIsOpen={setIsOpen} />
 					<Schedule />
-					<WriteModal isOpen={isOpen} />
+					<WriteModal isOpen={isOpen} setIsOpen={setIsOpen} />
 				</MainContainer>
 			</Container>
 		</>
