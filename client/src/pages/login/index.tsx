@@ -12,6 +12,7 @@ import { setCookie } from "src/utils/cookie";
 import { useDispatch } from "react-redux";
 import { login } from "src/store/slices/userSlice";
 import { type AppDispatch } from "src/store";
+import { api } from "src/utils/refreshToken";
 
 interface userType {
 	email: string;
@@ -52,8 +53,15 @@ const Login = () => {
 					path: "/",
 					expires: current,
 				});
-				dispatch(login());
-				navigate("/");
+				api
+					.get("/members/get")
+					.then((res) => {
+						dispatch(login(res.data.data));
+						navigate("/");
+					})
+					.catch((error) => {
+						console.log(error);
+					});
 			})
 			.catch((error) => {
 				// 404 : 회원이 존재하지 않음 , 400 : 비밀번호가 일치하지 않음
