@@ -10,7 +10,6 @@ import dateAsKor from "src/utils/dateAsKor";
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import CalendarComponent from "./Calendar";
-import useTokenCheck from "src/hooks/useTokenCheck";
 import { api } from "src/utils/refreshToken";
 import { v4 as uuidv4 } from "uuid";
 import useDebounce from "src/hooks/useDebounce";
@@ -31,8 +30,6 @@ export interface TagList {
 }
 
 const Diary = () => {
-	useTokenCheck();
-
 	const [diaries, setDiaries] = useState<diaryType[]>([]);
 	const [filterDiary, setFilterDiary] = useState<diaryType[]>([]);
 	const [searchVal, setSearchVal] = useState<string>("");
@@ -154,7 +151,7 @@ const Diary = () => {
 				<hr />
 				{filterDiary?.length !== 0 ? (
 					<>
-						{search === "" ? (
+						{search === "" || search === "?title=" ? (
 							<h3>분류 전체보기 ({diaries.length})</h3>
 						) : (
 							<h3>

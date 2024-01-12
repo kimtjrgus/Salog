@@ -13,10 +13,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import { useState } from "react";
 import { removeCookie } from "src/utils/cookie";
+import { useDispatch } from "react-redux";
+import { logout } from "src/store/slices/userSlice";
 
 export const SideBar = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	const onclickLogout = () => {
 		setIsOpen(true);
@@ -25,6 +28,7 @@ export const SideBar = () => {
 	const onClickCloseBtn = () => {
 		removeCookie("accessToken", { path: "/" });
 		removeCookie("refreshToken", { path: "/" });
+		dispatch(logout());
 		navigate("/login", { replace: true });
 	};
 

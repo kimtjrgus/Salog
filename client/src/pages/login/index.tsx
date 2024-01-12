@@ -9,6 +9,10 @@ import { ReactComponent as Naver } from "../../assets/Naver.svg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setCookie } from "src/utils/cookie";
+import { useDispatch } from "react-redux";
+import { login } from "src/store/slices/userSlice";
+import { type AppDispatch } from "src/store";
+import { api } from "src/utils/refreshToken";
 
 interface userType {
 	email: string;
@@ -20,6 +24,7 @@ const Login = () => {
 	const [error, setError] = useState<userType>({ email: "", password: "" });
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 	const navigate = useNavigate();
+	const dispatch = useDispatch<AppDispatch>();
 
 	// 이메일, 비밀번호가 변경될 때 상태를 저장하는 함수
 	const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +53,15 @@ const Login = () => {
 					path: "/",
 					expires: current,
 				});
-				navigate("/");
+				api
+					.get("/members/get")
+					.then((res) => {
+						dispatch(login(res.data.data));
+						navigate("/");
+					})
+					.catch((error) => {
+						console.log(error);
+					});
 			})
 			.catch((error) => {
 				// 404 : 회원이 존재하지 않음 , 400 : 비밀번호가 일치하지 않음

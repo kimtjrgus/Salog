@@ -8,22 +8,20 @@ import { Input } from "../login";
 import ReactQuillComponent from "../diary_write/TextEditor";
 import { api } from "src/utils/refreshToken";
 import useTokenCheck from "src/hooks/useTokenCheck";
-import { type diaryType, type TagList } from "../diary";
+import { type TagList } from "../diary";
 export interface valuesType {
 	title: string;
 	body: string;
 }
 
 const DiaryWrite = () => {
-	const [diary, setDiary] = useState<diaryType[]>([]);
 	const [values, setValues] = useState<valuesType>({ title: "", body: "" });
 	const [categories, setCategories] = useState<string[]>([]);
+
 	const [category, setCategory] = useState<string>("");
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [tagModal, setTagModal] = useState<boolean>(false);
 	useTokenCheck();
-
-	console.log(diary, values);
 
 	const id = useParams().id;
 
@@ -52,17 +50,30 @@ const DiaryWrite = () => {
 
 	const onKeyUpEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		const inputElement = e.target as HTMLInputElement;
+
 		if (inputElement.value.trim() !== "" && inputElement.value !== ",") {
 			if (e.key === ",") {
-				setCategories([
-					...categories,
-					inputElement.value.slice(0, inputElement.value.length - 1).trim(),
-				]);
-				setCategory("");
+				if (
+					!categories.includes(
+						inputElement.value.slice(0, inputElement.value.length - 1),
+					)
+				) {
+					setCategories([
+						...categories,
+						inputElement.value.slice(0, inputElement.value.length - 1).trim(),
+					]);
+					setCategory("");
+				} else {
+					setCategory("");
+				}
 			}
 			if (e.key === "Enter") {
-				setCategories([...categories, inputElement.value.trim()]);
-				setCategory("");
+				if (!categories.includes(inputElement.value)) {
+					setCategories([...categories, inputElement.value.trim()]);
+					setCategory("");
+				} else {
+					setCategory("");
+				}
 			}
 		}
 	};
@@ -117,11 +128,12 @@ const DiaryWrite = () => {
 		api
 			.get(`/diary/${id}`)
 			.then((res) => {
-				setDiary(res.data.data);
 				setValues({ title: res.data.data.title, body: res.data.data.body });
+				const tags: string[] = [];
 				res.data.data.tagList.forEach((tagObj: TagList) => {
-					setCategories([...categories, tagObj.tagName]);
+					tags.push(tagObj.tagName);
 				});
+				setCategories([...categories, ...tags]);
 			})
 			.catch((error) => {
 				console.log(error);
