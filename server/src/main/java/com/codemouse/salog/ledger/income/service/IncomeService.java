@@ -65,6 +65,8 @@ public class IncomeService {
                 .ifPresent(findIncome::setIncomeName);
         Optional.of(income.getMemo())
                 .ifPresent(findIncome::setMemo);
+        Optional.of(income.getPayment())
+                .ifPresent(findIncome::setPayment);
 
         // 태그
         tagHandler(incomePatchDto.getIncomeTag(), token, findIncome);

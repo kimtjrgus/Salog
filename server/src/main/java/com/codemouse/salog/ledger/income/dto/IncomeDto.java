@@ -16,6 +16,7 @@ public class IncomeDto {
         private String memo;
         private LocalDate date;
         private String incomeTag;
+        private String payment;
     }
 
     @AllArgsConstructor
@@ -25,6 +26,7 @@ public class IncomeDto {
         private String incomeName;
         private String memo;
         private String incomeTag;
+        private String payment;
     }
 
     @AllArgsConstructor
@@ -35,6 +37,7 @@ public class IncomeDto {
         private int money;
         private String incomeName;
         private String memo;
+        private String payment;
         private LocalDate date;
         private LedgerTagDto.Response incomeTag;
     }
