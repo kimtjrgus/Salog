@@ -12,18 +12,19 @@ interface Props {
 }
 
 interface outgoType {
-	id: string;
+	id: number;
 	date: string;
 	outgoName: string;
 	money: number;
 	memo: string;
 	outgoTag: string;
 	wasteList: boolean;
+	payment: string;
 	reciptImg: string;
 }
 
 interface incomeType {
-	id: 1;
+	id: number;
 	incomeTag: string;
 	date: string;
 	money: number;
@@ -114,7 +115,7 @@ const ReadModal = ({ isOpen, setIsOpen }: Props) => {
 							<p className="date ft-size">{dateAsDots(el.date)}</p>
 							<p className="tag ft-size">{el.outgoTag}</p>
 							<p className="name ft-size">{el.outgoName}</p>
-							<p className="method ft-size">{"현금"}</p>
+							<p className="method ft-size">{el.payment}</p>
 							<p className="outgo_money ft-size">{`${el.money.toLocaleString()}원`}</p>
 							<p className="memo ft-size">{el.memo}</p>
 						</div>
@@ -127,7 +128,7 @@ const ReadModal = ({ isOpen, setIsOpen }: Props) => {
 							<p className="date ft-size">{dateAsDots(el.date)}</p>
 							<p className="tag ft-size">{el.incomeTag}</p>
 							<p className="name ft-size">{el.income_name}</p>
-							<p className="method ft-size">{"카드"}</p>
+							<p className="method ft-size">{"x"}</p>
 							<p className="income_money ft-size">{`${el.money.toLocaleString()}원`}</p>
 							<p className="memo ft-size">{el.memo}</p>
 						</div>
@@ -257,6 +258,7 @@ const Container = styled.div`
 
 	.ft-size {
 		font-size: 1.2rem;
+		color: #474747;
 	}
 
 	.date {
