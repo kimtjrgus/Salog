@@ -144,7 +144,7 @@ public class IncomeService {
         if (incomePostDto != null) {
             String tagName = incomePostDto;
 
-            LedgerTag existTag = tagService.findLedgerTagByMemberIdAndTagName(token, tagName);
+            LedgerTag existTag = tagService.findLedgerTagByMemberIdAndTagName(token, tagName, LedgerTag.Group.INCOME);
 
             if (existTag != null) {
                 if (existTag.getCategory() == LedgerTag.Group.INCOME) {

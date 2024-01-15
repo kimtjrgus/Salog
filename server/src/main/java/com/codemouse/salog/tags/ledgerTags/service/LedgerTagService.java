@@ -80,10 +80,10 @@ public class LedgerTagService {
     }
 
     // 멤버와 태그이름에 해당하는 객체
-    public LedgerTag findLedgerTagByMemberIdAndTagName(String token, String tagName){
+    public LedgerTag findLedgerTagByMemberIdAndTagName(String token, String tagName, LedgerTag.Group category){
         long memberId = jwtTokenizer.getMemberId(token);
 
-        return ledgerTagRepository.findByMemberMemberIdAndTagName(memberId, tagName);
+        return ledgerTagRepository.findByMemberMemberIdAndTagNameAndCategory(memberId, tagName, category);
     }
 
     // 잉여태그 삭제
