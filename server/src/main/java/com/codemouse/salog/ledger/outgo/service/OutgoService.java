@@ -167,7 +167,7 @@ public class OutgoService {
         if (outgoPostDto != null) {
             String tagName = outgoPostDto;
 
-            LedgerTag existTag = ledgerTagService.findLedgerTagByMemberIdAndTagName(token, tagName);
+            LedgerTag existTag = ledgerTagService.findLedgerTagByMemberIdAndTagName(token, tagName, LedgerTag.Group.OUTGO);
 
             if (existTag != null) {
                 if (existTag.getCategory() == LedgerTag.Group.OUTGO) {
