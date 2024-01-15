@@ -211,6 +211,7 @@ const Container = styled.div`
 	margin-bottom: 5rem;
 
     .color__info {
+		z-index: 3;
         display: flex;
         align-items:center;
         margin-top: 2.2rem;
@@ -251,6 +252,8 @@ const Container = styled.div`
 
 	.react-calendar {
 		width: 770px;
+		height: 428px;
+		overflow-y: scroll;
 		padding: 0 1.5rem;
 		border-radius: 8px;
 		border: 1px solid #d9d9d9;
@@ -276,13 +279,21 @@ const Container = styled.div`
 			margin-top: 0.5rem;
             color: ${(props) => props.theme.COLORS.LIGHT_RED}
         }
+
+		&::-webkit-scrollbar {
+  			display: none;
+		}
 	}
 
 	.react-calendar__navigation {
-		height: 25px;
-		border-radius: 20px 20px 0 0;
+		display:flex;
+		align-items: flex-end;
+		height: 3.5rem;
+		z-index: 2;
+		position: sticky;
+		top:0;
+		background: white;
         justify-content: center;
-		margin-top:1.5rem;
 
 		span {
 			font-size: 1.6rem;
