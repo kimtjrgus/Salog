@@ -32,6 +32,7 @@ const Inner = styled.div`
 const Container = styled.div`
 	width: 92%;
 	height: 100vh;
+	overflow-y: hidden;
 	max-width: 130.5rem;
 	margin: 0 auto;
 	padding-top: 7.5rem;
