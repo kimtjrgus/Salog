@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface LedgerTagRepository extends JpaRepository<LedgerTag, Long> {
     List<LedgerTag> findAllByMemberMemberId(Long memberId);
+    List<LedgerTag> findAllByMemberMemberIdAndCategory(Long memberId, LedgerTag.Group category);
 
     // memberId와 tagName에 맞는 태그 찾기
     LedgerTag findByMemberMemberIdAndTagName(long memberId, String tagName);
