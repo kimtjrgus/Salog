@@ -126,6 +126,12 @@ const Container = styled.div`
 		color: #ffffff;
 	}
 
+	.hQozOV .react-calendar__tile:enabled:hover,
+	.hQozOV .react-calendar__tile:enabled:focus,
+	.hQozOV .react-calendar__tile--active {
+		color: black;
+	}
+
 	.react-calendar__tile--now {
 		background: none;
 		color: #000;
