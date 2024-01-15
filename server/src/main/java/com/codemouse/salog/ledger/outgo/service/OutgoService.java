@@ -58,21 +58,23 @@ public class OutgoService {
 
     // PATCH
     @Transactional
-    public void patchOutgo (String token, long outgoId, OutgoDto.Patch outgoDTO){
+    public void patchOutgo (String token, long outgoId, OutgoDto.Patch outgoDto){
         tokenBlackListService.isBlackListed(token);
 
+        Outgo outgo = outgoMapper.OutgoPatchDtoToOutgo(outgoDto);
         Outgo findOutgo = findVerifiedOutgo(outgoId);
         memberService.verifiedRequest(token, findOutgo.getMember().getMemberId());
 
-        Optional.ofNullable(outgoDTO.getDate()).ifPresent(date -> findOutgo.setDate(LocalDate.parse(date)));
-        Optional.ofNullable(outgoDTO.getOutgoName()).ifPresent(findOutgo::setOutgoName);
-        Optional.ofNullable(outgoDTO.getMoney()).ifPresent(findOutgo::setMoney);
-        Optional.ofNullable(outgoDTO.getMemo()).ifPresent(findOutgo::setMemo);
-        Optional.ofNullable(outgoDTO.getReceiptImg()).ifPresent(findOutgo::setReceiptImg);
-        Optional.ofNullable(outgoDTO.getWasteList()).ifPresent(findOutgo::setWasteList);
+        Optional.ofNullable(outgo.getDate()).ifPresent(findOutgo::setDate);
+        Optional.ofNullable(outgo.getOutgoName()).ifPresent(findOutgo::setOutgoName);
+        Optional.ofNullable(outgo.getMoney()).ifPresent(findOutgo::setMoney);
+        Optional.ofNullable(outgo.getPayment()).ifPresent(findOutgo::setPayment);
+        Optional.ofNullable(outgo.getMemo()).ifPresent(findOutgo::setMemo);
+        Optional.ofNullable(outgo.getReceiptImg()).ifPresent(findOutgo::setReceiptImg);
+        Optional.ofNullable(outgo.isWasteList()).ifPresent(findOutgo::setWasteList);
 
-        if(outgoDTO.getOutgoTag() != null){
-            tagHandler(outgoDTO.getOutgoTag(), token, findOutgo);
+        if(outgoDto.getOutgoTag() != null){
+            tagHandler(outgoDto.getOutgoTag(), token, findOutgo);
         }
         else{
             outgoRepository.save(findOutgo);
@@ -123,11 +125,11 @@ public class OutgoService {
 
         }
 
-        List<OutgoDto.Response> outgoDTOList = outgoPage.getContent().stream()
+        List<OutgoDto.Response> outgoDtoList = outgoPage.getContent().stream()
                 .map(outgoMapper::OutgoToOutgoResponseDto)
                 .collect(Collectors.toList());
 
-        return new MultiResponseDto<>(outgoDTOList, outgoPage);
+        return new MultiResponseDto<>(outgoDtoList, outgoPage);
     }
 
     // DELETE
