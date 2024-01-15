@@ -17,8 +17,8 @@ public class LedgerTagDto {
         private LedgerTag.Group category; // TODO dto안에 엔티티 객체가 들어있는 것에 대하여
     }
 
-    @AllArgsConstructor
     @Getter
+    @Setter
     public static class Response {
         private long ledgerTagId;
         private String tagName;
