@@ -29,9 +29,6 @@ public class Income {
     private String memo;
 
     @Column
-    private String payment;
-
-    @Column
     private LocalDate date; // 타입 안정성과 쿼리 호환을 위해 LocalDate 타입으로
 
     @ManyToOne
