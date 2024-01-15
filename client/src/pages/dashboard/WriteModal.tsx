@@ -219,7 +219,7 @@ const Container = styled.div<{ $isOpen: boolean }>`
   overflow-y: hidden;
   border-radius: 8px;
   background: white;
-  right: -0.5rem;
+  right: -0.2rem;
   bottom: 3.12rem;
   margin-right: 12.5rem;
   color: rgb(70, 70, 86);
