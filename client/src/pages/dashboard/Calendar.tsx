@@ -21,8 +21,12 @@ const DashboardCalendar = ({ isOpen, setIsOpen }: propsType) => {
 	const [value, onChange] = useState(new Date());
 	const [calendar, setCalendar] = useState<calendarType[]>([]);
 
-	const onClickTile = () => {
-		console.log("타일 클릭");
+	const onClickTile = (value: Date) => {
+		setIsOpen({
+			...isOpen,
+			dayTile: true,
+			day: new Date(value).toLocaleString(),
+		});
 	};
 
 	const onClickWriteBtn = (
@@ -60,7 +64,9 @@ const DashboardCalendar = ({ isOpen, setIsOpen }: propsType) => {
 				onChange={(value) => {
 					onChange(value as Date);
 				}}
-				onClickDay={onClickTile}
+				onClickDay={(value) => {
+					onClickTile(value);
+				}}
 				value={value}
 				next2Label={null}
 				prev2Label={null}
@@ -286,6 +292,11 @@ s	}
         color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
 
     }
+
+	.react-calendar__tile--active {
+		color: black;
+	}
+
 
 	.react-calendar__tile--now {
 		background: none;
