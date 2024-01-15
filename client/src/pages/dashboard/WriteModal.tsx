@@ -42,8 +42,6 @@ const WriteModal = ({ isOpen, setIsOpen }: Props) => {
 		memo: "",
 	});
 
-	console.log(values);
-
 	// input hover, click, blur 감지 후 실행 함수
 	const handleMouseEnter = () => {
 		setIsHovered({ ...isHovered, hover: true });
