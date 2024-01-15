@@ -27,6 +27,9 @@ public class Outgo {
     @Column
     private String outgoName;
 
+    @Column
+    private String payment; // 결제 수단 추가
+
     @Column(nullable = false)
     private boolean wasteList;
 

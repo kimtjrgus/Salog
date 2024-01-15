@@ -90,7 +90,8 @@ public class LedgerTagService {
     public void deleteUnusedIncomeTagsByMemberId(String token) {
         // 멤버 아이디로 모든 태그 검색
         long memberId = jwtTokenizer.getMemberId(token);
-        List<LedgerTag> allTags = ledgerTagRepository.findAllByMemberMemberId(memberId);
+        List<LedgerTag> allTags = ledgerTagRepository.findAllByMemberMemberIdAndCategory(
+                memberId, LedgerTag.Group.INCOME);
 
         for (LedgerTag tag : allTags) {
             long incomeCount = incomeRepository.countByLedgerTag(tag);
@@ -104,12 +105,14 @@ public class LedgerTagService {
     public void deleteUnusedOutgoTagsByMemberId(String token) {
         // 멤버 아이디로 모든 태그 검색
         long memberId = jwtTokenizer.getMemberId(token);
-        List<LedgerTag> allTags = ledgerTagRepository.findAllByMemberMemberId(memberId);
+
+        List<LedgerTag> allTags = ledgerTagRepository.findAllByMemberMemberIdAndCategory(
+                memberId, LedgerTag.Group.OUTGO);
 
         for (LedgerTag tag : allTags) {
-            long incomeCount = outgoRepository.countByLedgerTag(tag);
+            long outgoCount = outgoRepository.countByLedgerTag(tag);
 
-            if (incomeCount == 0) {
+            if (outgoCount == 0) {
                 ledgerTagRepository.delete(tag);
             }
         }
