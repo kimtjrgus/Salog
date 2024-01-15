@@ -1,6 +1,9 @@
 package com.codemouse.salog.members.entity;
 
 import com.codemouse.salog.audit.Auditable;
+import com.codemouse.salog.ledger.income.entity.Income;
+import com.codemouse.salog.ledger.outgo.entity.Outgo;
+import com.codemouse.salog.tags.ledgerTags.entity.LedgerTag;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +39,9 @@ public class Member extends Auditable {
     // JWT - 역할 부여
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<LedgerTag> ledgerTags;
 
 
     public enum Status {
