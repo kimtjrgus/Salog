@@ -8,6 +8,7 @@ import Schedule from "./Schedule";
 import WriteModal from "./WriteModal";
 import { useSelector } from "react-redux";
 import { type RootState } from "src/store";
+import ReadModal from "./ReadModal";
 
 export interface outgoType {
 	month: number;
@@ -183,6 +184,7 @@ const Dashboard = () => {
 					<Schedule />
 					<WriteModal isOpen={isOpen} setIsOpen={setIsOpen} />
 				</MainContainer>
+				{isOpen.dayTile && <ReadModal isOpen={isOpen} setIsOpen={setIsOpen} />}
 			</Container>
 		</>
 	);
