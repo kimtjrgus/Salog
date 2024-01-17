@@ -38,7 +38,6 @@ public class IncomeService {
     private final IncomeMapper incomeMapper;
     private final MemberService memberService;
     private final JwtTokenizer jwtTokenizer;
-    private final DiaryService diaryService;
     private final LedgerTagService tagService;
     private final Validator validator;
 
