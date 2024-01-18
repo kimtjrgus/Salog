@@ -65,4 +65,14 @@ public class IncomeController {
 
         incomeService.deleteIncome(token, incomeId);
     }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<?> getMonthlyIncome(@RequestHeader(name = "Authorization") String token,
+                                              @RequestParam String date) {
+        tokenBlackListService.isBlackListed(token);
+
+        IncomeDto.MonthlyResponse response = incomeService.getMonthlyIncome(token, date);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

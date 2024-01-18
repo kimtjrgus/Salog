@@ -108,6 +108,26 @@ public class IncomeService {
         return new MultiResponseDto<>(incomeList, incomes);
     }
 
+    public IncomeDto.MonthlyResponse getMonthlyIncome(String token, String date) {
+        long memberId = jwtTokenizer.getMemberId(token);
+
+        int[] arr = Arrays.stream(date.split("-")).mapToInt(Integer::parseInt).toArray();
+        int year = arr[0];
+        int month = arr[1];
+
+        List<Object[]> totalIncomeByTag = incomeRepository.findTotalIncomeByMonthGroupByTag(memberId, year, month);
+        List<LedgerTagDto.MonthlyResponse> tagIncomes = totalIncomeByTag.stream()
+                .map(obj -> new LedgerTagDto.MonthlyResponse((String) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
+
+        Long monthlyIncome = incomeRepository.findTotalIncomeByMonth(memberId, year, month);
+
+        return new IncomeDto.MonthlyResponse(
+                monthlyIncome != null ? monthlyIncome.intValue() : 0,
+                tagIncomes
+        );
+    }
+
     public void deleteIncome(String token, long incomeId) {
 
         Income income = findVerifiedIncome(incomeId);

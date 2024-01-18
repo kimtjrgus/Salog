@@ -23,4 +23,12 @@ public class LedgerTagDto {
         private long ledgerTagId;
         private String tagName;
     }
+
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public static class MonthlyResponse {
+        private String tagName;
+        private long tagSum;
+    }
 }
