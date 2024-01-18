@@ -3,7 +3,6 @@ package com.codemouse.salog.ledger.outgo.service;
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
 import com.codemouse.salog.auth.utils.TokenBlackListService;
 import com.codemouse.salog.dto.MultiResponseDto;
-import com.codemouse.salog.dto.SingleResponseDto;
 import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.ledger.outgo.dto.OutgoDto;
@@ -185,7 +184,7 @@ public class OutgoService {
 //    }
 
     // GET OutgoSum
-    public SingleResponseDto getSumOfOutgoLists(String token, String date){
+    public OutgoDto.ResponseBySum getSumOfOutgoLists(String token, String date){
         tokenBlackListService.isBlackListed(token);
 
         long memberId = jwtTokenizer.getMemberId(token);
@@ -195,15 +194,19 @@ public class OutgoService {
         int month = Integer.parseInt(dateParts[1]);
 
         List<Object[]> results = outgoRepository.getSumOfOutgoListsByTag(memberId, year, month);
-        List<OutgoDto.SumByLedgerTag> sumByTags = results.stream()
-                .map(outgoMapper::mapToSumByTag)
+        List<LedgerTagDto.MonthlyResponse> sumByTags = results.stream()
+                .map(result -> {
+                    String tagName = (String) result[0];
+                    long tagSum = ((Number) result[1]).longValue();
+                    return new LedgerTagDto.MonthlyResponse(tagName, tagSum);
+                })
                 .collect(Collectors.toList());
 
         // 월간 지출 합계를 계산합니다.
         long monthlyOutgo =
-                sumByTags.stream().mapToLong(OutgoDto.SumByLedgerTag::getTagSum).sum();
+                sumByTags.stream().mapToLong(LedgerTagDto.MonthlyResponse::getTagSum).sum();
 
-        return new SingleResponseDto(new OutgoDto.ResponseBySum(monthlyOutgo, sumByTags));
+        return new OutgoDto.ResponseBySum(monthlyOutgo, sumByTags);
     }
 
     // GET WasteSum
@@ -269,6 +272,4 @@ public class OutgoService {
         outgoRepository.save(outgo);
         ledgerTagService.deleteUnusedOutgoTagsByMemberId(token);
     }
-
-
 }
