@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.List;
 
 
 public class OutgoDto {
@@ -68,4 +69,20 @@ public class OutgoDto {
         private boolean wasteList;
         private String receiptImg;
     }
+
+    @AllArgsConstructor
+    @Getter
+    public static class ResponseBySum {
+        private long monthlyOutgo;
+        private List<SumByLedgerTag> tags;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public static class SumByLedgerTag {
+        private long ledgerTagId;
+        private String tagName;
+        private long tagSum;
+    }
 }
+
