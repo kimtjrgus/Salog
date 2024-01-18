@@ -18,10 +18,11 @@ import javax.validation.constraints.Positive;
 @Slf4j
 @Validated
 @AllArgsConstructor
+@RequestMapping("/outgo")
 public class OutgoController {
     private final OutgoService service;
 
-    @PostMapping("/outgo/post")
+    @PostMapping("/post")
     @ResponseStatus(HttpStatus.CREATED)
     public void createOutgo (@RequestHeader(name = "Authorization") String token,
                              @Valid @RequestBody OutgoDto.Post requestBody){
@@ -29,7 +30,7 @@ public class OutgoController {
     }
 
 
-    @PatchMapping("/outgo/update/{outgo-id}")
+    @PatchMapping("/update/{outgo-id}")
     @ResponseStatus(HttpStatus.OK)
     public void updateOutgo (@RequestHeader(name = "Authorization") String token,
                              @PathVariable("outgo-id") @Positive long outgoId,
@@ -37,7 +38,7 @@ public class OutgoController {
         service.patchOutgo(token, outgoId, requestBody);
     }
 
-    @GetMapping("/outgo")
+    @GetMapping
     public ResponseEntity getOutgoLists (@RequestHeader(name = "Authorization") String token,
                                          @Positive @RequestParam int page,
                                          @Positive @RequestParam int size,
@@ -61,10 +62,10 @@ public class OutgoController {
 //        return new ResponseEntity<>(wastePages, HttpStatus.OK);
 //    }
 
-    @GetMapping("/monthlyOutgo")
+    @GetMapping("/monthly")
     public ResponseEntity getSumOfOutgoLists (@RequestHeader(name = "Authorization") String token,
                                     @Valid @RequestParam String date){
-        SingleResponseDto sumOfOutgos =
+        OutgoDto.ResponseBySum sumOfOutgos =
                 service.getSumOfOutgoLists(token, date);
 
         return new ResponseEntity(sumOfOutgos, HttpStatus.OK);
@@ -79,7 +80,7 @@ public class OutgoController {
 //        return new ResponseEntity(sumOfWasteLists, HttpStatus.OK);
 //    }
 
-    @DeleteMapping("/outgo/delete/{outgo-id}")
+    @DeleteMapping("/delete/{outgo-id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOutgo (@RequestHeader(name = "Authorization") String token,
                              @PathVariable("outgo-id") @Positive long outgoId){
