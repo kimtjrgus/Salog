@@ -24,7 +24,7 @@ public interface OutgoRepository extends JpaRepository<Outgo, Long> {
     Page<Outgo> findAllByMemberMemberIdAndWasteListAndDateBetween(
             Long memberId, boolean wasteList, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-    @Query(value = "SELECT lt.ledger_tag_id, lt.tag_name, SUM(o.money) " +
+    @Query(value = "SELECT lt.tag_name, SUM(o.money) " +
             "FROM outgo o " +
             "JOIN ledger_tag lt ON o.ledger_tag_id = lt.ledger_tag_id " +
             "WHERE o.member_id = :memberId AND YEAR(o.date) = :year AND MONTH(o.date) = :month AND lt.category = 'OUTGO' " +

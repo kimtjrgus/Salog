@@ -14,12 +14,4 @@ public interface OutgoMapper {
 
     @Mapping(source = "ledgerTag", target = "outgoTag", qualifiedByName = "ledgerTagToLedgerTagResponseDto")
     OutgoDto.Response OutgoToOutgoResponseDto(Outgo outgo);
-
-    default OutgoDto.SumByLedgerTag mapToSumByTag(Object[] result) {
-        long ledgerTagId = ((Number) result[0]).longValue();
-        String tagName = (String) result[1];
-        long tagSum = ((Number) result[2]).longValue();
-
-        return new OutgoDto.SumByLedgerTag(ledgerTagId, tagName, tagSum);
-    }
 }
