@@ -72,8 +72,8 @@ public class OutgoDto {
 
     @AllArgsConstructor
     @Getter
-    public static class ResponseBySum {
-        private long monthlyOutgo;
+    public static class MonthlyResponse {
+        private long monthlyTotal;
         private List<LedgerTagDto.MonthlyResponse> tags;
     }
 }
