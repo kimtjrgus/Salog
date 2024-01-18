@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { SvgIcon } from "@mui/material";
 import GridViewIcon from "@mui/icons-material/GridView";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
@@ -9,7 +9,7 @@ import StickyNote2OutlinedIcon from "@mui/icons-material/StickyNote2Outlined";
 import ContactSupportOutlinedIcon from "@mui/icons-material/ContactSupportOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ExitToAppRoundedIcon from "@mui/icons-material/ExitToAppRounded";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import { useState } from "react";
 import { removeCookie } from "src/utils/cookie";
@@ -32,6 +32,16 @@ export const SideBar = () => {
 		navigate("/login", { replace: true });
 	};
 
+	const isActive = (paths: string[]) => {
+		const location = useLocation();
+		console.log(
+			location,
+			paths.some((path) => location.pathname === path),
+		);
+
+		return paths.some((path) => location.pathname === path);
+	};
+
 	return (
 		<>
 			<Container>
@@ -44,7 +54,10 @@ export const SideBar = () => {
 						/>
 						<ListTitle>대시보드</ListTitle>
 					</NavStyle>
-					<NavStyle to="/history">
+					<NavStyle
+						to="/history"
+						isActive={isActive(["/history", "/income", "/outgo", "/waste"])}
+					>
 						<SvgIcon
 							component={MenuBookIcon}
 							sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
@@ -152,7 +165,7 @@ const Lists = styled.div`
 	border-bottom: 1px solid #b4b4b4;
 `;
 
-const NavStyle = styled(NavLink)`
+const NavStyle = styled(NavLink)<{ isActive: boolean }>`
 	display: flex;
 	align-items: center;
 	padding: 0.5rem 1.3rem;
@@ -167,6 +180,16 @@ const NavStyle = styled(NavLink)`
 	&:hover {
 		background-color: #f0f3fd;
 	}
+
+	${(props) =>
+		props.isActive &&
+		css`
+			background-color: #e2e8ff;
+			> svg,
+			p {
+				color: ${props.theme.COLORS.LIGHT_BLUE};
+			}
+		`}
 
 	&.active {
 		background-color: #e2e8ff;
