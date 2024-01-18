@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class IncomeDto {
     @AllArgsConstructor
@@ -37,5 +38,13 @@ public class IncomeDto {
         private String memo;
         private LocalDate date;
         private LedgerTagDto.Response incomeTag;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public static class MonthlyResponse {
+        private long monthlyIncome;
+        private List<LedgerTagDto.MonthlyResponse> tags;
     }
 }

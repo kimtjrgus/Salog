@@ -38,7 +38,6 @@ public class IncomeService {
     private final IncomeMapper incomeMapper;
     private final MemberService memberService;
     private final JwtTokenizer jwtTokenizer;
-    private final DiaryService diaryService;
     private final LedgerTagService tagService;
     private final Validator validator;
 
@@ -107,6 +106,29 @@ public class IncomeService {
                 .collect(Collectors.toList());
 
         return new MultiResponseDto<>(incomeList, incomes);
+    }
+
+    public IncomeDto.MonthlyResponse getMonthlyIncome(String token, String date) {
+        long memberId = jwtTokenizer.getMemberId(token);
+
+        int[] arr = Arrays.stream(date.split("-")).mapToInt(Integer::parseInt).toArray();
+        int year = arr[0];
+        int month = arr[1];
+
+        // 월별 태그 합계 계산
+        List<Object[]> totalIncomeByTag = incomeRepository.findTotalIncomeByMonthGroupByTag(memberId, year, month);
+        // 계산된 태그 합계를 삽입
+        List<LedgerTagDto.MonthlyResponse> tagIncomes = totalIncomeByTag.stream()
+                .map(obj -> new LedgerTagDto.MonthlyResponse((String) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
+
+        // 월별 수입 합계 계산
+        Long monthlyIncome = incomeRepository.findTotalIncomeByMonth(memberId, year, month);
+
+        return new IncomeDto.MonthlyResponse(
+                monthlyIncome != null ? monthlyIncome.intValue() : 0,
+                tagIncomes
+        );
     }
 
     public void deleteIncome(String token, long incomeId) {
