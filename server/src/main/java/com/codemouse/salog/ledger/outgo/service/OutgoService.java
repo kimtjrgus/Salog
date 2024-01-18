@@ -3,6 +3,7 @@ package com.codemouse.salog.ledger.outgo.service;
 import com.codemouse.salog.auth.jwt.JwtTokenizer;
 import com.codemouse.salog.auth.utils.TokenBlackListService;
 import com.codemouse.salog.dto.MultiResponseDto;
+import com.codemouse.salog.dto.SingleResponseDto;
 import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.ledger.outgo.dto.OutgoDto;
@@ -58,21 +59,23 @@ public class OutgoService {
 
     // PATCH
     @Transactional
-    public void patchOutgo (String token, long outgoId, OutgoDto.Patch outgoDTO){
+    public void patchOutgo (String token, long outgoId, OutgoDto.Patch outgoDto){
         tokenBlackListService.isBlackListed(token);
 
+        Outgo outgo = outgoMapper.OutgoPatchDtoToOutgo(outgoDto);
         Outgo findOutgo = findVerifiedOutgo(outgoId);
         memberService.verifiedRequest(token, findOutgo.getMember().getMemberId());
 
-        Optional.ofNullable(outgoDTO.getDate()).ifPresent(date -> findOutgo.setDate(LocalDate.parse(date)));
-        Optional.ofNullable(outgoDTO.getOutgoName()).ifPresent(findOutgo::setOutgoName);
-        Optional.ofNullable(outgoDTO.getMoney()).ifPresent(findOutgo::setMoney);
-        Optional.ofNullable(outgoDTO.getMemo()).ifPresent(findOutgo::setMemo);
-        Optional.ofNullable(outgoDTO.getReceiptImg()).ifPresent(findOutgo::setReceiptImg);
-        Optional.ofNullable(outgoDTO.getWasteList()).ifPresent(findOutgo::setWasteList);
+        Optional.ofNullable(outgo.getDate()).ifPresent(findOutgo::setDate);
+        Optional.ofNullable(outgo.getOutgoName()).ifPresent(findOutgo::setOutgoName);
+        Optional.ofNullable(outgo.getMoney()).ifPresent(findOutgo::setMoney);
+        Optional.ofNullable(outgo.getPayment()).ifPresent(findOutgo::setPayment);
+        Optional.ofNullable(outgo.getMemo()).ifPresent(findOutgo::setMemo);
+        Optional.ofNullable(outgo.getReceiptImg()).ifPresent(findOutgo::setReceiptImg);
+        Optional.ofNullable(outgo.isWasteList()).ifPresent(findOutgo::setWasteList);
 
-        if(outgoDTO.getOutgoTag() != null){
-            tagHandler(outgoDTO.getOutgoTag(), token, findOutgo);
+        if(outgoDto.getOutgoTag() != null){
+            tagHandler(outgoDto.getOutgoTag(), token, findOutgo);
         }
         else{
             outgoRepository.save(findOutgo);
@@ -123,12 +126,91 @@ public class OutgoService {
 
         }
 
-        List<OutgoDto.Response> outgoDTOList = outgoPage.getContent().stream()
+        List<OutgoDto.Response> outgoDtoList = outgoPage.getContent().stream()
                 .map(outgoMapper::OutgoToOutgoResponseDto)
                 .collect(Collectors.toList());
 
-        return new MultiResponseDto<>(outgoDTOList, outgoPage);
+        return new MultiResponseDto<>(outgoDtoList, outgoPage);
     }
+
+    // GET WasteList
+//    public MultiResponseDto<OutgoDto.Response> findAllWasteLists(String token, int page, int size, String date, String outgoTag){
+//        tokenBlackListService.isBlackListed(token);
+//        long memberId = jwtTokenizer.getMemberId(token);
+//
+//        Page<Outgo> wastePage;
+//
+//        // 월, 일별조회를 위한 변수선언
+//        LocalDate startDate;
+//        LocalDate endDate;
+//
+//        // 1. 조회할 날짜 지정
+//        // date 끝자리에 00 입력시 월별 조회
+//        if (date.endsWith("00")) { // 2012-11-01
+//            LocalDate parsedDate = LocalDate.parse(date.substring(0, 7) + "-01");
+//            startDate = parsedDate.withDayOfMonth(1);
+//            endDate = parsedDate.withDayOfMonth(parsedDate.lengthOfMonth());
+//        } // 그외 경우 일별 조회
+//        else {
+//            startDate = LocalDate.parse(date);
+//            endDate = startDate;
+//        }
+//
+//        // 2. 지정한 날짜에 대한 쿼리들(태그O, 태그X)
+//        if(outgoTag != null){ // 태그별 조회
+//            String decodedTag = URLDecoder.decode(outgoTag, StandardCharsets.UTF_8);
+//            log.info("DecodedTag To UTF-8 : {}", decodedTag);
+//
+//            // 태그이름에 대한 검색 쿼리 outgo 쿼리
+//            List<LedgerTag> tags = ledgerTagRepository.findAllByMemberMemberIdAndTagName(memberId, decodedTag);
+//            List<Long> outgoIds = tags.stream()
+//                    .flatMap(tag -> tag.getOutgos().stream()) // 각 LedgerTag의 Outgo 리스트를 스트림으로 평탄화
+//                    .map(Outgo::getOutgoId)
+//                    .collect(Collectors.toList());
+//
+//            wastePage = outgoRepository.findAllByOutgoIdInAndWasteListAndDateBetween(
+//                    outgoIds, true, startDate, endDate, PageRequest.of(page - 1, size, Sort.by("date").descending()));
+//        }
+//        else{ // none tag
+//            wastePage = outgoRepository.findAllByMemberMemberIdAndWasteListAndDateBetween(
+//                    memberId, true, startDate, endDate, PageRequest.of(page - 1, size, Sort.by("date").descending()));
+//
+//        }
+//
+//        List<OutgoDto.Response> wasteDtoList = wastePage.getContent().stream()
+//                .map(outgoMapper::OutgoToOutgoResponseDto)
+//                .collect(Collectors.toList());
+//
+//        return new MultiResponseDto<>(wasteDtoList, wastePage);
+//    }
+
+    // GET OutgoSum
+    public SingleResponseDto getSumOfOutgoLists(String token, String date){
+        tokenBlackListService.isBlackListed(token);
+
+        long memberId = jwtTokenizer.getMemberId(token);
+
+        String[] dateParts = date.split("-");
+        int year = Integer.parseInt(dateParts[0]);
+        int month = Integer.parseInt(dateParts[1]);
+
+        List<Object[]> results = outgoRepository.getSumOfOutgoListsByTag(memberId, year, month);
+        List<OutgoDto.SumByLedgerTag> sumByTags = results.stream()
+                .map(outgoMapper::mapToSumByTag)
+                .collect(Collectors.toList());
+
+        // 월간 지출 합계를 계산합니다.
+        long monthlyOutgo =
+                sumByTags.stream().mapToLong(OutgoDto.SumByLedgerTag::getTagSum).sum();
+
+        return new SingleResponseDto(new OutgoDto.ResponseBySum(monthlyOutgo, sumByTags));
+    }
+
+    // GET WasteSum
+//    public SingleResponseDto<> getSumOfWasteLists(String token, String date){
+//        tokenBlackListService.isBlackListed(token);
+//
+//    }
 
     // DELETE
     @Transactional
@@ -187,4 +269,6 @@ public class OutgoService {
         outgoRepository.save(outgo);
         ledgerTagService.deleteUnusedOutgoTagsByMemberId(token);
     }
+
+
 }
