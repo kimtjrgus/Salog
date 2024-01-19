@@ -28,7 +28,7 @@ public class BudgetDto {
         private long budgetId;
         private LocalDate date;
         private long budget;
-        private int totalOutgo; // 지출 월별 합계 계산 (비교를 위함)
+        private long totalOutgo; // 지출 월별 합계 계산 (비교를 위함)
         private int dayRemain;
     }
 }

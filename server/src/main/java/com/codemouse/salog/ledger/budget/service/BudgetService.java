@@ -7,6 +7,7 @@ import com.codemouse.salog.ledger.budget.dto.BudgetDto;
 import com.codemouse.salog.ledger.budget.entity.MonthlyBudget;
 import com.codemouse.salog.ledger.budget.mapper.BudgetMapper;
 import com.codemouse.salog.ledger.budget.repository.BudgetRepository;
+import com.codemouse.salog.ledger.outgo.repository.OutgoRepository;
 import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.service.MemberService;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ public class BudgetService {
     private final BudgetMapper budgetMapper;
     private final MemberService memberService;
     private final JwtTokenizer jwtTokenizer;
+    private final OutgoRepository outgoRepository;
 
     public void createBudget(String token, BudgetDto.Post budgetPostDto) {
         MonthlyBudget budget = budgetMapper.budgetPostDtoToBudget(budgetPostDto);
@@ -58,12 +60,24 @@ public class BudgetService {
         int year = arr[0];
         int month = arr[1];
 
-        //todo 2024-01-17 지출 월별 합계 계산 내용 포함되어야함
         BudgetDto.Response response =
                 budgetMapper.budgetToBudgetResponseDto(budgetRepository.findByMonth(memberId, year, month));
-        response.setDayRemain(YearMonth.now().lengthOfMonth() - LocalDate.now().getDayOfMonth());
 
-        return response;
+        if (response == null) {
+            throw new BusinessLogicException(ExceptionCode.BUDGET_NOT_FOUND);
+        } else {
+            response.setDayRemain(YearMonth.now().lengthOfMonth() - LocalDate.now().getDayOfMonth());
+
+            // 지출 합계가 없을 시 에러 분기를 위해 별개의 변수에 초기화
+            Optional<Long> totalOutgoOp = Optional.ofNullable(outgoRepository.findTotalOutgoByMonth(memberId, year, month));
+            if (totalOutgoOp.isEmpty()) {
+                response.setTotalOutgo(0);
+            } else {
+                long totalOutgo = totalOutgoOp.get();
+                response.setTotalOutgo(totalOutgo);
+            }
+            return response;
+        }
     }
 
     public void deleteBudget(String token, long budgetId) {
