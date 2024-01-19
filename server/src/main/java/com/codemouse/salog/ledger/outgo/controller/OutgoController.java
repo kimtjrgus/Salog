@@ -50,35 +50,35 @@ public class OutgoController {
         return new ResponseEntity<>(outgoPages, HttpStatus.OK);
     }
 
-//    @GetMapping("/wasteList")
-//    public ResponseEntity getWasteLists (@RequestHeader(name = "Authorization") String token,
-//                                         @Positive @RequestParam int page,
-//                                         @Positive @RequestParam int size,
-//                                         @Valid @RequestParam String date,
-//                                         @Valid @RequestParam(required = false) String outgoTag){
-//
-//        MultiResponseDto<OutgoDto.Response> wastePages =
-//                service.findAllWasteLists(token, page, size, date, outgoTag);
-//        return new ResponseEntity<>(wastePages, HttpStatus.OK);
-//    }
+    @GetMapping("/wasteList")
+    public ResponseEntity getWasteLists (@RequestHeader(name = "Authorization") String token,
+                                         @Positive @RequestParam int page,
+                                         @Positive @RequestParam int size,
+                                         @Valid @RequestParam String date,
+                                         @Valid @RequestParam(required = false) String outgoTag){
+
+        MultiResponseDto<OutgoDto.Response> wastePages =
+                service.findAllWasteLists(token, page, size, date, outgoTag);
+        return new ResponseEntity<>(wastePages, HttpStatus.OK);
+    }
 
     @GetMapping("/monthly")
     public ResponseEntity getSumOfOutgoLists (@RequestHeader(name = "Authorization") String token,
                                     @Valid @RequestParam String date){
-        OutgoDto.ResponseBySum sumOfOutgos =
+        OutgoDto.MonthlyResponse sumOfOutgos =
                 service.getSumOfOutgoLists(token, date);
 
         return new ResponseEntity(sumOfOutgos, HttpStatus.OK);
     }
 
-//    @GetMapping("/monthlyWaste")
-//    public ResponseEntity getSumOfWasteLists (@RequestHeader(name = "Authorization") String token,
-//                                    @Valid @RequestParam String date){
-//        SingleResponseDto<OutgoDto.ResponseBySum> sumOfWasteLists =
-//                service.getSumOfWasteLists(token, date);
-//
-//        return new ResponseEntity(sumOfWasteLists, HttpStatus.OK);
-//    }
+    @GetMapping("/wasteList/monthly")
+    public ResponseEntity getSumOfWasteLists (@RequestHeader(name = "Authorization") String token,
+                                    @Valid @RequestParam String date){
+        OutgoDto.MonthlyResponse sumOfWasteLists =
+                service.getSumOfWasteLists(token, date);
+
+        return new ResponseEntity(sumOfWasteLists, HttpStatus.OK);
+    }
 
     @DeleteMapping("/delete/{outgo-id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

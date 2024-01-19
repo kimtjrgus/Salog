@@ -44,7 +44,7 @@ public class IncomeDto {
     @Getter
     @Setter
     public static class MonthlyResponse {
-        private long monthlyIncome;
+        private long monthlyTotal;
         private List<LedgerTagDto.MonthlyResponse> tags;
     }
 }

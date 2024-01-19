@@ -31,5 +31,12 @@ public interface OutgoRepository extends JpaRepository<Outgo, Long> {
             "GROUP BY lt.ledger_tag_id, lt.tag_name", nativeQuery = true)
     List<Object[]> getSumOfOutgoListsByTag(Long memberId, int year, int month);
 
+    @Query(value = "SELECT lt.tag_name, SUM(o.money) " +
+            "FROM outgo o " +
+            "JOIN ledger_tag lt ON o.ledger_tag_id = lt.ledger_tag_id " +
+            "WHERE o.member_id = :memberId AND YEAR(o.date) = :year AND MONTH(o.date) = :month AND lt.category = 'OUTGO' AND waste_list = TRUE " +
+            "GROUP BY lt.ledger_tag_id, lt.tag_name", nativeQuery = true)
+    List<Object[]> getSumOfWasteListsByTag(Long memberId, int year, int month);
+
     long countByLedgerTag(LedgerTag ledgerTag);
 }

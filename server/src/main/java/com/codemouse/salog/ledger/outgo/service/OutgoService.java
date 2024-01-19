@@ -85,45 +85,8 @@ public class OutgoService {
     @Transactional
     public MultiResponseDto<OutgoDto.Response> findAllOutgos (String token, int page, int size, String date, String outgoTag){
         tokenBlackListService.isBlackListed(token);
-        long memberId = jwtTokenizer.getMemberId(token);
 
-        Page<Outgo> outgoPage;
-        // 월, 일별조회를 위한 변수선언
-        LocalDate startDate;
-        LocalDate endDate;
-
-        // 1. 조회할 날짜 지정
-        // date 끝자리에 00 입력시 월별 조회
-        if (date.endsWith("00")) { // 2012-11-01
-            LocalDate parsedDate = LocalDate.parse(date.substring(0, 7) + "-01");
-            startDate = parsedDate.withDayOfMonth(1);
-            endDate = parsedDate.withDayOfMonth(parsedDate.lengthOfMonth());
-        } // 그외 경우 일별 조회
-        else {
-            startDate = LocalDate.parse(date);
-            endDate = startDate;
-        }
-
-        // 2. 지정한 날짜에 대한 쿼리들(태그O, 태그X)
-        if(outgoTag != null){ // 태그별 조회
-            String decodedTag = URLDecoder.decode(outgoTag, StandardCharsets.UTF_8);
-            log.info("DecodedTag To UTF-8 : {}", decodedTag);
-
-            // 태그이름에 대한 검색 쿼리 outgo 쿼리
-            List<LedgerTag> tags = ledgerTagRepository.findAllByMemberMemberIdAndTagName(memberId, decodedTag);
-            List<Long> outgoIds = tags.stream()
-                    .flatMap(tag -> tag.getOutgos().stream()) // 각 LedgerTag의 Outgo 리스트를 스트림으로 평탄화
-                    .map(Outgo::getOutgoId)
-                    .collect(Collectors.toList());
-
-            outgoPage = outgoRepository.findAllByOutgoIdInAndDateBetween(
-                    outgoIds, startDate, endDate, PageRequest.of(page - 1, size, Sort.by("date").descending()));
-        }
-        else{ // none tag
-            outgoPage = outgoRepository.findAllByMemberMemberIdAndDateBetween(
-                    memberId, startDate, endDate, PageRequest.of(page - 1, size, Sort.by("date").descending()));
-
-        }
+        Page<Outgo> outgoPage = findOutgoPages(token, page, size, date, outgoTag, null);
 
         List<OutgoDto.Response> outgoDtoList = outgoPage.getContent().stream()
                 .map(outgoMapper::OutgoToOutgoResponseDto)
@@ -133,60 +96,20 @@ public class OutgoService {
     }
 
     // GET WasteList
-//    public MultiResponseDto<OutgoDto.Response> findAllWasteLists(String token, int page, int size, String date, String outgoTag){
-//        tokenBlackListService.isBlackListed(token);
-//        long memberId = jwtTokenizer.getMemberId(token);
-//
-//        Page<Outgo> wastePage;
-//
-//        // 월, 일별조회를 위한 변수선언
-//        LocalDate startDate;
-//        LocalDate endDate;
-//
-//        // 1. 조회할 날짜 지정
-//        // date 끝자리에 00 입력시 월별 조회
-//        if (date.endsWith("00")) { // 2012-11-01
-//            LocalDate parsedDate = LocalDate.parse(date.substring(0, 7) + "-01");
-//            startDate = parsedDate.withDayOfMonth(1);
-//            endDate = parsedDate.withDayOfMonth(parsedDate.lengthOfMonth());
-//        } // 그외 경우 일별 조회
-//        else {
-//            startDate = LocalDate.parse(date);
-//            endDate = startDate;
-//        }
-//
-//        // 2. 지정한 날짜에 대한 쿼리들(태그O, 태그X)
-//        if(outgoTag != null){ // 태그별 조회
-//            String decodedTag = URLDecoder.decode(outgoTag, StandardCharsets.UTF_8);
-//            log.info("DecodedTag To UTF-8 : {}", decodedTag);
-//
-//            // 태그이름에 대한 검색 쿼리 outgo 쿼리
-//            List<LedgerTag> tags = ledgerTagRepository.findAllByMemberMemberIdAndTagName(memberId, decodedTag);
-//            List<Long> outgoIds = tags.stream()
-//                    .flatMap(tag -> tag.getOutgos().stream()) // 각 LedgerTag의 Outgo 리스트를 스트림으로 평탄화
-//                    .map(Outgo::getOutgoId)
-//                    .collect(Collectors.toList());
-//
-//            wastePage = outgoRepository.findAllByOutgoIdInAndWasteListAndDateBetween(
-//                    outgoIds, true, startDate, endDate, PageRequest.of(page - 1, size, Sort.by("date").descending()));
-//        }
-//        else{ // none tag
-//            wastePage = outgoRepository.findAllByMemberMemberIdAndWasteListAndDateBetween(
-//                    memberId, true, startDate, endDate, PageRequest.of(page - 1, size, Sort.by("date").descending()));
-//
-//        }
-//
-//        List<OutgoDto.Response> wasteDtoList = wastePage.getContent().stream()
-//                .map(outgoMapper::OutgoToOutgoResponseDto)
-//                .collect(Collectors.toList());
-//
-//        return new MultiResponseDto<>(wasteDtoList, wastePage);
-//    }
-
-    // GET OutgoSum
-    public OutgoDto.ResponseBySum getSumOfOutgoLists(String token, String date){
+    public MultiResponseDto<OutgoDto.Response> findAllWasteLists(String token, int page, int size, String date, String outgoTag){
         tokenBlackListService.isBlackListed(token);
+        Page<Outgo> wastePage = findOutgoPages(token, page, size, date, outgoTag, true);
 
+        List<OutgoDto.Response> wasteDtoList = wastePage.getContent().stream()
+                .map(outgoMapper::OutgoToOutgoResponseDto)
+                .collect(Collectors.toList());
+
+        return new MultiResponseDto<>(wasteDtoList, wastePage);
+    }
+
+    // GET Outgo Sum
+    public OutgoDto.MonthlyResponse getSumOfOutgoLists(String token, String date){
+        tokenBlackListService.isBlackListed(token);
         long memberId = jwtTokenizer.getMemberId(token);
 
         String[] dateParts = date.split("-");
@@ -206,14 +129,32 @@ public class OutgoService {
         long monthlyOutgo =
                 sumByTags.stream().mapToLong(LedgerTagDto.MonthlyResponse::getTagSum).sum();
 
-        return new OutgoDto.ResponseBySum(monthlyOutgo, sumByTags);
+        return new OutgoDto.MonthlyResponse(monthlyOutgo, sumByTags);
     }
 
-    // GET WasteSum
-//    public SingleResponseDto<> getSumOfWasteLists(String token, String date){
-//        tokenBlackListService.isBlackListed(token);
-//
-//    }
+    // GET WasteList Sum
+    public OutgoDto.MonthlyResponse getSumOfWasteLists(String token, String date){
+        tokenBlackListService.isBlackListed(token);
+        long memberId = jwtTokenizer.getMemberId(token);
+
+        String[] dateParts = date.split("-");
+        int year = Integer.parseInt(dateParts[0]);
+        int month = Integer.parseInt(dateParts[1]);
+
+        List<Object[]> results = outgoRepository.getSumOfWasteListsByTag(memberId, year, month);
+        List<LedgerTagDto.MonthlyResponse> sumByTags = results.stream()
+                .map(result -> {
+                    String tagName = (String) result[0];
+                    long tagSum = ((Number) result[1]).longValue();
+                    return new LedgerTagDto.MonthlyResponse(tagName, tagSum);
+                })
+                .collect(Collectors.toList());
+
+        long monthlyWasteList =
+                sumByTags.stream().mapToLong(LedgerTagDto.MonthlyResponse::getTagSum).sum();
+
+        return new OutgoDto.MonthlyResponse(monthlyWasteList, sumByTags);
+    }
 
     // DELETE
     @Transactional
@@ -271,5 +212,60 @@ public class OutgoService {
 
         outgoRepository.save(outgo);
         ledgerTagService.deleteUnusedOutgoTagsByMemberId(token);
+    }
+
+    // 페이지 생성 중복 코드 통일
+    private Page<Outgo> findOutgoPages(String token, int page, int size, String date, String outgoTag, Boolean isWasteList) {
+        long memberId = jwtTokenizer.getMemberId(token);
+        Page<Outgo> outgoPage = null;
+
+        // 1. 조회할 날짜 지정
+        LocalDate startDate;
+        LocalDate endDate;
+
+        // 월별 조회
+        if (date.endsWith("00")) {
+            LocalDate parsedDate = LocalDate.parse(date.substring(0, 7) + "-01");
+            startDate = parsedDate.withDayOfMonth(1);
+            endDate = parsedDate.withDayOfMonth(parsedDate.lengthOfMonth());
+        } // 그외 경우 일별 조회
+        else {
+            startDate = LocalDate.parse(date);
+            endDate = startDate;
+        }
+
+        // 2. 지정한 날짜에 대한 쿼리들(태그O, 태그X)
+        if (outgoTag != null) { // 태그별 조회
+            String decodedTag = URLDecoder.decode(outgoTag, StandardCharsets.UTF_8);
+            log.info("DecodedTag To UTF-8 : {}", decodedTag);
+
+            // 태그이름에 대한 검색 쿼리 outgo 쿼리
+            List<LedgerTag> tags = ledgerTagRepository.findAllByMemberMemberIdAndTagName(memberId, decodedTag);
+            List<Long> outgoIds = tags.stream()
+                    .flatMap(tag -> tag.getOutgos().stream()) // 각 LedgerTag의 Outgo 리스트를 스트림으로 평탄화
+                    .map(Outgo::getOutgoId)
+                    .collect(Collectors.toList());
+
+            if(isWasteList == null){
+                outgoPage = outgoRepository.findAllByOutgoIdInAndDateBetween(
+                        outgoIds, startDate, endDate, PageRequest.of(page - 1, size, Sort.by("date").descending()));
+
+            } else if(isWasteList){
+                outgoPage = outgoRepository.findAllByOutgoIdInAndWasteListAndDateBetween(
+                        outgoIds, true, startDate, endDate, PageRequest.of(page - 1, size, Sort.by("date").descending()));
+
+            }
+        }
+        else { // none tag
+            if (isWasteList == null){
+                outgoPage = outgoRepository.findAllByMemberMemberIdAndDateBetween(
+                        memberId, startDate, endDate, PageRequest.of(page - 1, size, Sort.by("date").descending()));
+            } else if (isWasteList) {
+                outgoPage = outgoRepository.findAllByMemberMemberIdAndWasteListAndDateBetween(
+                        memberId, true, startDate, endDate, PageRequest.of(page - 1, size, Sort.by("date").descending()));
+            }
+        }
+
+        return outgoPage;
     }
 }
