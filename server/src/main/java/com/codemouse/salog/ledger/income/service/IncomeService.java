@@ -117,9 +117,10 @@ public class IncomeService {
 
         // 월별 태그 합계 계산
         List<Object[]> totalIncomeByTag = incomeRepository.findTotalIncomeByMonthGroupByTag(memberId, year, month);
+
         // 계산된 태그 합계를 삽입
         List<LedgerTagDto.MonthlyResponse> tagIncomes = totalIncomeByTag.stream()
-                .map(obj -> new LedgerTagDto.MonthlyResponse((String) obj[0], (Long) obj[1]))
+                .map(obj -> new LedgerTagDto.MonthlyResponse((String) obj[0], obj[1] != null ? (Long) obj[1] : 0))
                 .collect(Collectors.toList());
 
         // 월별 수입 합계 계산
