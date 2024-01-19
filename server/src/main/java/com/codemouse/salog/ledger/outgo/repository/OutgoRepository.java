@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,6 +38,9 @@ public interface OutgoRepository extends JpaRepository<Outgo, Long> {
             "WHERE o.member_id = :memberId AND YEAR(o.date) = :year AND MONTH(o.date) = :month AND lt.category = 'OUTGO' AND waste_list = TRUE " +
             "GROUP BY lt.ledger_tag_id, lt.tag_name", nativeQuery = true)
     List<Object[]> getSumOfWasteListsByTag(Long memberId, int year, int month);
+
+    @Query("SELECT SUM(o.money) FROM Outgo o WHERE o.member.memberId = :memberId AND YEAR(o.date) = :year AND MONTH(o.date) = :month")
+    Long findTotalOutgoByMonth(@Param("memberId") long memberId, @Param("year") int year, @Param("month") int month);
 
     long countByLedgerTag(LedgerTag ledgerTag);
 }
