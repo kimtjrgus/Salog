@@ -1,13 +1,19 @@
 import styled from "styled-components";
 import { SvgIcon } from "@mui/material";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
-import { type incomeType } from ".";
+import { type incomeType, type checkedType } from ".";
 
 interface Props {
 	income: incomeType[];
+	checkedList: checkedType;
+	checkHandler: (
+		e: React.ChangeEvent<HTMLInputElement>,
+		id: number,
+		division: keyof checkedType,
+	) => void;
 }
 
-const IncomeList = ({ income }: Props) => {
+const IncomeList = ({ income, checkedList, checkHandler }: Props) => {
 	const dateAsDots = (element: string) => {
 		const originalDate = element;
 		const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
@@ -30,7 +36,13 @@ const IncomeList = ({ income }: Props) => {
 			{income.map((el) => {
 				return (
 					<li className="ledger__list" key={el.id}>
-						<input type="checkbox" />
+						<input
+							type="checkbox"
+							checked={checkedList.income.includes(el.id)}
+							onChange={(e) => {
+								checkHandler(e, el.id, "income");
+							}}
+						/>
 						<ColorBlueDiv>수입</ColorBlueDiv>
 						<p>{dateAsDots(el.date)}</p>
 						<p>{el.incomeTag}</p>
@@ -74,6 +86,10 @@ const Container = styled.ul`
 		p {
 			font-size: 1.2rem;
 			white-space: nowrap;
+
+			&:nth-child(3) {
+				width: 8.3rem;
+			}
 
 			&:nth-child(5) {
 				width: 10rem;

@@ -1,16 +1,20 @@
 import styled from "styled-components";
 import { SvgIcon } from "@mui/material";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
-import { type incomeType, type outgoType } from ".";
+import { type incomeType, type outgoType, type checkedType } from ".";
 
 interface Props {
 	outgo: outgoType[];
 	income: incomeType[];
+	checkedList: checkedType;
+	checkHandler: (
+		e: React.ChangeEvent<HTMLInputElement>,
+		id: number,
+		division: keyof checkedType,
+	) => void;
 }
 
-const HistoryList = ({ outgo, income }: Props) => {
-	console.log(outgo, income);
-
+const HistoryList = ({ outgo, income, checkedList, checkHandler }: Props) => {
 	const dateAsDots = (element: string) => {
 		const originalDate = element;
 		const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
@@ -33,7 +37,13 @@ const HistoryList = ({ outgo, income }: Props) => {
 			{outgo.map((el) => {
 				return (
 					<li className="ledger__list" key={el.id}>
-						<input type="checkbox" />
+						<input
+							type="checkbox"
+							checked={checkedList.outgo.includes(el.id)}
+							onChange={(e) => {
+								checkHandler(e, el.id, "outgo");
+							}}
+						/>
 						<ColorRedDiv>지출</ColorRedDiv>
 						<p>{dateAsDots(el.date)}</p>
 						<p>{el.outgoTag}</p>
@@ -51,7 +61,13 @@ const HistoryList = ({ outgo, income }: Props) => {
 			{income.map((el) => {
 				return (
 					<li className="ledger__list" key={el.id}>
-						<input type="checkbox" />
+						<input
+							type="checkbox"
+							checked={checkedList.income.includes(el.id)}
+							onChange={(e) => {
+								checkHandler(e, el.id, "income");
+							}}
+						/>
 						<ColorBlueDiv>수입</ColorBlueDiv>
 						<p>{dateAsDots(el.date)}</p>
 						<p>{el.incomeTag}</p>
@@ -95,6 +111,10 @@ const Container = styled.ul`
 		p {
 			font-size: 1.2rem;
 			white-space: nowrap;
+
+			&:nth-child(3) {
+				width: 8.3rem;
+			}
 
 			&:nth-child(5) {
 				width: 10rem;

@@ -11,6 +11,7 @@ import HistoryList from "./History";
 import IncomeList from "./IncomeList";
 import WasteList from "./WasteList";
 import OutgoList from "./OutgoList";
+import LedgerWrite from "./LedgerWrite";
 
 export interface outgoType {
 	id: number;
@@ -67,6 +68,12 @@ interface tagType {
 	tagSum: number;
 }
 
+export interface checkedType {
+	income: number[];
+	outgo: number[];
+	waste: number[];
+}
+
 const History = () => {
 	const [getMoment, setMoment] = useState(moment());
 	const [outgo, setOutgo] = useState<outgoType[]>([]);
@@ -88,7 +95,127 @@ const History = () => {
 		tags: [],
 	});
 
+	const [isOpen, setIsOpen] = useState<boolean>(false);
+
+	// 체크박스 상태
+	const [isAllChecked, setIsAllChecked] = useState(false);
+
+	const [checkedList, setCheckedList] = useState<checkedType>({
+		income: [],
+		outgo: [],
+		waste: [],
+	});
+	const [isChecked, setIsChecked] = useState(false);
+
 	const location = useLocation();
+
+	console.log(checkedList, isAllChecked);
+
+	const checkedItemHandler = (
+		id: number,
+		isChecked: boolean,
+		division: keyof checkedType,
+	) => {
+		setCheckedList((prev) => {
+			const updatedList = { ...prev };
+			if (isChecked) {
+				updatedList[division] = [...updatedList[division], id];
+			} else {
+				updatedList[division] = updatedList[division].filter(
+					(item) => item !== id,
+				);
+			}
+
+			// 전체 체크 여부 판단
+			const isAllIncomeChecked =
+				location.pathname === "/outgo" || location.pathname === "/history"
+					? updatedList.outgo.length === outgo.length &&
+					  updatedList.outgo.length > 0
+					: true;
+			const isAllOutgoChecked =
+				location.pathname === "/income" || location.pathname === "/history"
+					? updatedList.income.length === income.length &&
+					  updatedList.income.length > 0
+					: true;
+			const isAllWasteChecked =
+				location.pathname === "/waste"
+					? updatedList.waste.length === waste.length &&
+					  updatedList.waste.length > 0
+					: true;
+
+			setIsAllChecked(
+				isAllIncomeChecked && isAllOutgoChecked && isAllWasteChecked,
+			);
+
+			return updatedList;
+		});
+	};
+
+	const checkHandler = (
+		e: React.ChangeEvent<HTMLInputElement>,
+		id: number,
+		division: keyof checkedType,
+	) => {
+		setIsChecked(!isChecked);
+		checkedItemHandler(id, e.target.checked, division);
+	};
+
+	const handleAllChecked = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { checked } = e.target;
+
+		setIsAllChecked(checked); // isAllChecked 값을 true로 설정
+
+		if (checked) {
+			// setIsAllChecked(true); // isAllChecked 값을 true로 설정
+			if (location.pathname === "/history") {
+				outgo.forEach((el) => {
+					setCheckedList((prev) => {
+						const updatedList = { ...prev };
+						updatedList.outgo = [...updatedList.outgo, el.id];
+						return updatedList; // 업데이트된 상태 반환
+					});
+				});
+				income.forEach((el) => {
+					setCheckedList((prev) => {
+						const updatedList = { ...prev };
+						updatedList.income = [...updatedList.income, el.id];
+						return updatedList; // 업데이트된 상태 반환
+					});
+				});
+			} else if (location.pathname === "/outgo") {
+				outgo.forEach((el) => {
+					setCheckedList((prev) => {
+						const updatedList = { ...prev };
+						updatedList.outgo = [...updatedList.outgo, el.id];
+						return updatedList; // 업데이트된 상태 반환
+					});
+				});
+			} else if (location.pathname === "/waste") {
+				outgo.forEach((el) => {
+					setCheckedList((prev) => {
+						const updatedList = { ...prev };
+						updatedList.waste = [...updatedList.waste, el.id];
+						return updatedList; // 업데이트된 상태 반환
+					});
+				});
+			} else {
+				income.forEach((el) => {
+					setCheckedList((prev) => {
+						const updatedList = { ...prev };
+						updatedList.income = [...updatedList.income, el.id];
+						return updatedList; // 업데이트된 상태 반환
+					});
+				});
+			}
+		} else {
+			// setIsAllChecked(false); // isAllChecked 값을 false로 설정
+			setCheckedList({
+				income: [],
+				outgo: [],
+				waste: [],
+			});
+		}
+	};
 
 	useEffect(() => {
 		axios
@@ -141,103 +268,147 @@ const History = () => {
 			});
 	}, [getMoment]);
 
+	useEffect(() => {
+		setCheckedList({
+			income: [],
+			outgo: [],
+			waste: [],
+		});
+		setIsAllChecked(false);
+	}, [location.pathname]);
+
 	return (
-		<Container>
-			<h3>가계부 내역</h3>
-			<SubHeader>
-				<div className="sub__left">
-					<div className="date__div">
+		<>
+			<Container>
+				<h3>가계부 내역</h3>
+				<SubHeader>
+					<div className="sub__left">
+						<div className="date__div">
+							<button
+								onClick={() => {
+									setMoment(getMoment.clone().subtract(1, "month"));
+								}}
+							>
+								<SvgIcon
+									component={ArrowBackIosOutlinedIcon}
+									sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+								/>
+							</button>
+							<div>{getMoment.format("YYYY-MM")}</div>
+							<button
+								onClick={() => {
+									setMoment(getMoment.clone().add(1, "month"));
+								}}
+							>
+								<SvgIcon
+									component={ArrowForwardIosOutlinedIcon}
+									sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+								/>
+							</button>
+						</div>
 						<button
+							className="nowMonth__btn"
 							onClick={() => {
-								setMoment(getMoment.clone().subtract(1, "month"));
+								setMoment(moment());
 							}}
 						>
-							<SvgIcon
-								component={ArrowBackIosOutlinedIcon}
-								sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-							/>
-						</button>
-						<div>{getMoment.format("YYYY-MM")}</div>
-						<button
-							onClick={() => {
-								setMoment(getMoment.clone().add(1, "month"));
-							}}
-						>
-							<SvgIcon
-								component={ArrowForwardIosOutlinedIcon}
-								sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-							/>
+							이번 달
 						</button>
 					</div>
-					<button
-						className="nowMonth__btn"
-						onClick={() => {
-							setMoment(moment());
-						}}
-					>
-						이번 달
-					</button>
-				</div>
-				<div className="sub__right">
-					<button className="write__btn">
-						<SvgIcon
-							component={CreateOutlinedIcon}
-							sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+					<div className="sub__right">
+						<button
+							className="write__btn"
+							onClick={() => {
+								setIsOpen(true);
+							}}
+						>
+							<SvgIcon
+								component={CreateOutlinedIcon}
+								sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+							/>
+							<p>가계부 작성하기</p>
+						</button>
+					</div>
+				</SubHeader>
+				<MainLists>
+					<div className="lists__header">
+						<NavStyle to="/history" $isActive={"/history"}>
+							<p>{`전체 (${income.length + outgo.length})`}</p>
+							<p className="sum__red">
+								{(
+									sumIncome.monthlyIncome - sumOutgo.monthlyOutgo
+								).toLocaleString()}{" "}
+								원
+							</p>
+						</NavStyle>
+						<NavStyle to="/income" $isActive={"/income"}>
+							<p>{`수입 (${income.length})`}</p>
+							<p className="sum__blue">
+								{sumIncome.monthlyIncome.toLocaleString()} 원
+							</p>
+						</NavStyle>
+						<NavStyle to="/outgo" $isActive={"/outgo"}>
+							<p>{`지출 (${outgo.length})`}</p>
+							<p className="sum__red">
+								{sumOutgo.monthlyOutgo.toLocaleString()} 원
+							</p>
+						</NavStyle>
+						<NavStyle to="/waste" $isActive={"/waste"}>
+							<p>{`낭비 리스트 (${waste.length})`}</p>
+							<p className="sum__green">
+								{sumWasteList.monthlyWaste.toLocaleString()} 원
+							</p>
+						</NavStyle>
+					</div>
+					<div className="category__header">
+						<input
+							type="checkbox"
+							checked={isAllChecked}
+							onChange={handleAllChecked}
 						/>
-						<p>가계부 작성하기</p>
-					</button>
-				</div>
-			</SubHeader>
-			<MainLists>
-				<div className="lists__header">
-					<NavStyle to="/history" isActive={"/history"}>
-						<p>{`전체 (${income.length + outgo.length})`}</p>
-						<p className="sum__red">
-							{(
-								sumOutgo.monthlyOutgo - sumIncome.monthlyIncome
-							).toLocaleString()}{" "}
-							원
-						</p>
-					</NavStyle>
-					<NavStyle to="/income" isActive={"/income"}>
-						<p>{`수입 (${income.length})`}</p>
-						<p className="sum__blue">
-							{sumIncome.monthlyIncome.toLocaleString()} 원
-						</p>
-					</NavStyle>
-					<NavStyle to="/outgo" isActive={"/outgo"}>
-						<p>{`지출 (${outgo.length})`}</p>
-						<p className="sum__red">
-							{sumOutgo.monthlyOutgo.toLocaleString()} 원
-						</p>
-					</NavStyle>
-					<NavStyle to="/waste" isActive={"/waste"}>
-						<p>{`낭비 리스트 (${waste.length})`}</p>
-						<p className="sum__green">
-							{sumWasteList.monthlyWaste.toLocaleString()} 원
-						</p>
-					</NavStyle>
-				</div>
-				<div className="category__header">
-					<input type="checkbox" />
-					<p>분류</p>
-					<p>날짜</p>
-					<p>카테고리</p>
-					<p>거래처</p>
-					<p>결제수단</p>
-					<p>금액</p>
-					<p>메모</p>
-					<p>영수증</p>
-				</div>
-				{/* 경로에 따라 다른 컴포넌트를 보여줘야함  */}
-				{location.pathname === "/history" && (
-					<HistoryList outgo={outgo} income={income} />
-				)}
-				{location.pathname === "/income" && <IncomeList income={income} />}
-				{location.pathname === "/outgo" && <OutgoList outgo={outgo} />}
-				{location.pathname === "/waste" && <WasteList waste={waste} />}
-			</MainLists>
-		</Container>
+						<p>분류</p>
+						<p>날짜</p>
+						<p>카테고리</p>
+						<p>거래처</p>
+						<p>결제수단</p>
+						<p>금액</p>
+						<p>메모</p>
+						<p>영수증</p>
+					</div>
+					{/* 경로에 따라 다른 컴포넌트를 보여줘야함  */}
+					{location.pathname === "/history" && (
+						<HistoryList
+							outgo={outgo}
+							income={income}
+							checkedList={checkedList}
+							checkHandler={checkHandler}
+						/>
+					)}
+					{location.pathname === "/income" && (
+						<IncomeList
+							income={income}
+							checkedList={checkedList}
+							checkHandler={checkHandler}
+						/>
+					)}
+					{location.pathname === "/outgo" && (
+						<OutgoList
+							outgo={outgo}
+							checkedList={checkedList}
+							checkHandler={checkHandler}
+						/>
+					)}
+					{location.pathname === "/waste" && (
+						<WasteList
+							waste={waste}
+							checkedList={checkedList}
+							checkHandler={checkHandler}
+						/>
+					)}
+				</MainLists>
+			</Container>
+			{isOpen && <LedgerWrite setIsOpen={setIsOpen} />}
+		</>
 	);
 };
 
@@ -377,7 +548,7 @@ const MainLists = styled.div`
 	}
 `;
 
-const NavStyle = styled(NavLink)<{ isActive: string }>`
+const NavStyle = styled(NavLink)<{ $isActive: string }>`
 	text-align: center;
 	flex-grow: 1;
 	padding: 1rem;
@@ -393,13 +564,13 @@ const NavStyle = styled(NavLink)<{ isActive: string }>`
 	}
 
 	${(props) =>
-		props.isActive === "/history" || props.isActive === "/outgo"
+		props.$isActive === "/history" || props.$isActive === "/outgo"
 			? css`
 					&.active {
 						border-bottom: 2px solid ${(props) => props.theme.COLORS.LIGHT_RED};
 					}
 			  `
-			: props.isActive === "/income"
+			: props.$isActive === "/income"
 			  ? css`
 						&.active {
 							border-bottom: 2px solid
