@@ -42,5 +42,8 @@ public interface OutgoRepository extends JpaRepository<Outgo, Long> {
     @Query("SELECT SUM(o.money) FROM Outgo o WHERE o.member.memberId = :memberId AND YEAR(o.date) = :year AND MONTH(o.date) = :month")
     Long findTotalOutgoByMonth(@Param("memberId") long memberId, @Param("year") int year, @Param("month") int month);
 
+    @Query("SELECT SUM(o.money) FROM Outgo o WHERE o.member.memberId = :memberId AND o.date = :curDate")
+    Long findTotalOutgoByDay(long memberId, LocalDate curDate);
+
     long countByLedgerTag(LedgerTag ledgerTag);
 }
