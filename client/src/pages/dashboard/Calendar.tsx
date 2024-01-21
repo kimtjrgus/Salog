@@ -91,17 +91,7 @@ const DashboardCalendar = ({ isOpen, setIsOpen }: propsType) => {
 						);
 						return (
 							<>
-								<div
-									className="calendar__tileContent"
-									onMouseEnter={(e) => {
-										// 가계부 수정 아이콘을 표시하는 로직 추가
-										console.log(e);
-									}}
-									onMouseLeave={(e) => {
-										// 가계부 수정 아이콘을 숨기는 로직 추가
-										console.log(e);
-									}}
-								>
+								<div className="calendar__tileContent">
 									{arr[0]?.totalIncome !== 0 && (
 										<p className="tileContent__income">{arr[0]?.totalIncome}</p>
 									)}
