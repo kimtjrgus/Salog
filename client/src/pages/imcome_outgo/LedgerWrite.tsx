@@ -6,10 +6,12 @@ import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOu
 import { useCallback, useEffect, useState } from "react";
 import { debounce } from "src/utils/timeFunc";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { type modalType } from ".";
+import { useDispatch } from "react-redux";
+import { showToast } from "src/store/slices/toastSlice";
 
 interface Props {
-	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
 }
 
 // type valuesType = Record<string, Record<string, string>>;
@@ -51,9 +53,7 @@ const LedgerWrite = ({ setIsOpen }: Props) => {
 		},
 	]);
 	const [isDisabled, setIsDisabled] = useState<boolean>(true);
-	console.log(values);
-
-	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	// const onChangeMoney = (e: React.ChangeEvent<HTMLInputElement>) => {
 	// 	const inputValue = e.target.value;
@@ -132,8 +132,6 @@ const LedgerWrite = ({ setIsOpen }: Props) => {
 				isNotValid = false;
 			}
 
-			console.log(isBlank, isNotValid);
-
 			setIsDisabled(isNotValid);
 		}, 700),
 		[],
@@ -176,7 +174,13 @@ const LedgerWrite = ({ setIsOpen }: Props) => {
 						});
 			return null;
 		});
-		navigate("/history");
+		setIsOpen((prev) => {
+			const updated = { ...prev };
+			return { ...updated, writeModal: false };
+		});
+		dispatch(showToast({ message: "작성이 완료되었습니다", type: "success" }));
+		window.location.replace("/history");
+		// Toast(ToastType.success, "작성이 완료되었습니다");
 	};
 
 	useEffect(() => {
@@ -190,7 +194,10 @@ const LedgerWrite = ({ setIsOpen }: Props) => {
 					className="deleteIcon"
 					component={ClearOutlinedIcon}
 					onClick={() => {
-						setIsOpen(false);
+						setIsOpen((prev) => {
+							const updated = { ...prev };
+							return { ...updated, writeModal: false };
+						});
 					}}
 					sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
 				/>

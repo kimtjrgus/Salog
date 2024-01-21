@@ -5,6 +5,9 @@ import { SvgIcon } from "@mui/material";
 import ArrowBackIosOutlinedIcon from "@mui/icons-material/ArrowBackIosOutlined";
 import ArrowForwardIosOutlinedIcon from "@mui/icons-material/ArrowForwardIosOutlined";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import axios from "axios";
 import { NavLink, useLocation } from "react-router-dom";
 import HistoryList from "./History";
@@ -12,6 +15,10 @@ import IncomeList from "./IncomeList";
 import WasteList from "./WasteList";
 import OutgoList from "./OutgoList";
 import LedgerWrite from "./LedgerWrite";
+import { useDispatch, useSelector } from "react-redux";
+import { showToast, hideToast } from "src/store/slices/toastSlice";
+import Toast, { ToastType } from "src/components/Layout/Toast";
+import { type RootState } from "src/store";
 
 export interface outgoType {
 	id: number;
@@ -74,6 +81,11 @@ export interface checkedType {
 	waste: number[];
 }
 
+export interface modalType {
+	writeModal: boolean;
+	deleteModal: boolean;
+}
+
 const History = () => {
 	const [getMoment, setMoment] = useState(moment());
 	const [outgo, setOutgo] = useState<outgoType[]>([]);
@@ -95,7 +107,10 @@ const History = () => {
 		tags: [],
 	});
 
-	const [isOpen, setIsOpen] = useState<boolean>(false);
+	const [isOpen, setIsOpen] = useState<modalType>({
+		writeModal: false,
+		deleteModal: false,
+	});
 
 	// 체크박스 상태
 	const [isAllChecked, setIsAllChecked] = useState(false);
@@ -105,11 +120,12 @@ const History = () => {
 		outgo: [],
 		waste: [],
 	});
+
 	const [isChecked, setIsChecked] = useState(false);
+	const modal = useSelector((state: RootState) => state.persistedReducer.toast);
 
 	const location = useLocation();
-
-	console.log(checkedList, isAllChecked);
+	const dispatch = useDispatch();
 
 	const checkedItemHandler = (
 		id: number,
@@ -151,6 +167,25 @@ const History = () => {
 		});
 	};
 
+	const sumOfCheckedList = () => {
+		const sumOfMoney = { outgo: 0, income: 0, waste: 0 };
+		checkedList.outgo.forEach((id) => {
+			const idx = outgo.findIndex((el) => el.id === id);
+			sumOfMoney.outgo += outgo[idx].money;
+		});
+		checkedList.income.forEach((id) => {
+			const idx = income.findIndex((el) => el.id === id);
+			sumOfMoney.income += income[idx].money;
+		});
+		checkedList.waste.forEach((id) => {
+			const idx = waste.findIndex((el) => el.id === id);
+			sumOfMoney.waste += waste[idx].money;
+		});
+		if (location.pathname !== "/waste")
+			return sumOfMoney.income - sumOfMoney.outgo;
+		else return sumOfMoney.waste;
+	};
+
 	const checkHandler = (
 		e: React.ChangeEvent<HTMLInputElement>,
 		id: number,
@@ -169,42 +204,47 @@ const History = () => {
 			// setIsAllChecked(true); // isAllChecked 값을 true로 설정
 			if (location.pathname === "/history") {
 				outgo.forEach((el) => {
-					setCheckedList((prev) => {
-						const updatedList = { ...prev };
-						updatedList.outgo = [...updatedList.outgo, el.id];
-						return updatedList; // 업데이트된 상태 반환
-					});
+					!checkedList.outgo.includes(el.id) &&
+						setCheckedList((prev) => {
+							const updatedList = { ...prev };
+							updatedList.outgo = [...updatedList.outgo, el.id];
+							return updatedList; // 업데이트된 상태 반환
+						});
 				});
 				income.forEach((el) => {
-					setCheckedList((prev) => {
-						const updatedList = { ...prev };
-						updatedList.income = [...updatedList.income, el.id];
-						return updatedList; // 업데이트된 상태 반환
-					});
+					!checkedList.income.includes(el.id) &&
+						setCheckedList((prev) => {
+							const updatedList = { ...prev };
+							updatedList.income = [...updatedList.income, el.id];
+							return updatedList; // 업데이트된 상태 반환
+						});
 				});
 			} else if (location.pathname === "/outgo") {
 				outgo.forEach((el) => {
-					setCheckedList((prev) => {
-						const updatedList = { ...prev };
-						updatedList.outgo = [...updatedList.outgo, el.id];
-						return updatedList; // 업데이트된 상태 반환
-					});
+					!checkedList.outgo.includes(el.id) &&
+						setCheckedList((prev) => {
+							const updatedList = { ...prev };
+							updatedList.outgo = [...updatedList.outgo, el.id];
+							return updatedList; // 업데이트된 상태 반환
+						});
 				});
 			} else if (location.pathname === "/waste") {
 				outgo.forEach((el) => {
-					setCheckedList((prev) => {
-						const updatedList = { ...prev };
-						updatedList.waste = [...updatedList.waste, el.id];
-						return updatedList; // 업데이트된 상태 반환
-					});
+					!checkedList.waste.includes(el.id) &&
+						setCheckedList((prev) => {
+							const updatedList = { ...prev };
+							updatedList.waste = [...updatedList.waste, el.id];
+							return updatedList; // 업데이트된 상태 반환
+						});
 				});
 			} else {
 				income.forEach((el) => {
-					setCheckedList((prev) => {
-						const updatedList = { ...prev };
-						updatedList.income = [...updatedList.income, el.id];
-						return updatedList; // 업데이트된 상태 반환
-					});
+					!checkedList.income.includes(el.id) &&
+						setCheckedList((prev) => {
+							const updatedList = { ...prev };
+							updatedList.income = [...updatedList.income, el.id];
+							return updatedList; // 업데이트된 상태 반환
+						});
 				});
 			}
 		} else {
@@ -217,55 +257,80 @@ const History = () => {
 		}
 	};
 
+	const handleDeleteClick = () => {
+		const deletePromises: Array<Promise<any>> = [];
+
+		checkedList.outgo.length !== 0 &&
+			checkedList.outgo.forEach((id) => {
+				const deletePromise = axios.delete(`http://localhost:8000/outgo/${id}`);
+				deletePromises.push(deletePromise);
+			});
+
+		checkedList.income.length !== 0 &&
+			checkedList.income.forEach((id) => {
+				const deletePromise = axios.delete(
+					`http://localhost:8000/income/${id}`,
+				);
+				deletePromises.push(deletePromise);
+			});
+		checkedList.waste.length !== 0 &&
+			checkedList.waste.forEach((id) => {
+				const deletePromise = axios.delete(`http://localhost:8000/waste/${id}`);
+				deletePromises.push(deletePromise);
+			});
+
+		Promise.all(deletePromises)
+			.then((responses) => {
+				// 삭제 요청에 대한 응답 처리
+				console.log(responses);
+
+				setIsOpen((prev) => ({ ...prev, deleteModal: false }));
+
+				// 클라이언트에서 데이터 제거
+				const updatedCheckedList = { ...checkedList };
+				updatedCheckedList.outgo = [];
+				updatedCheckedList.income = [];
+				updatedCheckedList.waste = [];
+				setCheckedList(updatedCheckedList);
+
+				dispatch(
+					showToast({ message: "삭제가 완료되었습니다", type: "success" }),
+				);
+				window.location.replace("/history");
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	};
+
 	useEffect(() => {
-		axios
-			.get("http://localhost:8000/outgo")
-			.then((res) => {
-				setOutgo(res.data);
-			})
-			.catch((error) => {
+		const fetchData = async () => {
+			try {
+				const requests = [
+					axios.get("http://localhost:8000/outgo"),
+					axios.get("http://localhost:8000/income"),
+					axios.get("http://localhost:8000/wasteList"),
+					axios.get("http://localhost:8000/monthlyOutgo"),
+					axios.get("http://localhost:8000/monthlyIncome"),
+					axios.get("http://localhost:8000/monthlyWasteList"),
+				];
+
+				const responses = await axios.all(requests);
+
+				// 개별 요청의 응답을 처리하여 상태를 업데이트합니다.
+				setOutgo(responses[0].data);
+				setIncome(responses[1].data);
+				setWaste(responses[2].data);
+				setSumOutgo(responses[3].data[0]);
+				setSumIncome(responses[4].data[0]);
+				setSumWasteList(responses[5].data[0]);
+			} catch (error) {
 				console.log(error);
-			});
-		axios
-			.get("http://localhost:8000/income")
-			.then((res) => {
-				setIncome(res.data);
-			})
-			.catch((error) => {
-				console.log(error);
-			});
-		axios
-			.get("http://localhost:8000/wasteList")
-			.then((res) => {
-				setWaste(res.data);
-			})
-			.catch((error) => {
-				console.log(error);
-			});
-		axios
-			.get("http://localhost:8000/monthlyOutgo")
-			.then((res) => {
-				setSumOutgo(res.data[0]);
-			})
-			.catch((error) => {
-				console.log(error);
-			});
-		axios
-			.get("http://localhost:8000/monthlyIncome")
-			.then((res) => {
-				setSumIncome(res.data[0]);
-			})
-			.catch((error) => {
-				console.log(error);
-			});
-		axios
-			.get("http://localhost:8000/monthlyWasteList")
-			.then((res) => {
-				setSumWasteList(res.data[0]);
-			})
-			.catch((error) => {
-				console.log(error);
-			});
+			}
+		};
+		fetchData().catch((error) => {
+			console.log(error);
+		});
 	}, [getMoment]);
 
 	useEffect(() => {
@@ -276,6 +341,16 @@ const History = () => {
 		});
 		setIsAllChecked(false);
 	}, [location.pathname]);
+
+	useEffect(() => {
+		// 전역상태를 이용한 토스트 창 띄우기
+		setTimeout(() => {
+			if (modal.visible) {
+				Toast(ToastType.success, modal.message);
+				dispatch(hideToast());
+			}
+		}, 100);
+	}, [modal, dispatch]);
 
 	return (
 		<>
@@ -319,7 +394,10 @@ const History = () => {
 						<button
 							className="write__btn"
 							onClick={() => {
-								setIsOpen(true);
+								setIsOpen((prev) => {
+									const updated = { ...prev };
+									return { ...updated, writeModal: true };
+								});
 							}}
 						>
 							<SvgIcon
@@ -360,21 +438,81 @@ const History = () => {
 							</p>
 						</NavStyle>
 					</div>
-					<div className="category__header">
-						<input
-							type="checkbox"
-							checked={isAllChecked}
-							onChange={handleAllChecked}
-						/>
-						<p>분류</p>
-						<p>날짜</p>
-						<p>카테고리</p>
-						<p>거래처</p>
-						<p>결제수단</p>
-						<p>금액</p>
-						<p>메모</p>
-						<p>영수증</p>
-					</div>
+					{checkedList.income.length > 0 ||
+					checkedList.outgo.length > 0 ||
+					checkedList.waste.length > 0 ? (
+						<div className="category__header__checked">
+							<input
+								type="checkbox"
+								checked={isAllChecked}
+								onChange={handleAllChecked}
+							/>
+							<p>{`${
+								checkedList.income.length +
+								checkedList.outgo.length +
+								checkedList.waste.length
+							}건이 선택되었습니다.`}</p>
+							<p>{sumOfCheckedList().toLocaleString()} 원</p>
+							<div className="plus__waste">
+								<SvgIcon
+									component={AddCircleOutlineOutlinedIcon}
+									sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+								/>
+								<p>낭비 리스트</p>
+							</div>
+							<div
+								className="delete__list"
+								onClick={() => {
+									setIsOpen((prev) => {
+										const updated = { ...prev };
+										return { ...updated, deleteModal: true };
+									});
+								}}
+							>
+								<SvgIcon
+									component={DeleteOutlineOutlinedIcon}
+									sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+								/>
+								<p>삭제</p>
+							</div>
+							<div className="delete__list">
+								<SvgIcon
+									component={CreateOutlinedIcon}
+									sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+								/>
+								<p>수정</p>
+							</div>
+							<SvgIcon
+								className="delete__icon"
+								component={ClearOutlinedIcon}
+								sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+								onClick={() => {
+									setIsAllChecked(false);
+									setCheckedList({
+										income: [],
+										outgo: [],
+										waste: [],
+									});
+								}}
+							/>
+						</div>
+					) : (
+						<div className="category__header">
+							<input
+								type="checkbox"
+								checked={isAllChecked}
+								onChange={handleAllChecked}
+							/>
+							<p>분류</p>
+							<p>날짜</p>
+							<p>카테고리</p>
+							<p>거래처</p>
+							<p>결제수단</p>
+							<p>금액</p>
+							<p>메모</p>
+							<p>영수증</p>
+						</div>
+					)}
 					{/* 경로에 따라 다른 컴포넌트를 보여줘야함  */}
 					{location.pathname === "/history" && (
 						<HistoryList
@@ -407,7 +545,28 @@ const History = () => {
 					)}
 				</MainLists>
 			</Container>
-			{isOpen && <LedgerWrite setIsOpen={setIsOpen} />}
+			{isOpen.writeModal && <LedgerWrite setIsOpen={setIsOpen} />}
+			{isOpen.deleteModal && (
+				<DeleteModal>
+					<div className="msg__box">
+						<h4>가계부 삭제</h4>
+						<p>정말 삭제하시겠습니까?</p>
+						<div className="buttons">
+							<button
+								onClick={() => {
+									setIsOpen((prev) => {
+										const updated = { ...prev };
+										return { ...updated, deleteModal: false };
+									});
+								}}
+							>
+								취소
+							</button>
+							<button onClick={handleDeleteClick}>확인</button>
+						</div>
+					</div>
+				</DeleteModal>
+			)}
 		</>
 	);
 };
@@ -418,7 +577,7 @@ const Container = styled.div`
 	display: flex;
 	flex-direction: column;
 	height: 100%;
-	padding: 3rem 4rem;
+	padding: 3rem 8rem;
 
 	h3 {
 		font-size: 2.2rem;
@@ -488,9 +647,10 @@ const MainLists = styled.div`
 
 	.category__header {
 		width: 100%;
+		height: 39px;
 		border: 1px solid #c7c7c7;
 		border-top: none;
-		padding: 0.8rem;
+		padding: 0 0.8rem;
 		display: flex;
 		align-items: center;
 		gap: 4rem;
@@ -526,6 +686,76 @@ const MainLists = styled.div`
 			&:nth-child(8) {
 				width: 15rem;
 			}
+		}
+	}
+
+	.category__header__checked {
+		width: 100%;
+		height: 39px;
+		border: 1px solid #c7c7c7;
+		background: #50506d;
+		border-top: none;
+		padding: 0 0.8rem;
+		display: flex;
+		align-items: center;
+		color: white;
+		gap: 1rem;
+
+		input {
+			cursor: pointer;
+			width: 1.6rem;
+			height: 1.6rem;
+			margin-left: 1.5rem;
+			margin-right: 2.3rem;
+		}
+
+		p {
+			font-size: 1.2rem;
+			font-weight: 300;
+			white-space: nowrap;
+
+			&:nth-child(2) {
+				width: 50rem;
+			}
+
+			&:nth-child(3) {
+				width: 8rem;
+				padding-right: 1rem;
+				padding-top: 0.5rem;
+				height: 24px;
+				border-right: 0.5px solid white;
+			}
+		}
+
+		.plus__waste {
+			cursor: pointer;
+			display: flex;
+			height: 24px;
+			align-items: center;
+			gap: 4px;
+			border-right: 0.5px solid white;
+
+			p {
+				width: 7rem;
+			}
+		}
+
+		.delete__list {
+			cursor: pointer;
+			display: flex;
+			height: 24px;
+			align-items: center;
+			gap: 4px;
+			border-right: 0.5px solid white;
+
+			p {
+				width: 3.5rem;
+			}
+		}
+
+		.delete__icon {
+			cursor: pointer;
+			margin-left: 1rem;
 		}
 	}
 
@@ -583,4 +813,57 @@ const NavStyle = styled(NavLink)<{ $isActive: string }>`
 								${(props) => props.theme.COLORS.LIGHT_GREEN};
 						}
 			    `}
+`;
+
+const DeleteModal = styled.div`
+	width: 100%;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.3);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 99;
+
+	.msg__box {
+		width: 36rem;
+		height: 20rem;
+		background-color: ${(props) => props.theme.COLORS.WHITE};
+		border-radius: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		padding: 2.5rem;
+
+		h4 {
+			font-size: 2.2rem;
+			color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
+			margin-bottom: 1.5rem;
+		}
+
+		p {
+			font-size: 1.4rem;
+			color: #7e7e7e;
+		}
+
+		.buttons {
+			margin-top: 6rem;
+			display: flex;
+			justify-content: space-between;
+			gap: 2rem;
+
+			button {
+				border-radius: 4px;
+				color: #7e7e7e;
+				padding: 1rem 6rem;
+				background: #d9d9d9;
+
+				&:last-child {
+					background: ${(props) => props.theme.COLORS.LIGHT_BLUE};
+					color: white;
+				}
+			}
+		}
+	}
 `;
