@@ -186,6 +186,14 @@ public class OutgoService {
                 () -> new BusinessLogicException(ExceptionCode.OUTGO_NOT_FOUND));
     }
 
+    public long getDailyTotalOutgo(String token, LocalDate curDate){
+        long memberId = jwtTokenizer.getMemberId(token);
+
+        return Optional.ofNullable(
+                outgoRepository.findTotalOutgoByDay(memberId, curDate)
+        ).orElse(0L); // 쿼리결과 null 값이 반환될 경우 0이 대신 반환
+    }
+
     // 태그 등록, 중복 체크
     private void tagHandler(String outgoPostDto, String token, Outgo outgo) {
         LedgerTag ledgerTag = null;

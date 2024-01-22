@@ -26,6 +26,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -156,6 +157,14 @@ public class IncomeService {
                 .orElseThrow(
                         () -> new BusinessLogicException(ExceptionCode.INCOME_NOT_FOUND)
                 );
+    }
+
+    public long getDailyTotalIncome(String token, LocalDate curDate){
+        long memberId = jwtTokenizer.getMemberId(token);
+
+        return Optional.ofNullable(
+                incomeRepository.findTotalIncomeByDay(memberId, curDate)
+                ).orElse(0L); // 쿼리결과 null 값이 반환될 경우 0이 대신 반환
     }
 
     // 태그 등록, 중복 체크
