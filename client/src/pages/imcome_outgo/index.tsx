@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { SvgIcon } from "@mui/material";
 import ArrowBackIosOutlinedIcon from "@mui/icons-material/ArrowBackIosOutlined";
 import ArrowForwardIosOutlinedIcon from "@mui/icons-material/ArrowForwardIosOutlined";
+import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
+import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOutlineOutlined";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import axios from "axios";
@@ -49,6 +52,7 @@ export interface wasteType {
 	memo: string;
 	outgoTag: string;
 	wasteList: boolean;
+	payment: string;
 	reciptImg: string;
 }
 
@@ -86,11 +90,17 @@ export interface modalType {
 	deleteModal: boolean;
 }
 
+interface filterType {
+	date: boolean;
+	tag: boolean;
+}
+
 const History = () => {
 	const [getMoment, setMoment] = useState(moment());
 	const [outgo, setOutgo] = useState<outgoType[]>([]);
 	const [income, setIncome] = useState<incomeType[]>([]);
 	const [waste, setWaste] = useState<wasteType[]>([]);
+
 	const [sumOutgo, setSumOutgo] = useState<sumOutgoType>({
 		month: 0,
 		monthlyOutgo: 0,
@@ -112,6 +122,11 @@ const History = () => {
 		deleteModal: false,
 	});
 
+	const [filtered, setFiltered] = useState<filterType>({
+		date: false,
+		tag: false,
+	});
+
 	// 체크박스 상태
 	const [isAllChecked, setIsAllChecked] = useState(false);
 
@@ -126,6 +141,41 @@ const History = () => {
 
 	const location = useLocation();
 	const dispatch = useDispatch();
+
+	// income과 outgo를 합쳐 최근 순으로 정렬
+	const combined: Array<incomeType | outgoType> = [...income, ...outgo];
+
+	const sortByDate = (array: any[]) => {
+		const sortedArray = [...array];
+
+		sortedArray.sort((a, b) => {
+			const dateA = new Date(a.date);
+			const dateB = new Date(b.date);
+			return filtered.date
+				? dateB.getTime() - dateA.getTime()
+				: dateA.getTime() - dateB.getTime();
+		});
+
+		if (location.pathname === "/income") {
+			setIncome(sortedArray);
+			return;
+		}
+		if (location.pathname === "/outgo") {
+			setOutgo(sortedArray);
+			return;
+		}
+		if (location.pathname === "/waste") {
+			setWaste(sortedArray);
+		}
+	};
+
+	combined.sort((a, b) => {
+		const dateA = new Date(a.date);
+		const dateB = new Date(b.date);
+		return filtered.date
+			? dateA.getTime() - dateB.getTime()
+			: dateB.getTime() - dateA.getTime();
+	});
 
 	const checkedItemHandler = (
 		id: number,
@@ -303,6 +353,59 @@ const History = () => {
 			});
 	};
 
+	const handleAddWaste = () => {
+		checkedList.outgo.forEach((id) => {
+			const idx = outgo.findIndex((el) => el.id === id);
+			axios
+				.post("http://localhost:8000/wasteList", outgo[idx])
+				.then((res) => {
+					console.log(res);
+					dispatch(
+						showToast({
+							message: "낭비리스트가 추가되었습니다",
+							type: "success",
+						}),
+					);
+					window.location.replace("/waste");
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		});
+	};
+
+	const handleDeleteWaste = () => {
+		checkedList.waste.forEach((id) => {
+			axios
+				.delete(`http://localhost:8000/wasteList/${id}`)
+				.then((res) => {
+					console.log(res);
+
+					dispatch(
+						showToast({
+							message: "낭비리스트 삭제가 완료되었습니다",
+							type: "success",
+						}),
+					);
+					window.location.replace("/waste");
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		});
+	};
+
+	const onCursorActive = () => {
+		const path = location.pathname;
+		if (path === "/income") return "false";
+		else if (path === "/outgo") return "true";
+		else if (path === "/history") {
+			return (checkedList.income.length === 0).toString();
+		} else {
+			return "true";
+		}
+	};
+
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
@@ -319,8 +422,11 @@ const History = () => {
 
 				// 개별 요청의 응답을 처리하여 상태를 업데이트합니다.
 				setOutgo(responses[0].data);
+				// sortByDate(responses[0].data);
 				setIncome(responses[1].data);
+				// sortByDate(responses[1].data);
 				setWaste(responses[2].data);
+				// sortByDate(responses[2].data);
 				setSumOutgo(responses[3].data[0]);
 				setSumIncome(responses[4].data[0]);
 				setSumWasteList(responses[5].data[0]);
@@ -340,6 +446,10 @@ const History = () => {
 			waste: [],
 		});
 		setIsAllChecked(false);
+		setFiltered({
+			date: false,
+			tag: false,
+		});
 	}, [location.pathname]);
 
 	useEffect(() => {
@@ -453,13 +563,27 @@ const History = () => {
 								checkedList.waste.length
 							}건이 선택되었습니다.`}</p>
 							<p>{sumOfCheckedList().toLocaleString()} 원</p>
-							<div className="plus__waste">
-								<SvgIcon
-									component={AddCircleOutlineOutlinedIcon}
-									sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-								/>
-								<p>낭비 리스트</p>
-							</div>
+							{location.pathname === "/waste" ? (
+								<div className="plus__waste" onClick={handleDeleteWaste}>
+									<SvgIcon
+										component={RemoveCircleOutlineOutlinedIcon}
+										sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+									/>
+									<p>낭비 리스트</p>
+								</div>
+							) : (
+								<WastePlus
+									className="plus__waste"
+									onClick={handleAddWaste}
+									cursor={onCursorActive()}
+								>
+									<SvgIcon
+										component={AddCircleOutlineOutlinedIcon}
+										sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+									/>
+									<p>낭비 리스트</p>
+								</WastePlus>
+							)}
 							<div
 								className="delete__list"
 								onClick={() => {
@@ -504,7 +628,32 @@ const History = () => {
 								onChange={handleAllChecked}
 							/>
 							<p>분류</p>
-							<p>날짜</p>
+							<p
+								onClick={() => {
+									setFiltered((prev) => {
+										const updated = { ...prev };
+										return { ...updated, date: !prev.date };
+									});
+									if (location.pathname === "/income") sortByDate(income);
+									if (location.pathname === "/outgo") sortByDate(outgo);
+									if (location.pathname === "/waste") sortByDate(waste);
+								}}
+							>
+								날짜
+								{filtered.date ? (
+									<SvgIcon
+										className="arrow__up"
+										component={ArrowUpwardRoundedIcon}
+										sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+									/>
+								) : (
+									<SvgIcon
+										className="arrow__up"
+										component={ArrowDownwardRoundedIcon}
+										sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+									/>
+								)}
+							</p>
 							<p>카테고리</p>
 							<p>거래처</p>
 							<p>결제수단</p>
@@ -516,8 +665,7 @@ const History = () => {
 					{/* 경로에 따라 다른 컴포넌트를 보여줘야함  */}
 					{location.pathname === "/history" && (
 						<HistoryList
-							outgo={outgo}
-							income={income}
+							sortedArray={combined}
 							checkedList={checkedList}
 							checkHandler={checkHandler}
 						/>
@@ -581,6 +729,7 @@ const Container = styled.div`
 
 	h3 {
 		font-size: 2.2rem;
+		color: #464656;
 	}
 `;
 
@@ -673,6 +822,9 @@ const MainLists = styled.div`
 
 			&:nth-child(3) {
 				width: 8.2rem;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
 			}
 
 			&:nth-child(5) {
@@ -686,6 +838,10 @@ const MainLists = styled.div`
 			&:nth-child(8) {
 				width: 15rem;
 			}
+		}
+
+		.arrow__up {
+			margin-left: 0.3rem;
 		}
 	}
 
@@ -865,5 +1021,20 @@ const DeleteModal = styled.div`
 				}
 			}
 		}
+	}
+`;
+
+const WastePlus = styled.div<{ cursor: string }>`
+	cursor: ${(props) =>
+		props.cursor === "true" ? "pointer" : "not-allowed"} !important;
+	opacity: ${(props) => (props.cursor === "true" ? "1" : "0.4")};
+	display: flex;
+	height: 24px;
+	align-items: center;
+	gap: 4px;
+	border-right: 0.5px solid white;
+
+	p {
+		width: 7rem;
 	}
 `;
