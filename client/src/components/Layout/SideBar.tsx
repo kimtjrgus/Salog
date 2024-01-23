@@ -34,11 +34,6 @@ export const SideBar = () => {
 
 	const isActive = (paths: string[]) => {
 		const location = useLocation();
-		console.log(
-			location,
-			paths.some((path) => location.pathname === path),
-		);
-
 		return paths.some((path) => location.pathname === path);
 	};
 
@@ -56,7 +51,7 @@ export const SideBar = () => {
 					</NavStyle>
 					<NavStyle
 						to="/history"
-						isActive={isActive(["/history", "/income", "/outgo", "/waste"])}
+						$isActive={isActive(["/history", "/income", "/outgo", "/waste"])}
 					>
 						<SvgIcon
 							component={MenuBookIcon}
@@ -165,7 +160,7 @@ const Lists = styled.div`
 	border-bottom: 1px solid #b4b4b4;
 `;
 
-const NavStyle = styled(NavLink)<{ isActive: boolean }>`
+const NavStyle = styled(NavLink)<{ $isActive: boolean }>`
 	display: flex;
 	align-items: center;
 	padding: 0.5rem 1.3rem;
@@ -182,7 +177,7 @@ const NavStyle = styled(NavLink)<{ isActive: boolean }>`
 	}
 
 	${(props) =>
-		props.isActive &&
+		props.$isActive &&
 		css`
 			background-color: #e2e8ff;
 			> svg,

@@ -7,6 +7,8 @@ const userSlice = createSlice({
 		emailAlarm: false,
 		homeAlarm: false,
 		createdAt: "",
+		incomeTags: [],
+		outgoTags: [],
 	},
 	reducers: {
 		login: (state, action) => {
@@ -14,6 +16,8 @@ const userSlice = createSlice({
 			state.emailAlarm = action.payload.emailAlarm;
 			state.homeAlarm = action.payload.homeAlarm;
 			state.createdAt = action.payload.createdAt;
+			state.incomeTags = action.payload.incomeTags;
+			state.outgoTags = action.payload.outgoTags;
 		},
 		logout: (state) => {
 			state.isLoggedIn = false;

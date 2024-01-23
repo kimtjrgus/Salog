@@ -1,16 +1,20 @@
 import styled from "styled-components";
 import { SvgIcon } from "@mui/material";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
-import { type incomeType, type outgoType } from ".";
+import { type incomeType, type outgoType, type checkedType } from ".";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
-	outgo: outgoType[];
-	income: incomeType[];
+	sortedArray: Array<incomeType | outgoType>;
+	checkedList: checkedType;
+	checkHandler: (
+		e: React.ChangeEvent<HTMLInputElement>,
+		id: number,
+		division: keyof checkedType,
+	) => void;
 }
 
-const HistoryList = ({ outgo, income }: Props) => {
-	console.log(outgo, income);
-
+const HistoryList = ({ sortedArray, checkedList, checkHandler }: Props) => {
 	const dateAsDots = (element: string) => {
 		const originalDate = element;
 		const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
@@ -30,41 +34,56 @@ const HistoryList = ({ outgo, income }: Props) => {
 
 	return (
 		<Container className="ledger__lists">
-			{outgo.map((el) => {
-				return (
-					<li className="ledger__list" key={el.id}>
-						<input type="checkbox" />
-						<ColorRedDiv>지출</ColorRedDiv>
-						<p>{dateAsDots(el.date)}</p>
-						<p>{el.outgoTag}</p>
-						<p>{el.outgoName}</p>
-						<p>{el.payment}</p>
-						<p className="money__red">{el.money.toLocaleString()}원</p>
-						<p>{el.memo}</p>
-						<SvgIcon
-							component={ReceiptLongOutlinedIcon}
-							sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-						/>
-					</li>
-				);
-			})}
-			{income.map((el) => {
-				return (
-					<li className="ledger__list" key={el.id}>
-						<input type="checkbox" />
-						<ColorBlueDiv>수입</ColorBlueDiv>
-						<p>{dateAsDots(el.date)}</p>
-						<p>{el.incomeTag}</p>
-						<p>{el.income_name}</p>
-						<p>{"x"}</p>
-						<p className="money__blue">{el.money.toLocaleString()}원</p>
-						<p>{el.memo}</p>
-						<SvgIcon
-							component={ReceiptLongOutlinedIcon}
-							sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-						/>
-					</li>
-				);
+			{sortedArray.map((el) => {
+				if ("incomeTag" in el) {
+					// el이 incomeType인 경우
+					return (
+						<li className="ledger__list" key={uuidv4()}>
+							<input
+								type="checkbox"
+								checked={checkedList.income.includes(el.id)}
+								onChange={(e) => {
+									checkHandler(e, el.id, "income");
+								}}
+							/>
+							<ColorBlueDiv>수입</ColorBlueDiv>
+							<p>{dateAsDots(el.date)}</p>
+							<p>{el.incomeTag}</p>
+							<p>{el.income_name}</p>
+							<p>{"x"}</p>
+							<p className="money__blue">{el.money.toLocaleString()}원</p>
+							<p>{el.memo}</p>
+							<SvgIcon
+								component={ReceiptLongOutlinedIcon}
+								sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+							/>
+						</li>
+					);
+				} else {
+					// el이 outgoType인 경우
+					return (
+						<li className="ledger__list" key={el.id}>
+							<input
+								type="checkbox"
+								checked={checkedList.outgo.includes(el.id)}
+								onChange={(e) => {
+									checkHandler(e, el.id, "outgo");
+								}}
+							/>
+							<ColorRedDiv>지출</ColorRedDiv>
+							<p>{dateAsDots(el.date)}</p>
+							<p>{el.outgoTag}</p>
+							<p>{el.outgoName}</p>
+							<p>{el.payment}</p>
+							<p className="money__red">{el.money.toLocaleString()}원</p>
+							<p>{el.memo}</p>
+							<SvgIcon
+								component={ReceiptLongOutlinedIcon}
+								sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+							/>
+						</li>
+					);
+				}
 			})}
 		</Container>
 	);
@@ -95,6 +114,10 @@ const Container = styled.ul`
 		p {
 			font-size: 1.2rem;
 			white-space: nowrap;
+
+			&:nth-child(3) {
+				width: 8.3rem;
+			}
 
 			&:nth-child(5) {
 				width: 10rem;
