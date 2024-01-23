@@ -6,12 +6,14 @@ import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOu
 import { useCallback, useEffect, useState } from "react";
 import { debounce } from "src/utils/timeFunc";
 import axios from "axios";
-import { type modalType } from ".";
+import { type outgoType, type incomeType, type modalType } from ".";
 import { useDispatch } from "react-redux";
 import { showToast } from "src/store/slices/toastSlice";
 
 interface Props {
 	setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
+	setIncome: React.Dispatch<React.SetStateAction<incomeType[]>>;
+	setOutgo: React.Dispatch<React.SetStateAction<outgoType[]>>;
 }
 
 // type valuesType = Record<string, Record<string, string>>;
@@ -39,7 +41,7 @@ interface valuesType {
 	memo: string;
 }
 
-const LedgerWrite = ({ setIsOpen }: Props) => {
+const LedgerWrite = ({ setIsOpen, setIncome, setOutgo }: Props) => {
 	const [values, setValues] = useState<valuesType[]>([
 		{
 			id: 1,
@@ -152,7 +154,9 @@ const LedgerWrite = ({ setIsOpen }: Props) => {
 							reciptImg: "",
 						})
 						.then((res) => {
-							console.log(res);
+							setOutgo((prev: outgoType[]) => {
+								return [...prev, res.data];
+							});
 						})
 						.catch((error) => {
 							console.log(error);
@@ -167,7 +171,9 @@ const LedgerWrite = ({ setIsOpen }: Props) => {
 							reciptImg: "",
 						})
 						.then((res) => {
-							console.log(res);
+							setIncome((prev: incomeType[]) => {
+								return [...prev, res.data];
+							});
 						})
 						.catch((error) => {
 							console.log(error);
@@ -179,8 +185,6 @@ const LedgerWrite = ({ setIsOpen }: Props) => {
 			return { ...updated, writeModal: false };
 		});
 		dispatch(showToast({ message: "작성이 완료되었습니다", type: "success" }));
-		window.location.replace("/history");
-		// Toast(ToastType.success, "작성이 완료되었습니다");
 	};
 
 	useEffect(() => {
