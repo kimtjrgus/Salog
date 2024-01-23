@@ -12,7 +12,7 @@ import RemoveCircleOutlineOutlinedIcon from "@mui/icons-material/RemoveCircleOut
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import axios from "axios";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import HistoryList from "./History";
 import IncomeList from "./IncomeList";
 import WasteList from "./WasteList";
@@ -141,6 +141,7 @@ const History = () => {
 
 	const location = useLocation();
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	// income과 outgo를 합쳐 최근 순으로 정렬
 	const combined: Array<incomeType | outgoType> = [...income, ...outgo];
@@ -231,6 +232,8 @@ const History = () => {
 			const idx = waste.findIndex((el) => el.id === id);
 			sumOfMoney.waste += waste[idx].money;
 		});
+		console.log(sumOfMoney);
+
 		if (location.pathname !== "/waste")
 			return sumOfMoney.income - sumOfMoney.outgo;
 		else return sumOfMoney.waste;
@@ -279,7 +282,7 @@ const History = () => {
 						});
 				});
 			} else if (location.pathname === "/waste") {
-				outgo.forEach((el) => {
+				waste.forEach((el) => {
 					!checkedList.waste.includes(el.id) &&
 						setCheckedList((prev) => {
 							const updatedList = { ...prev };
@@ -307,6 +310,7 @@ const History = () => {
 		}
 	};
 
+	// 체크한 목록들을 삭제하는 함수
 	const handleDeleteClick = () => {
 		const deletePromises: Array<Promise<any>> = [];
 
@@ -330,14 +334,47 @@ const History = () => {
 			});
 
 		Promise.all(deletePromises)
-			.then((responses) => {
+			.then(() => {
 				// 삭제 요청에 대한 응답 처리
-				console.log(responses);
-
 				setIsOpen((prev) => ({ ...prev, deleteModal: false }));
+
+				// 데이터 상태 최신화
+				if (checkedList.income.length !== 0) {
+					checkedList.income.forEach((id) => {
+						setIncome((prevData) => {
+							const data = prevData.filter((el) => {
+								return el.id !== id;
+							});
+							return data;
+						});
+					});
+				}
+
+				if (checkedList.outgo.length !== 0) {
+					checkedList.outgo.forEach((id) => {
+						setOutgo((prevData) => {
+							const data = prevData.filter((el) => {
+								return el.id !== id;
+							});
+							return data;
+						});
+					});
+				}
+
+				if (checkedList.waste.length !== 0) {
+					checkedList.waste.forEach((id) => {
+						setWaste((prevData) => {
+							const data = prevData.filter((el) => {
+								return el.id !== id;
+							});
+							return data;
+						});
+					});
+				}
 
 				// 클라이언트에서 데이터 제거
 				const updatedCheckedList = { ...checkedList };
+
 				updatedCheckedList.outgo = [];
 				updatedCheckedList.income = [];
 				updatedCheckedList.waste = [];
@@ -346,7 +383,6 @@ const History = () => {
 				dispatch(
 					showToast({ message: "삭제가 완료되었습니다", type: "success" }),
 				);
-				window.location.replace("/history");
 			})
 			.catch((error) => {
 				console.log(error);
@@ -359,17 +395,23 @@ const History = () => {
 			axios
 				.post("http://localhost:8000/wasteList", outgo[idx])
 				.then((res) => {
-					console.log(res);
+					setWaste([...waste, res.data]);
 					dispatch(
 						showToast({
 							message: "낭비리스트가 추가되었습니다",
 							type: "success",
 						}),
 					);
-					window.location.replace("/waste");
+					navigate("/waste");
 				})
 				.catch((error) => {
-					console.log(error);
+					console.error(error);
+					dispatch(
+						showToast({
+							message: "이미 존재하는 항목입니다",
+							type: "error",
+						}),
+					);
 				});
 		});
 	};
@@ -378,19 +420,22 @@ const History = () => {
 		checkedList.waste.forEach((id) => {
 			axios
 				.delete(`http://localhost:8000/wasteList/${id}`)
-				.then((res) => {
-					console.log(res);
-
+				.then(() => {
+					setWaste((prevData) => {
+						const data = prevData.filter((el) => {
+							return el.id !== id;
+						});
+						return data;
+					});
 					dispatch(
 						showToast({
 							message: "낭비리스트 삭제가 완료되었습니다",
 							type: "success",
 						}),
 					);
-					window.location.replace("/waste");
 				})
 				.catch((error) => {
-					console.log(error);
+					console.error(error);
 				});
 		});
 	};
@@ -422,11 +467,8 @@ const History = () => {
 
 				// 개별 요청의 응답을 처리하여 상태를 업데이트합니다.
 				setOutgo(responses[0].data);
-				// sortByDate(responses[0].data);
 				setIncome(responses[1].data);
-				// sortByDate(responses[1].data);
 				setWaste(responses[2].data);
-				// sortByDate(responses[2].data);
 				setSumOutgo(responses[3].data[0]);
 				setSumIncome(responses[4].data[0]);
 				setSumWasteList(responses[5].data[0]);
@@ -456,7 +498,9 @@ const History = () => {
 		// 전역상태를 이용한 토스트 창 띄우기
 		setTimeout(() => {
 			if (modal.visible) {
-				Toast(ToastType.success, modal.message);
+				modal.type === "success"
+					? Toast(ToastType.success, modal.message)
+					: Toast(ToastType.error, modal.message);
 				dispatch(hideToast());
 			}
 		}, 100);
@@ -585,7 +629,9 @@ const History = () => {
 								</WastePlus>
 							)}
 							<div
-								className="delete__list"
+								className={`delete__list ${
+									location.pathname === "/waste" ? "disable" : ""
+								}`}
 								onClick={() => {
 									setIsOpen((prev) => {
 										const updated = { ...prev };
@@ -599,7 +645,11 @@ const History = () => {
 								/>
 								<p>삭제</p>
 							</div>
-							<div className="delete__list">
+							<div
+								className={`delete__list ${
+									location.pathname === "/waste" ? "disable" : ""
+								}`}
+							>
 								<SvgIcon
 									component={CreateOutlinedIcon}
 									sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
@@ -693,7 +743,13 @@ const History = () => {
 					)}
 				</MainLists>
 			</Container>
-			{isOpen.writeModal && <LedgerWrite setIsOpen={setIsOpen} />}
+			{isOpen.writeModal && (
+				<LedgerWrite
+					setIsOpen={setIsOpen}
+					setIncome={setIncome}
+					setOutgo={setOutgo}
+				/>
+			)}
 			{isOpen.deleteModal && (
 				<DeleteModal>
 					<div className="msg__box">
@@ -909,6 +965,12 @@ const MainLists = styled.div`
 			}
 		}
 
+		.disable {
+			cursor: not-allowed;
+			opacity: 0.4;
+			pointer-events: none;
+		}
+
 		.delete__icon {
 			cursor: pointer;
 			margin-left: 1rem;
@@ -1028,6 +1090,7 @@ const WastePlus = styled.div<{ cursor: string }>`
 	cursor: ${(props) =>
 		props.cursor === "true" ? "pointer" : "not-allowed"} !important;
 	opacity: ${(props) => (props.cursor === "true" ? "1" : "0.4")};
+	pointer-events: ${(props) => (props.cursor === "true" ? "auto" : "none")};
 	display: flex;
 	height: 24px;
 	align-items: center;
