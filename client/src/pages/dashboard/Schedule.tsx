@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
 import { v4 as uuidv4 } from "uuid";
 
@@ -20,6 +21,8 @@ interface fixedIncomeType {
 const Schedule = () => {
 	const [fixedOutgo, setFixedOutgo] = useState<fixedOutgoType[]>([]);
 	const [fixedIncome, setFixedIncome] = useState<fixedIncomeType[]>([]);
+
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		axios
@@ -75,7 +78,13 @@ const Schedule = () => {
 					);
 				})}
 			</div>
-			<button>금융 일정 관리하기</button>
+			<button
+				onClick={() => {
+					navigate("/fixed__account");
+				}}
+			>
+				금융 일정 관리하기
+			</button>
 		</Container>
 	);
 };
@@ -113,7 +122,15 @@ const Container = styled.div`
 
 	.lists {
 		margin-top: 2rem;
+		height: 25.5rem;
 		overflow-y: scroll;
+
+		-ms-overflow-style: none; /* 인터넷 익스플로러 */
+		scrollbar-width: none; /* 파이어폭스 */
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
 	}
 `;
 
