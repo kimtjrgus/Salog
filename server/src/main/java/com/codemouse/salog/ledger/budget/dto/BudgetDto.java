@@ -13,8 +13,6 @@ public class BudgetDto {
     @Getter
     public static class Post {
         private LocalDate date;
-        @Min(value = 1, message = "금액은 1 이상이어야 합니다.")
-        @Max(value = 2147483646, message = "금액은 최대 2,147,483,646입니다.")
         private int budget;
     }
 
@@ -22,8 +20,6 @@ public class BudgetDto {
     @Getter
     public static class Patch {
         private LocalDate date;
-        @Min(value = 1, message = "금액은 1 이상이어야 합니다.")
-        @Max(value = 2147483646, message = "금액은 최대 2,147,483,646입니다.")
         private int budget;
     }
 

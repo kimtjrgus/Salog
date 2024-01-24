@@ -16,8 +16,6 @@ public class IncomeDto {
     @AllArgsConstructor
     @Getter
     public static class Post {
-        @Min(value = 1, message = "금액은 1 이상이어야 합니다.")
-        @Max(value = 2147483646, message = "금액은 최대 2,147,483,646입니다.")
         private int money;
         @Size(max = 15, message = "incomeName이 15글자이내여야 합니다.")
         private String incomeName;
@@ -31,8 +29,6 @@ public class IncomeDto {
     @AllArgsConstructor
     @Getter
     public static class Patch {
-        @Min(value = 1, message = "금액은 1 이상이어야 합니다.")
-        @Max(value = 2147483646, message = "금액은 최대 2,147,483,646입니다.")
         private int money;
         @Size(max = 15, message = "incomeName이 15글자이내여야 합니다.")
         private String incomeName;
