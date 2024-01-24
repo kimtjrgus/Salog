@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IncomeRepository extends JpaRepository<Income, Long> {
@@ -29,6 +30,9 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
 
     @Query("SELECT i.ledgerTag.tagName, SUM(i.money) FROM Income i WHERE i.member.memberId = :memberId AND YEAR(i.date) = :year AND MONTH(i.date) = :month AND i.ledgerTag.category = 'INCOME' GROUP BY i.ledgerTag.tagName")
     List<Object[]> findTotalIncomeByMonthGroupByTag(@Param("memberId") long memberId, @Param("year") int year, @Param("month") int month);
+
+    @Query("SELECT SUM(i.money) FROM Income i WHERE i.member.memberId = :memberId AND i.date = :curDate")
+    Long findTotalIncomeByDay(long memberId, LocalDate curDate);
 
     long countByLedgerTag(LedgerTag ledgerTag);
 }
