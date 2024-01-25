@@ -1,12 +1,14 @@
 package com.codemouse.salog.members.dto;
 
+import com.codemouse.salog.tags.ledgerTags.dto.LedgerTagDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class MemberDto {
     @AllArgsConstructor
@@ -40,13 +42,14 @@ public class MemberDto {
         private String newPassword;
     }
 
-
-    @AllArgsConstructor
     @Getter
+    @Setter
     public static class Response {
-        private int memberId;
+        private long memberId;
         private boolean emailAlarm;
         private boolean homeAlarm;
         private LocalDateTime createdAt;
+        private List<LedgerTagDto.Response> incomeTags;
+        private List<LedgerTagDto.Response> outgoTags;
     }
 }

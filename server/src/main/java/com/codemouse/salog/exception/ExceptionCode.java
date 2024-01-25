@@ -23,8 +23,22 @@ public enum ExceptionCode {
     MEMBER_MISMATCHED(400, "MEMBER_MISMATCHED MemberId가 일치하지 않음"),
     DIARY_NOT_FOUND(404, "DIARY_NOT_FOUND 존재하지 않는 일기"),
     TAG_NOT_FOUND(404, "TAG_NOT_FOUND 존재하지 않는 태그"),
-    TAG_UNVALIDATED(400, "TAG_UNVALIDATED 유효하지않은 태그, 10글자이내로 입력바람");
+    TAG_UNVALIDATED(400, "TAG_UNVALIDATED 유효하지않은 태그, 10글자이내로 입력바람"),
 
+    // 수입
+    INCOME_NOT_FOUND(404, "INCOME_NOT_FOUND 존재하지 않는 수입"),
+
+    // 고정 수입
+    FIXED_INCOME_NOT_FOUND(404, "FIXED_INCOME_NOT_FOUND 존재하지 않는 고정 수입"),
+
+    // 지출
+    OUTGO_NOT_FOUND(404, "OUTGO_NOT_FOUND 존재하지 않는 지출"),
+
+    // 고정 지출
+    FIXED_OUTGO_NOT_FOUND(404, "FIXED_OUTGO_NOT_FOUND 존재하지 않는 고정 지출"),
+
+    // 월간 예산
+    BUDGET_NOT_FOUND(404, "BUDGET_NOT_FOUND 존재하지 않는 월별 예산");
 
     private int status;
 

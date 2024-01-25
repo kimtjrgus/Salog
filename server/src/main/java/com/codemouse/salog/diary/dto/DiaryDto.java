@@ -1,6 +1,6 @@
 package com.codemouse.salog.diary.dto;
 
-import com.codemouse.salog.tags.dto.TagDto;
+import com.codemouse.salog.tags.diaryTags.dto.DiaryTagDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +42,6 @@ public class DiaryDto {
         private String title;
         private String body;
         private String img;
-        private List<TagDto.DiaryResponse> tagList;
+        private List<DiaryTagDto.Response> tagList;
     }
 }

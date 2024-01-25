@@ -11,12 +11,12 @@ import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.service.MemberService;
-import com.codemouse.salog.tags.dto.TagDto;
-import com.codemouse.salog.tags.entity.DiaryTag;
-import com.codemouse.salog.tags.entity.DiaryTagLink;
-import com.codemouse.salog.tags.mapper.TagMapper;
-import com.codemouse.salog.tags.repository.DiaryTagLinkRepository;
-import com.codemouse.salog.tags.service.TagService;
+import com.codemouse.salog.tags.diaryTags.dto.DiaryTagDto;
+import com.codemouse.salog.tags.diaryTags.mapper.DiaryTagMapper;
+import com.codemouse.salog.tags.diaryTags.service.DiaryTagService;
+import com.codemouse.salog.tags.diaryTags.entity.DiaryTag;
+import com.codemouse.salog.tags.diaryTags.entity.DiaryTagLink;
+import com.codemouse.salog.tags.diaryTags.repository.DiaryTagLinkRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +44,8 @@ import java.util.stream.Collectors;
 public class DiaryService {
     private final DiaryRepository diaryRepository;
     private final DiaryMapper diaryMapper;
-    private final TagService tagService;
-    private final TagMapper tagMapper;
+    private final DiaryTagService tagService;
+    private final DiaryTagMapper tagMapper;
     @Autowired
     private final Validator validator; // 일기태그 유효성 검사
     private final DiaryTagLinkRepository diaryTagLinkRepository;
@@ -82,10 +82,10 @@ public class DiaryService {
                 diaryTagToUse = existingDiaryTag;
             } else {
                 // 새 태그 생성
-                TagDto.DiaryPost diaryPost = new TagDto.DiaryPost(tagName);
+                DiaryTagDto.Post diaryPost = new DiaryTagDto.Post(tagName);
 
                 // 추가: diaryPost에 대한 유효성 검사
-                Set<ConstraintViolation<TagDto.DiaryPost>> violations = validator.validate(diaryPost);
+                Set<ConstraintViolation<DiaryTagDto.Post>> violations = validator.validate(diaryPost);
                 if (!violations.isEmpty()) {
                     throw new BusinessLogicException(ExceptionCode.TAG_UNVALIDATED);
                 }
@@ -136,10 +136,10 @@ public class DiaryService {
                     diaryTagToUse = existingDiaryTag;
                 } else {
                     // 새 태그 생성
-                    TagDto.DiaryPost diaryPost = new TagDto.DiaryPost(tagName);
+                    DiaryTagDto.Post diaryPost = new DiaryTagDto.Post(tagName);
 
                     // 추가: diaryPost에 대한 유효성 검사
-                    Set<ConstraintViolation<TagDto.DiaryPost>> violations = validator.validate(diaryPost);
+                    Set<ConstraintViolation<DiaryTagDto.Post>> violations = validator.validate(diaryPost);
                     if (!violations.isEmpty()) {
                         throw new BusinessLogicException(ExceptionCode.TAG_UNVALIDATED);
                     }
@@ -170,9 +170,9 @@ public class DiaryService {
         DiaryDto.Response diaryResponse = diaryMapper.DiaryToDiaryResponseDto(diary);
 
         // 태그 리스트 추가
-        List<TagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
+        List<DiaryTagDto.Response> tagList = diary.getDiaryTagLinks().stream()
                 .map(DiaryTagLink::getDiaryTag)
-                .map(tagMapper::TagToDiaryTagResponseDto)
+                .map(tagMapper::DiaryTagToDiaryTagResponseDto)
                 .collect(Collectors.toList());
         diaryResponse.setTagList(tagList);
 
@@ -229,9 +229,9 @@ public class DiaryService {
                         DiaryDto.Response response = diaryMapper.DiaryToDiaryResponseDto(diary);
 
                         // 태그 리스트 추가
-                        List<TagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
+                        List<DiaryTagDto.Response> tagList = diary.getDiaryTagLinks().stream()
                                 .map(DiaryTagLink::getDiaryTag)
-                                .map(tagMapper::TagToDiaryTagResponseDto)
+                                .map(tagMapper::DiaryTagToDiaryTagResponseDto)
                                 .collect(Collectors.toList());
                         response.setTagList(tagList);
 
@@ -261,9 +261,9 @@ public class DiaryService {
                     DiaryDto.Response response = diaryMapper.DiaryToDiaryResponseDto(diary);
 
                     // 태그 리스트 추가
-                    List<TagDto.DiaryResponse> tagList = diary.getDiaryTagLinks().stream()
+                    List<DiaryTagDto.Response> tagList = diary.getDiaryTagLinks().stream()
                             .map(DiaryTagLink::getDiaryTag)
-                            .map(tagMapper::TagToDiaryTagResponseDto)
+                            .map(tagMapper::DiaryTagToDiaryTagResponseDto)
                             .collect(Collectors.toList());
                     response.setTagList(tagList);
 
