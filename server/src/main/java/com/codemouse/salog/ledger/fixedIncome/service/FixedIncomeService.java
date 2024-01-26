@@ -33,16 +33,18 @@ public class FixedIncomeService {
     private final JwtTokenizer jwtTokenizer;
     private final MemberService memberService;
 
-    public void createFixedIncome(String token, FixedIncomeDto.Post fixedIncomePostDto) {
+    public FixedIncomeDto.Response createFixedIncome(String token, FixedIncomeDto.Post fixedIncomePostDto) {
         FixedIncome fixedIncome = fixedIncomeMapper.fixedIncomePostDtoToFixedIncome(fixedIncomePostDto);
 
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
         fixedIncome.setMember(member);
 
-        fixedIncomeRepository.save(fixedIncome);
+        FixedIncome savedFixedIncome = fixedIncomeRepository.save(fixedIncome);
+
+        return fixedIncomeMapper.fixedIncomeToFixedIncomeResponseDto(savedFixedIncome);
     }
 
-    public void updateFixedIncome(String token, long fixedIncomeId, FixedIncomeDto.Patch fixedIncomePatchDto) {
+    public FixedIncomeDto.Response updateFixedIncome(String token, long fixedIncomeId, FixedIncomeDto.Patch fixedIncomePatchDto) {
         FixedIncome fixedIncome = fixedIncomeMapper.fixedIncomePatchDtoToFixedIncome(fixedIncomePatchDto);
         FixedIncome findFixedIncome = findVerifiedFixedIncome(fixedIncomeId);
         memberService.verifiedRequest(token, findFixedIncome.getMember().getMemberId());
@@ -54,7 +56,9 @@ public class FixedIncomeService {
         Optional.of(fixedIncome.getDate())
                 .ifPresent(findFixedIncome::setDate);
 
-        fixedIncomeRepository.save(findFixedIncome);
+        FixedIncome savedFixedIncome = fixedIncomeRepository.save(findFixedIncome);
+
+        return fixedIncomeMapper.fixedIncomeToFixedIncomeResponseDto(savedFixedIncome);
     }
 
     public MultiResponseDto<FixedIncomeDto.Response> getFixedIncomes(String token, int page, int size, String date) {

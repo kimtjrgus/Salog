@@ -37,18 +37,20 @@ public class FixedOutgoService {
 
 
     // POST
-    public void createFixedOutgo (String token, FixedOutgoDto.Post fixedOutgoDto) {
+    public FixedOutgoDto.Response createFixedOutgo (String token, FixedOutgoDto.Post fixedOutgoDto) {
         tokenBlackListService.isBlackListed(token);
 
         FixedOutgo fixedOutgo = fixedOutgoMapper.FixedOutgoPostDtoToFixedOutgo(fixedOutgoDto);
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
 
         fixedOutgo.setMember(member);
-        fixedOutgoRepository.save(fixedOutgo);
+        FixedOutgo savedFixedOutgo = fixedOutgoRepository.save(fixedOutgo);
+
+        return fixedOutgoMapper.FixedOutgoToFixedOutgoResponseDto(savedFixedOutgo);
     }
 
     // PATCH
-    public void updateFixedOutgo (String token, long fixedOutgoId, FixedOutgoDto.Patch fixedOutgoDto){
+    public FixedOutgoDto.Response updateFixedOutgo (String token, long fixedOutgoId, FixedOutgoDto.Patch fixedOutgoDto){
         tokenBlackListService.isBlackListed(token);
 
         FixedOutgo findFixedOutgo = findVerifiedFixedOutgo(fixedOutgoId);
@@ -59,7 +61,9 @@ public class FixedOutgoService {
         Optional.of(fixedOutgo.getMoney()).ifPresent(findFixedOutgo::setMoney);
         Optional.of(fixedOutgo.getOutgoName()).ifPresent(findFixedOutgo::setOutgoName);
 
-        fixedOutgoRepository.save(findFixedOutgo);
+        FixedOutgo savedFixedOutgo = fixedOutgoRepository.save(findFixedOutgo);
+
+        return fixedOutgoMapper.FixedOutgoToFixedOutgoResponseDto(savedFixedOutgo);
     }
 
     // GET
