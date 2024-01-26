@@ -40,7 +40,7 @@ public class OutgoDto {
         @Pattern(regexp = "^\\S{1,10}$", message = "outgoTag는 공백 없이 1~10글자 사이여야 합니다.")
         private String outgoTag;
         private String receiptImg;
-        private Boolean wasteList;
+        private boolean wasteList;
     }
 
     @AllArgsConstructor
