@@ -55,9 +55,9 @@ public class FixedOutgoService {
         FixedOutgo fixedOutgo = fixedOutgoMapper.FixedOutgoPatchDtoToFixedOutgo(fixedOutgoDto);
         memberService.verifiedRequest(token, findFixedOutgo.getMember().getMemberId());
 
-        Optional.ofNullable(fixedOutgo.getDate()).ifPresent(findFixedOutgo::setDate);
-        Optional.ofNullable(fixedOutgo.getMoney()).ifPresent(findFixedOutgo::setMoney);
-        Optional.ofNullable(fixedOutgo.getOutgoName()).ifPresent(findFixedOutgo::setOutgoName);
+        Optional.of(fixedOutgo.getDate()).ifPresent(findFixedOutgo::setDate);
+        Optional.of(fixedOutgo.getMoney()).ifPresent(findFixedOutgo::setMoney);
+        Optional.of(fixedOutgo.getOutgoName()).ifPresent(findFixedOutgo::setOutgoName);
 
         fixedOutgoRepository.save(findFixedOutgo);
     }
