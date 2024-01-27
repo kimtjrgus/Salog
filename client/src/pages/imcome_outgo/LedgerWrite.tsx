@@ -5,15 +5,17 @@ import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import { useCallback, useEffect, useState } from "react";
 import { debounce } from "src/utils/timeFunc";
-import axios from "axios";
 import { type outgoType, type incomeType, type modalType } from ".";
 import { useDispatch } from "react-redux";
 import { showToast } from "src/store/slices/toastSlice";
+import { api } from "src/utils/refreshToken";
+import type moment from "moment";
 
 interface Props {
 	setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
 	setIncome: React.Dispatch<React.SetStateAction<incomeType[]>>;
 	setOutgo: React.Dispatch<React.SetStateAction<outgoType[]>>;
+	getMoment: moment.Moment;
 }
 
 // type valuesType = Record<string, Record<string, string>>;
@@ -41,7 +43,7 @@ interface valuesType {
 	memo: string;
 }
 
-const LedgerWrite = ({ setIsOpen, setIncome, setOutgo }: Props) => {
+const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
 	const [values, setValues] = useState<valuesType[]>([
 		{
 			id: 1,
@@ -142,8 +144,8 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo }: Props) => {
 	const onClickSubmit = () => {
 		values.map((value) => {
 			value.division === "outgo"
-				? axios
-						.post("http://localhost:8000/outgo", {
+				? api
+						.post("/outgo/post", {
 							date: value.date,
 							outgoName: value.name,
 							money: Number(value.money),
@@ -151,29 +153,46 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo }: Props) => {
 							outgoTag: value.tag,
 							wasteList: false,
 							payment: value.payment,
-							reciptImg: "",
+							receiptImg: "",
 						})
 						.then((res) => {
-							setOutgo((prev: outgoType[]) => {
-								return [...prev, res.data];
-							});
+							console.log(res.data);
+							// 작성한 데이터의 날짜와 현재 열려있는 페이지의 날짜가 같다면 저장(상태 최신화를 위해서 작성한 코드)
+							if (
+								new Date(res.data.date).getFullYear() ===
+									new Date(getMoment.format("YYYY-MM-DD")).getFullYear() &&
+								new Date(res.data.date).getMonth() + 1 ===
+									new Date(getMoment.format("YYYY-MM-DD")).getMonth() + 1
+							) {
+								setOutgo((prev: outgoType[]) => {
+									return [...prev, res.data];
+								});
+							}
 						})
 						.catch((error) => {
 							console.log(error);
 						})
-				: axios
-						.post("http://localhost:8000/income", {
+				: api
+						.post("/income/post", {
 							date: value.date,
-							income_name: value.name,
+							incomeName: value.name,
 							money: Number(value.money),
 							memo: value.memo,
 							incomeTag: value.tag,
-							reciptImg: "",
+							receiptImg: "",
 						})
 						.then((res) => {
-							setIncome((prev: incomeType[]) => {
-								return [...prev, res.data];
-							});
+							console.log(res.data);
+							if (
+								new Date(res.data.date).getFullYear() ===
+									new Date(getMoment.format("YYYY-MM-DD")).getFullYear() &&
+								new Date(res.data.date).getMonth() + 1 ===
+									new Date(getMoment.format("YYYY-MM-DD")).getMonth() + 1
+							) {
+								setIncome((prev: incomeType[]) => {
+									return [...prev, res.data];
+								});
+							}
 						})
 						.catch((error) => {
 							console.log(error);
