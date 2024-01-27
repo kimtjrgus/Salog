@@ -35,21 +35,21 @@ const HistoryList = ({ sortedArray, checkedList, checkHandler }: Props) => {
 	return (
 		<Container className="ledger__lists">
 			{sortedArray.map((el) => {
-				if ("incomeTag" in el) {
+				if (el && "incomeTag" in el) {
 					// el이 incomeType인 경우
 					return (
 						<li className="ledger__list" key={uuidv4()}>
 							<input
 								type="checkbox"
-								checked={checkedList.income.includes(el.id)}
+								checked={checkedList.income.includes(el.incomeId)}
 								onChange={(e) => {
-									checkHandler(e, el.id, "income");
+									checkHandler(e, el.incomeId, "income");
 								}}
 							/>
 							<ColorBlueDiv>수입</ColorBlueDiv>
 							<p>{dateAsDots(el.date)}</p>
-							<p>{el.incomeTag}</p>
-							<p>{el.income_name}</p>
+							<p>{el.incomeTag.tagName}</p>
+							<p>{el.incomeName}</p>
 							<p>{"x"}</p>
 							<p className="money__blue">{el.money.toLocaleString()}원</p>
 							<p>{el.memo}</p>
@@ -62,17 +62,17 @@ const HistoryList = ({ sortedArray, checkedList, checkHandler }: Props) => {
 				} else {
 					// el이 outgoType인 경우
 					return (
-						<li className="ledger__list" key={el.id}>
+						<li className="ledger__list" key={uuidv4()}>
 							<input
 								type="checkbox"
-								checked={checkedList.outgo.includes(el.id)}
+								checked={checkedList.outgo.includes(el.outgoId)}
 								onChange={(e) => {
-									checkHandler(e, el.id, "outgo");
+									checkHandler(e, el.outgoId, "outgo");
 								}}
 							/>
 							<ColorRedDiv>지출</ColorRedDiv>
 							<p>{dateAsDots(el.date)}</p>
-							<p>{el.outgoTag}</p>
+							<p>{el.outgoTag.tagName}</p>
 							<p>{el.outgoName}</p>
 							<p>{el.payment}</p>
 							<p className="money__red">{el.money.toLocaleString()}원</p>

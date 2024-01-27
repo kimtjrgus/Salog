@@ -3,28 +3,27 @@ import "chart.js/auto";
 import PieChart from "./PieChart";
 import { useEffect, useState } from "react";
 import DashboardCalendar from "./Calendar";
-import axios from "axios";
 import Schedule from "./Schedule";
 import WriteModal from "./WriteModal";
 import { useSelector } from "react-redux";
 import { type RootState } from "src/store";
 import ReadModal from "./ReadModal";
+import { api } from "src/utils/refreshToken";
+import moment from "moment";
 
 export interface outgoType {
-	month: number;
-	monthlyOutgo: number;
+	monthlyTotal: number;
 	tags: tagType[];
 }
 
 export interface incomeType {
-	month: number;
-	monthlyIncome: number;
+	monthlyTotal: number;
 	tags: tagType[];
 }
 
 export interface wasteType {
-	month: number;
-	monthlyWaste: number;
+	date: string;
+	monthlyTotal: number;
 	tags: tagType[];
 }
 
@@ -51,18 +50,16 @@ const Dashboard = () => {
 
 	// member에 태그가 추가되면 화면 제작
 	const [monthlyOutgo, setMonthlyOutgo] = useState<outgoType>({
-		month: 0,
-		monthlyOutgo: 0,
+		monthlyTotal: 0,
 		tags: [],
 	});
 	const [monthlyIncome, setMonthlyIncome] = useState<incomeType>({
-		month: 0,
-		monthlyIncome: 0,
+		monthlyTotal: 0,
 		tags: [],
 	});
 	const [monthlyWasteList, setMonthlyWasteList] = useState<wasteType>({
-		month: 0,
-		monthlyWaste: 0,
+		date: "",
+		monthlyTotal: 0,
 		tags: [],
 	});
 	const [monthlyBudget, setMonthlyBudget] = useState<budgetType>({
@@ -81,51 +78,59 @@ const Dashboard = () => {
 		{
 			title: "이번 달 지출",
 			data: monthlyOutgo,
-			sum: monthlyOutgo.monthlyOutgo,
+			sum: monthlyOutgo.monthlyTotal,
 		},
 		{
 			title: "이번 달 수입",
 			data: monthlyIncome,
-			sum: monthlyIncome.monthlyIncome,
+			sum: monthlyIncome.monthlyTotal,
 		},
 		{
 			title: "낭비 리스트",
 			data: monthlyWasteList,
-			sum: monthlyWasteList.monthlyWaste,
+			sum: monthlyWasteList.monthlyTotal,
 		},
 	];
 	useEffect(() => {
-		axios
-			.get("http://localhost:8000/monthlyOutgo")
+		api
+			.get(`/outgo/monthly?date=${moment().format("YYYY-MM-DD")}`)
 			.then((res) => {
-				setMonthlyOutgo(res.data[0]);
+				setMonthlyOutgo(res.data);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
-		axios
-			.get("http://localhost:8000/monthlyIncome")
+		api
+			.get(`/income/monthly?date=${moment().format("YYYY-MM-DD")}`)
 			.then((res) => {
-				setMonthlyIncome(res.data[0]);
+				setMonthlyIncome(res.data);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
-		axios
-			.get("http://localhost:8000/monthlyWasteList")
+		api
+			.get(`/outgo/wasteList/monthly?date=${moment().format("YYYY-MM-DD")}`)
 			.then((res) => {
-				setMonthlyWasteList(res.data[0]);
+				setMonthlyWasteList(res.data);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
-		axios
-			.get("http://localhost:8000/monthlyBudget")
+		api
+			.get(`/monthlyBudget?date=${moment().format("YYYY-MM")}`)
 			.then((res) => {
-				setMonthlyBudget(res.data[0]);
+				console.log(res, typeof res.data);
+
+				res.data === ""
+					? setMonthlyBudget({
+							budget: 0,
+							totalOutgo: 0,
+							dayRemain: 0,
+					  })
+					: setMonthlyBudget(res.data);
 			})
 			.catch((error) => {
-				console.log(error);
+				console.error(error);
 			});
 		// const fetchData = async () => {
 		// 	try {
@@ -150,10 +155,14 @@ const Dashboard = () => {
 					{statLists.map((stat, index) => (
 						<StatList key={index}>
 							<h3>{stat.title}</h3>
-							<h4>{stat.sum.toLocaleString()}원</h4>
+							<h4>{stat.sum?.toLocaleString()}원</h4>
 							<hr />
 							<div className="PieChartContainer">
-								<PieChart stat={stat} />
+								{stat.sum === 0 ? (
+									<div className="null__chart"></div>
+								) : (
+									<PieChart stat={stat} />
+								)}
 							</div>
 						</StatList>
 					))}
@@ -162,9 +171,17 @@ const Dashboard = () => {
 						<h4>{monthlyBudget.budget.toLocaleString()}원</h4>
 						<hr />
 						<BarChartContainer
-							width={`${Math.floor(
-								(monthlyBudget.totalOutgo / monthlyBudget.budget) * 100,
-							)}`}
+							width={`${
+								isNaN(
+									Math.floor(
+										(monthlyBudget.totalOutgo / monthlyBudget.budget) * 100,
+									),
+								)
+									? 0
+									: Math.floor(
+											(monthlyBudget.totalOutgo / monthlyBudget.budget) * 100,
+									  )
+							}`}
 						>
 							<div className="legends">
 								<div className="legend__square"></div>
@@ -173,8 +190,22 @@ const Dashboard = () => {
 								<p>지출</p>
 							</div>
 							<div className="bar">
-								<div className="bar__item"></div>
-								<span>{monthlyBudget.totalOutgo.toLocaleString()}원</span>
+								<div className="bar__item">
+									{Math.floor(
+										(monthlyBudget?.totalOutgo / monthlyBudget?.budget) * 100,
+									) > 10 ? (
+										<span className="bar__percent">
+											{`${Math.floor(
+												(monthlyBudget?.totalOutgo / monthlyBudget?.budget) *
+													100,
+											)}`}
+											%
+										</span>
+									) : null}
+								</div>
+								<span className="bar__outgo">
+									{monthlyBudget.totalOutgo.toLocaleString()}원
+								</span>
 							</div>
 						</BarChartContainer>
 					</StatList>
@@ -232,6 +263,15 @@ const StatList = styled.li`
 	.PieChartContainer {
 		width: 250px;
 		height: 100px; /* 파이차트 컨테이너의 높이 설정 */
+
+		.null__chart {
+			margin-top: 1.8rem;
+			margin-left: 2rem;
+			width: 90px;
+			height: 90px;
+			border-radius: 50px;
+			border: 12px solid #bababa;
+		}
 	}
 `;
 
@@ -272,6 +312,10 @@ const BarChartContainer = styled.div<{ width: string }>`
 		background: #d9d9d9;
 
 		.bar__item {
+			display: flex;
+			align-items: center;
+			justify-content: center; /* 수정된 부분 */
+
 			background: #1bbf83;
 			border-radius: ${(props) =>
 				Number(props.width) < 100 ? "4px 0 0 4px" : "4px"};
@@ -279,7 +323,13 @@ const BarChartContainer = styled.div<{ width: string }>`
 			height: 22px;
 		}
 
-		span {
+		.bar__percent {
+			color: white;
+			font-size: 1.1rem;
+			font-weight: 500;
+		}
+
+		.bar__outgo {
 			color: #7c7878;
 			white-space: nowrap;
 			font-size: 1rem;

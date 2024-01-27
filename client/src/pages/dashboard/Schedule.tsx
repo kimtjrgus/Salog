@@ -1,5 +1,6 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "src/utils/refreshToken";
 import { styled } from "styled-components";
 import { v4 as uuidv4 } from "uuid";
 
@@ -21,19 +22,21 @@ const Schedule = () => {
 	const [fixedOutgo, setFixedOutgo] = useState<fixedOutgoType[]>([]);
 	const [fixedIncome, setFixedIncome] = useState<fixedIncomeType[]>([]);
 
+	const navigate = useNavigate();
+
 	useEffect(() => {
-		axios
-			.get("http://localhost:8000/fixedOutgo")
+		api
+			.get(`/fixedOutgo/get?page=1&size=10&date=2024-01-00`)
 			.then((res) => {
-				setFixedOutgo(res.data);
+				setFixedOutgo(res.data.data);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
-		axios
-			.get("http://localhost:8000/fixedIncome")
+		api
+			.get(`/fixedIncome/get?page=1&size=10&date=2024-01-00`)
 			.then((res) => {
-				setFixedIncome(res.data);
+				setFixedIncome(res.data.data);
 			})
 			.catch((error) => {
 				console.log(error);
@@ -43,39 +46,52 @@ const Schedule = () => {
 	return (
 		<Container>
 			<h3>금융 일정 📆</h3>
-			<div className="lists">
-				{fixedOutgo.map((el) => {
-					return (
-						<List key={uuidv4()} date={el.date}>
-							<div className="list__day__outgo">
-								{new Date(el.date).getDate()}일
-							</div>
-							<div className="list__write__outgo">
-								<p>{el.outgoName}</p>
-								<p>
-									{el.money.toLocaleString()}원 / <span>지출</span>
-								</p>
-							</div>
-						</List>
-					);
-				})}
-				{fixedIncome.map((el) => {
-					return (
-						<List key={uuidv4()} date={el.date}>
-							<div className="list__day__income">
-								{new Date(el.date).getDate()}일
-							</div>
-							<div className="list__write__income">
-								<p>{el.incomeName}</p>
-								<p>
-									{el.money.toLocaleString()}원 / <span>수입</span>
-								</p>
-							</div>
-						</List>
-					);
-				})}
-			</div>
-			<button>금융 일정 관리하기</button>
+			{fixedOutgo.length === 0 && fixedIncome.length === 0 ? (
+				<div className="null__fixed">
+					<p>현재 등록된 금융 일정이 없습니다.</p>
+					<p>금융 일정을 등록하여 정기적인 지출 ∙ 수입을 관리해보세요!</p>
+				</div>
+			) : (
+				<div className="lists">
+					{fixedOutgo.map((el) => {
+						return (
+							<List key={uuidv4()} date={el.date}>
+								<div className="list__day__outgo">
+									{new Date(el.date).getDate()}일
+								</div>
+								<div className="list__write__outgo">
+									<p>{el.outgoName}</p>
+									<p>
+										{el.money.toLocaleString()}원 / <span>지출</span>
+									</p>
+								</div>
+							</List>
+						);
+					})}
+					{fixedIncome.map((el) => {
+						return (
+							<List key={uuidv4()} date={el.date}>
+								<div className="list__day__income">
+									{new Date(el.date).getDate()}일
+								</div>
+								<div className="list__write__income">
+									<p>{el.incomeName}</p>
+									<p>
+										{el.money.toLocaleString()}원 / <span>수입</span>
+									</p>
+								</div>
+							</List>
+						);
+					})}
+				</div>
+			)}
+			<button
+				onClick={() => {
+					navigate("/fixed__account");
+				}}
+			>
+				금융 일정 관리하기
+			</button>
 		</Container>
 	);
 };
@@ -96,6 +112,21 @@ const Container = styled.div`
 		font-weight: 400;
 	}
 
+	.null__fixed {
+		width: 94%;
+		height: 50%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+
+		p {
+			font-size: 1.05rem;
+			color: rgb(98, 98, 115);
+			white-space: pre-wrap;
+			line-height: 1.7rem;
+		}
+	}
+
 	button {
 		width: 85%;
 		position: absolute;
@@ -113,7 +144,15 @@ const Container = styled.div`
 
 	.lists {
 		margin-top: 2rem;
+		height: 25.5rem;
 		overflow-y: scroll;
+
+		-ms-overflow-style: none; /* 인터넷 익스플로러 */
+		scrollbar-width: none; /* 파이어폭스 */
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
 	}
 `;
 

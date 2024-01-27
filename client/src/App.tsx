@@ -14,6 +14,9 @@ import SignUp from "./pages/sign_up";
 import PublicRoute from "./components/Common/PublicRoute";
 import DiaryUpdate from "./pages/diary_update";
 import ScrollToTop from "./utils/scrollToTop";
+import Fixed from "./pages/fixed_account";
+import Budget from "./pages/budget";
+import MonthRadio from "./pages/monthRadio";
 
 function App() {
 	return (
@@ -31,6 +34,10 @@ function App() {
 					<Route path={"/diary/:id"} element={<DiaryDetail />} />
 					<Route path={"/diary/:id/update"} element={<DiaryUpdate />} />
 					<Route path={"/diary/post"} element={<DiaryWrite />} />
+					<Route path={"/fixed__account"} element={<Fixed />} />
+					<Route path={"/fixed__account/update"} element={<Fixed />} />
+					<Route path={"/budget"} element={<Budget />} />
+					<Route path={"/monthRadio"} element={<MonthRadio />} />
 				</Route>
 				{/* 로그인 하지 않은 유저만 접근 가능 */}
 				<Route element={<PublicRoute />}>

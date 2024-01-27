@@ -1,8 +1,8 @@
-import axios from "axios";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import { api } from "src/utils/refreshToken";
 import { styled } from "styled-components";
 import { type modalType } from ".";
 
@@ -19,13 +19,20 @@ interface propsType {
 
 const DashboardCalendar = ({ isOpen, setIsOpen }: propsType) => {
 	const [value, onChange] = useState(new Date());
+
 	const [calendar, setCalendar] = useState<calendarType[]>([]);
+	const [startDate, setStartDate] = useState<Date | null>(new Date(value));
+
+	// 캘린더의 시작일을 상태에 저장함
+	const getActiveMonth = (activeStartDate: Date | null) => {
+		setStartDate(activeStartDate);
+	};
 
 	const onClickTile = (value: Date) => {
 		setIsOpen({
 			...isOpen,
 			dayTile: true,
-			day: new Date(value).toLocaleString(),
+			day: moment(new Date(value)).format("YYYY-MM-DD"),
 		});
 	};
 
@@ -37,20 +44,20 @@ const DashboardCalendar = ({ isOpen, setIsOpen }: propsType) => {
 		setIsOpen({
 			...isOpen,
 			writeIcon: true,
-			day: new Date(date.date).toLocaleString(),
+			day: moment(new Date(date.date)).format("YYYY-MM-DD"),
 		});
 	};
 
 	useEffect(() => {
-		axios
-			.get("http://localhost:8000/getCalendar")
+		api
+			.get(`/calendar?date=${moment(startDate).format("YYYY-MM-DD")}`)
 			.then((res) => {
 				setCalendar(res.data);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
-	}, []);
+	}, [startDate]);
 
 	return (
 		<Container>
@@ -73,6 +80,9 @@ const DashboardCalendar = ({ isOpen, setIsOpen }: propsType) => {
 				minDetail="month" // 상단 네비게이션에서 '월' 단위만 보이게 설정
 				maxDetail="month" // 상단 네비게이션에서 '월' 단위만 보이게 설정
 				showNeighboringMonth={false} //  이전, 이후 달의 날짜는 보이지 않도록 설정
+				onActiveStartDateChange={({ activeStartDate }) => {
+					getActiveMonth(activeStartDate);
+				}}
 				formatDay={(locale, date) =>
 					new Date(date).toLocaleDateString("en-us" || locale, {
 						day: "numeric",

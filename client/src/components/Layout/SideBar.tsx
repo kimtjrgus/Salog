@@ -59,7 +59,7 @@ export const SideBar = () => {
 						/>
 						<ListTitle>지출 · 수입</ListTitle>
 					</NavStyle>
-					<NavStyle to="/monthRatio">
+					<NavStyle to="/monthRadio">
 						<SvgIcon
 							component={SignalCellularAltIcon}
 							sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
@@ -73,7 +73,7 @@ export const SideBar = () => {
 						/>
 						<ListTitle>예산</ListTitle>
 					</NavStyle>
-					<NavStyle to="/fixed_account">
+					<NavStyle to="/fixed__account">
 						<SvgIcon
 							component={AttachMoneyOutlinedIcon}
 							sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}

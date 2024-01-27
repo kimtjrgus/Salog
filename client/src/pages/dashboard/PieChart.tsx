@@ -1,6 +1,8 @@
 import { ResponsivePie } from "@nivo/pie";
 
 const PieChart = ({ stat }: any) => {
+	console.log(stat);
+
 	const handle = {
 		padClick: (data: any) => {
 			console.log(data);
