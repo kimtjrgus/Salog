@@ -1,7 +1,6 @@
 package com.codemouse.salog.ledger.outgo.controller;
 
 import com.codemouse.salog.dto.MultiResponseDto;
-import com.codemouse.salog.dto.SingleResponseDto;
 import com.codemouse.salog.ledger.outgo.dto.OutgoDto;
 import com.codemouse.salog.ledger.outgo.service.OutgoService;
 import lombok.AllArgsConstructor;
@@ -23,23 +22,25 @@ public class OutgoController {
     private final OutgoService service;
 
     @PostMapping("/post")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void createOutgo (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> createOutgo (@RequestHeader(name = "Authorization") String token,
                              @Valid @RequestBody OutgoDto.Post requestBody){
-        service.postOutgo(token, requestBody);
+        OutgoDto.Response response = service.postOutgo(token, requestBody);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
     @PatchMapping("/update/{outgo-id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void updateOutgo (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> updateOutgo (@RequestHeader(name = "Authorization") String token,
                              @PathVariable("outgo-id") @Positive long outgoId,
                              @Valid @RequestBody OutgoDto.Patch requestBody){
-        service.patchOutgo(token, outgoId, requestBody);
+        OutgoDto.Response response = service.patchOutgo(token, outgoId, requestBody);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity getOutgoLists (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> getOutgoLists (@RequestHeader(name = "Authorization") String token,
                                          @Positive @RequestParam int page,
                                          @Positive @RequestParam int size,
                                          @Valid @RequestParam String date,
@@ -51,7 +52,7 @@ public class OutgoController {
     }
 
     @GetMapping("/wasteList")
-    public ResponseEntity getWasteLists (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> getWasteLists (@RequestHeader(name = "Authorization") String token,
                                          @Positive @RequestParam int page,
                                          @Positive @RequestParam int size,
                                          @Valid @RequestParam String date,
@@ -63,21 +64,21 @@ public class OutgoController {
     }
 
     @GetMapping("/monthly")
-    public ResponseEntity getSumOfOutgoLists (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> getSumOfOutgoLists (@RequestHeader(name = "Authorization") String token,
                                     @Valid @RequestParam String date){
         OutgoDto.MonthlyResponse sumOfOutgos =
                 service.getSumOfOutgoLists(token, date);
 
-        return new ResponseEntity(sumOfOutgos, HttpStatus.OK);
+        return new ResponseEntity<>(sumOfOutgos, HttpStatus.OK);
     }
 
     @GetMapping("/wasteList/monthly")
-    public ResponseEntity getSumOfWasteLists (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> getSumOfWasteLists (@RequestHeader(name = "Authorization") String token,
                                     @Valid @RequestParam String date){
         OutgoDto.MonthlyResponse sumOfWasteLists =
                 service.getSumOfWasteLists(token, date);
 
-        return new ResponseEntity(sumOfWasteLists, HttpStatus.OK);
+        return new ResponseEntity<>(sumOfWasteLists, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{outgo-id}")
