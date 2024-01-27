@@ -64,7 +64,7 @@ public class BudgetService {
                 budgetMapper.budgetToBudgetResponseDto(budgetRepository.findByMonth(memberId, year, month));
 
         if (response == null) {
-            throw new BusinessLogicException(ExceptionCode.BUDGET_NOT_FOUND);
+            return response;
         } else {
             response.setDayRemain(YearMonth.now().lengthOfMonth() - LocalDate.now().getDayOfMonth());
 
