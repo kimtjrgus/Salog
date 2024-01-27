@@ -22,61 +22,64 @@ import { useDispatch, useSelector } from "react-redux";
 import { showToast, hideToast } from "src/store/slices/toastSlice";
 import Toast, { ToastType } from "src/components/Layout/Toast";
 import { type RootState } from "src/store";
+import { api } from "src/utils/refreshToken";
 
 export interface outgoType {
-	id: number;
+	outgoId: number;
 	date: string;
 	outgoName: string;
 	money: number;
 	memo: string;
-	outgoTag: string;
+	outgoTag: tagType;
 	wasteList: boolean;
 	payment: string;
-	reciptImg: string;
+	receiptImg: string;
 }
 
 export interface incomeType {
-	id: number;
-	incomeTag: string;
+	incomeId: number;
+	incomeTag: tagType;
 	date: string;
 	money: number;
-	income_name: string;
+	incomeName: string;
 	memo: string;
 }
 
 export interface wasteType {
-	id: number;
+	outgoId: number;
 	date: string;
 	money: number;
 	outgoName: string;
 	memo: string;
-	outgoTag: string;
+	outgoTag: tagType;
 	wasteList: boolean;
 	payment: string;
-	reciptImg: string;
+	receiptImg: string;
 }
 
 interface sumOutgoType {
-	month: number;
-	monthlyOutgo: number;
-	tags: tagType[];
+	monthlyTotal: number;
+	tags: monthlyTagType[];
 }
 
 interface sumIncomeType {
-	month: number;
-	monthlyIncome: number;
-	tags: tagType[];
+	monthlyTotal: number;
+	tags: monthlyTagType[];
 }
 
 interface sumWasteType {
-	month: number;
-	monthlyWaste: number;
-	tags: tagType[];
+	monthlyTotal: number;
+	tags: monthlyTagType[];
+}
+
+interface monthlyTagType {
+	tagName: string;
+	tagSum: number;
 }
 
 interface tagType {
+	ledgerTagId: number;
 	tagName: string;
-	tagSum: number;
 }
 
 export interface checkedType {
@@ -97,23 +100,21 @@ interface filterType {
 
 const History = () => {
 	const [getMoment, setMoment] = useState(moment());
+
 	const [outgo, setOutgo] = useState<outgoType[]>([]);
 	const [income, setIncome] = useState<incomeType[]>([]);
 	const [waste, setWaste] = useState<wasteType[]>([]);
 
 	const [sumOutgo, setSumOutgo] = useState<sumOutgoType>({
-		month: 0,
-		monthlyOutgo: 0,
+		monthlyTotal: 0,
 		tags: [],
 	});
 	const [sumIncome, setSumIncome] = useState<sumIncomeType>({
-		month: 0,
-		monthlyIncome: 0,
+		monthlyTotal: 0,
 		tags: [],
 	});
 	const [sumWasteList, setSumWasteList] = useState<sumWasteType>({
-		month: 0,
-		monthlyWaste: 0,
+		monthlyTotal: 0,
 		tags: [],
 	});
 
@@ -196,18 +197,15 @@ const History = () => {
 			// 전체 체크 여부 판단
 			const isAllIncomeChecked =
 				location.pathname === "/outgo" || location.pathname === "/history"
-					? updatedList.outgo.length === outgo.length &&
-					  updatedList.outgo.length > 0
+					? updatedList.outgo.length === outgo.length
 					: true;
 			const isAllOutgoChecked =
 				location.pathname === "/income" || location.pathname === "/history"
-					? updatedList.income.length === income.length &&
-					  updatedList.income.length > 0
+					? updatedList.income.length === income.length
 					: true;
 			const isAllWasteChecked =
 				location.pathname === "/waste"
-					? updatedList.waste.length === waste.length &&
-					  updatedList.waste.length > 0
+					? updatedList.waste.length === waste.length
 					: true;
 
 			setIsAllChecked(
@@ -221,22 +219,21 @@ const History = () => {
 	const sumOfCheckedList = () => {
 		const sumOfMoney = { outgo: 0, income: 0, waste: 0 };
 		checkedList.outgo.forEach((id) => {
-			const idx = outgo.findIndex((el) => el.id === id);
+			const idx = outgo.findIndex((el) => el.outgoId === id);
 			sumOfMoney.outgo += outgo[idx].money;
 		});
 		checkedList.income.forEach((id) => {
-			const idx = income.findIndex((el) => el.id === id);
+			const idx = income.findIndex((el) => el.incomeId === id);
 			sumOfMoney.income += income[idx].money;
 		});
 		checkedList.waste.forEach((id) => {
-			const idx = waste.findIndex((el) => el.id === id);
-			sumOfMoney.waste += waste[idx].money;
+			const idx = waste.findIndex((el) => el.outgoId === id);
+			sumOfMoney.waste += waste[idx]?.money;
 		});
-		console.log(sumOfMoney);
 
 		if (location.pathname !== "/waste")
 			return sumOfMoney.income - sumOfMoney.outgo;
-		else return sumOfMoney.waste;
+		else return sumOfMoney.waste ?? 0;
 	};
 
 	const checkHandler = (
@@ -257,45 +254,45 @@ const History = () => {
 			// setIsAllChecked(true); // isAllChecked 값을 true로 설정
 			if (location.pathname === "/history") {
 				outgo.forEach((el) => {
-					!checkedList.outgo.includes(el.id) &&
+					!checkedList.outgo.includes(el.outgoId) &&
 						setCheckedList((prev) => {
 							const updatedList = { ...prev };
-							updatedList.outgo = [...updatedList.outgo, el.id];
+							updatedList.outgo = [...updatedList.outgo, el.outgoId];
 							return updatedList; // 업데이트된 상태 반환
 						});
 				});
 				income.forEach((el) => {
-					!checkedList.income.includes(el.id) &&
+					!checkedList.income.includes(el.incomeId) &&
 						setCheckedList((prev) => {
 							const updatedList = { ...prev };
-							updatedList.income = [...updatedList.income, el.id];
+							updatedList.income = [...updatedList.income, el.incomeId];
 							return updatedList; // 업데이트된 상태 반환
 						});
 				});
 			} else if (location.pathname === "/outgo") {
 				outgo.forEach((el) => {
-					!checkedList.outgo.includes(el.id) &&
+					!checkedList.outgo.includes(el.outgoId) &&
 						setCheckedList((prev) => {
 							const updatedList = { ...prev };
-							updatedList.outgo = [...updatedList.outgo, el.id];
+							updatedList.outgo = [...updatedList.outgo, el.outgoId];
 							return updatedList; // 업데이트된 상태 반환
 						});
 				});
 			} else if (location.pathname === "/waste") {
 				waste.forEach((el) => {
-					!checkedList.waste.includes(el.id) &&
+					!checkedList.waste.includes(el.outgoId) &&
 						setCheckedList((prev) => {
 							const updatedList = { ...prev };
-							updatedList.waste = [...updatedList.waste, el.id];
+							updatedList.waste = [...updatedList.waste, el.outgoId];
 							return updatedList; // 업데이트된 상태 반환
 						});
 				});
 			} else {
 				income.forEach((el) => {
-					!checkedList.income.includes(el.id) &&
+					!checkedList.income.includes(el.incomeId) &&
 						setCheckedList((prev) => {
 							const updatedList = { ...prev };
-							updatedList.income = [...updatedList.income, el.id];
+							updatedList.income = [...updatedList.income, el.incomeId];
 							return updatedList; // 업데이트된 상태 반환
 						});
 				});
@@ -316,20 +313,18 @@ const History = () => {
 
 		checkedList.outgo.length !== 0 &&
 			checkedList.outgo.forEach((id) => {
-				const deletePromise = axios.delete(`http://localhost:8000/outgo/${id}`);
+				const deletePromise = api.delete(`/outgo/delete/${id}`);
 				deletePromises.push(deletePromise);
 			});
 
 		checkedList.income.length !== 0 &&
 			checkedList.income.forEach((id) => {
-				const deletePromise = axios.delete(
-					`http://localhost:8000/income/${id}`,
-				);
+				const deletePromise = api.delete(`/income/delete/${id}`);
 				deletePromises.push(deletePromise);
 			});
 		checkedList.waste.length !== 0 &&
 			checkedList.waste.forEach((id) => {
-				const deletePromise = axios.delete(`http://localhost:8000/waste/${id}`);
+				const deletePromise = api.delete(`/waste/delete/${id}`);
 				deletePromises.push(deletePromise);
 			});
 
@@ -343,7 +338,7 @@ const History = () => {
 					checkedList.income.forEach((id) => {
 						setIncome((prevData) => {
 							const data = prevData.filter((el) => {
-								return el.id !== id;
+								return el.incomeId !== id;
 							});
 							return data;
 						});
@@ -354,7 +349,7 @@ const History = () => {
 					checkedList.outgo.forEach((id) => {
 						setOutgo((prevData) => {
 							const data = prevData.filter((el) => {
-								return el.id !== id;
+								return el.outgoId !== id;
 							});
 							return data;
 						});
@@ -365,7 +360,7 @@ const History = () => {
 					checkedList.waste.forEach((id) => {
 						setWaste((prevData) => {
 							const data = prevData.filter((el) => {
-								return el.id !== id;
+								return el.outgoId !== id;
 							});
 							return data;
 						});
@@ -391,18 +386,17 @@ const History = () => {
 
 	const handleAddWaste = () => {
 		checkedList.outgo.forEach((id) => {
-			const idx = outgo.findIndex((el) => el.id === id);
-			axios
-				.post("http://localhost:8000/wasteList", outgo[idx])
+			const idx = outgo.findIndex((el) => el.outgoId === id);
+			api
+				.patch(`/outgo/update/${id}`, {
+					...outgo[idx],
+					outgoTag: outgo[idx].outgoTag.tagName,
+					wasteList: true,
+				})
 				.then((res) => {
-					setWaste([...waste, res.data]);
-					dispatch(
-						showToast({
-							message: "낭비리스트가 추가되었습니다",
-							type: "success",
-						}),
-					);
-					navigate("/waste");
+					setWaste((prevData) => {
+						return [...prevData, res.data];
+					});
 				})
 				.catch((error) => {
 					console.error(error);
@@ -414,18 +408,37 @@ const History = () => {
 					);
 				});
 		});
+
+		dispatch(
+			showToast({
+				message: "낭비리스트가 추가되었습니다",
+				type: "success",
+			}),
+		);
+		navigate("/waste");
 	};
 
 	const handleDeleteWaste = () => {
 		checkedList.waste.forEach((id) => {
-			axios
-				.delete(`http://localhost:8000/wasteList/${id}`)
+			const idx = outgo.findIndex((el) => el.outgoId === id);
+			api
+				.patch(`/outgo/update/${id}`, {
+					...outgo[idx],
+					outgoTag: outgo[idx].outgoTag.tagName,
+					wasteList: false,
+				})
 				.then(() => {
 					setWaste((prevData) => {
 						const data = prevData.filter((el) => {
-							return el.id !== id;
+							return el.outgoId !== id;
 						});
 						return data;
+					});
+					setIsAllChecked(false); // isAllChecked 값을 false로 설정
+					setCheckedList({
+						income: [],
+						outgo: [],
+						waste: [],
 					});
 					dispatch(
 						showToast({
@@ -452,26 +465,29 @@ const History = () => {
 	};
 
 	useEffect(() => {
+		const date = getMoment.format("YYYY-MM");
+		const customDate = `${date}-00`;
+
 		const fetchData = async () => {
 			try {
 				const requests = [
-					axios.get("http://localhost:8000/outgo"),
-					axios.get("http://localhost:8000/income"),
-					axios.get("http://localhost:8000/wasteList"),
-					axios.get("http://localhost:8000/monthlyOutgo"),
-					axios.get("http://localhost:8000/monthlyIncome"),
-					axios.get("http://localhost:8000/monthlyWasteList"),
+					api.get(`/outgo?page=1&size=30&date=${customDate}`),
+					api.get(`/income?page=1&size=30&date=${customDate}`),
+					api.get(`/outgo/wasteList?page=1&size=30&date=${customDate}`),
+					// api.get(`/outgo/monthly?date=${customDate}`),
+					// api.get(`/income/monthly?date=${customDate}`),
+					// api.get(`/outgo/wasteList/monthly?date=${customDate}`),
 				];
 
 				const responses = await axios.all(requests);
 
 				// 개별 요청의 응답을 처리하여 상태를 업데이트합니다.
-				setOutgo(responses[0].data);
-				setIncome(responses[1].data);
-				setWaste(responses[2].data);
-				setSumOutgo(responses[3].data[0]);
-				setSumIncome(responses[4].data[0]);
-				setSumWasteList(responses[5].data[0]);
+				setOutgo(responses[0].data.data);
+				setIncome(responses[1].data.data);
+				setWaste(responses[2].data.data);
+				// setSumOutgo(responses[3].data);
+				// setSumIncome(responses[4].data);
+				// setSumWasteList(responses[5].data);
 			} catch (error) {
 				console.log(error);
 			}
@@ -480,6 +496,32 @@ const History = () => {
 			console.log(error);
 		});
 	}, [getMoment]);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const date = getMoment.format("YYYY-MM");
+			const customDate = `${date}-00`;
+			try {
+				const requests = [
+					api.get(`/outgo/monthly?date=${customDate}`),
+					api.get(`/income/monthly?date=${customDate}`),
+					api.get(`/outgo/wasteList/monthly?date=${customDate}`),
+				];
+
+				const responses = await axios.all(requests);
+
+				// 개별 요청의 응답을 처리하여 상태를 업데이트합니다.
+				setSumOutgo(responses[0].data);
+				setSumIncome(responses[1].data);
+				setSumWasteList(responses[2].data);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		fetchData().catch((error) => {
+			console.log(error);
+		});
+	}, [outgo, income, waste]);
 
 	useEffect(() => {
 		setCheckedList({
@@ -568,7 +610,7 @@ const History = () => {
 							<p>{`전체 (${income.length + outgo.length})`}</p>
 							<p className="sum__red">
 								{(
-									sumIncome.monthlyIncome - sumOutgo.monthlyOutgo
+									sumIncome.monthlyTotal - sumOutgo.monthlyTotal
 								).toLocaleString()}{" "}
 								원
 							</p>
@@ -576,19 +618,19 @@ const History = () => {
 						<NavStyle to="/income" $isActive={"/income"}>
 							<p>{`수입 (${income.length})`}</p>
 							<p className="sum__blue">
-								{sumIncome.monthlyIncome.toLocaleString()} 원
+								{sumIncome.monthlyTotal.toLocaleString()} 원
 							</p>
 						</NavStyle>
 						<NavStyle to="/outgo" $isActive={"/outgo"}>
 							<p>{`지출 (${outgo.length})`}</p>
 							<p className="sum__red">
-								{sumOutgo.monthlyOutgo.toLocaleString()} 원
+								{sumOutgo.monthlyTotal.toLocaleString()} 원
 							</p>
 						</NavStyle>
 						<NavStyle to="/waste" $isActive={"/waste"}>
 							<p>{`낭비 리스트 (${waste.length})`}</p>
 							<p className="sum__green">
-								{sumWasteList.monthlyWaste.toLocaleString()} 원
+								{sumWasteList.monthlyTotal.toLocaleString()} 원
 							</p>
 						</NavStyle>
 					</div>
@@ -748,6 +790,7 @@ const History = () => {
 					setIsOpen={setIsOpen}
 					setIncome={setIncome}
 					setOutgo={setOutgo}
+					getMoment={getMoment}
 				/>
 			)}
 			{isOpen.deleteModal && (

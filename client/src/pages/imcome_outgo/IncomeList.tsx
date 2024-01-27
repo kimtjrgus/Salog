@@ -35,18 +35,18 @@ const IncomeList = ({ income, checkedList, checkHandler }: Props) => {
 		<Container className="ledger__lists">
 			{income.map((el) => {
 				return (
-					<li className="ledger__list" key={el.id}>
+					<li className="ledger__list" key={el.incomeId}>
 						<input
 							type="checkbox"
-							checked={checkedList.income.includes(el.id)}
+							checked={checkedList.income.includes(el.incomeId)}
 							onChange={(e) => {
-								checkHandler(e, el.id, "income");
+								checkHandler(e, el.incomeId, "income");
 							}}
 						/>
 						<ColorBlueDiv>수입</ColorBlueDiv>
 						<p>{dateAsDots(el.date)}</p>
-						<p>{el.incomeTag}</p>
-						<p>{el.income_name}</p>
+						<p>{el.incomeTag.tagName}</p>
+						<p>{el.incomeName}</p>
 						<p>{"x"}</p>
 						<p className="money__blue">{el.money.toLocaleString()}원</p>
 						<p>{el.memo}</p>

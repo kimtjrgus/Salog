@@ -4,7 +4,8 @@ import { SvgIcon } from "@mui/material";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import { useEffect, useState } from "react";
 import { type modalType } from ".";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { api } from "src/utils/refreshToken";
 
 interface Props {
 	isOpen: modalType;
@@ -12,30 +13,36 @@ interface Props {
 }
 
 interface outgoType {
-	id: number;
+	outgoId: number;
 	date: string;
 	outgoName: string;
 	money: number;
 	memo: string;
-	outgoTag: string;
+	outgoTag: tagType;
 	wasteList: boolean;
 	payment: string;
 	reciptImg: string;
 }
 
 interface incomeType {
-	id: number;
-	incomeTag: string;
+	incomeId: number;
+	incomeTag: tagType;
 	date: string;
 	money: number;
-	income_name: string;
+	incomeName: string;
 	memo: string;
+}
+
+interface tagType {
+	ledgerTagId: number;
+	tagName: string;
 }
 
 const ReadModal = ({ isOpen, setIsOpen }: Props) => {
 	const [outgo, setOutgo] = useState<outgoType[]>([]);
 	const [income, setIncome] = useState<incomeType[]>([]);
-	console.log(isOpen.day);
+
+	const navigate = useNavigate();
 
 	const dateAsDots = (element: string) => {
 		const originalDate = element;
@@ -59,24 +66,24 @@ const ReadModal = ({ isOpen, setIsOpen }: Props) => {
 	};
 
 	useEffect(() => {
-		axios
-			.get("http://localhost:8000/outgo")
+		api
+			.get(`/outgo?page=1&size=10&date=${isOpen.day}`)
 			.then((res) => {
-				setOutgo(res.data);
+				setOutgo(res.data.data);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
 
-		axios
-			.get("http://localhost:8000/income")
+		api
+			.get(`/income?page=1&size=10&date=${isOpen.day}`)
 			.then((res) => {
-				setIncome(res.data);
+				setIncome(res.data.data);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
-	}, []);
+	}, [isOpen.day]);
 
 	return (
 		<Background>
@@ -87,10 +94,16 @@ const ReadModal = ({ isOpen, setIsOpen }: Props) => {
 					onClick={onClickCloseBtn}
 					sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
 				/>
-				<h3>11월 7일 가계부 내역</h3>
+				<h3>{`${new Date(isOpen.day).getMonth() + 1}월 ${new Date(
+					isOpen.day,
+				).getDate()}일 가계부 내역`}</h3>
 				<div className="total__container">
 					<p className="total">총 220,000원</p>
-					<button>
+					<button
+						onClick={() => {
+							navigate("/history");
+						}}
+					>
 						<SvgIcon
 							component={CreateOutlinedIcon}
 							sx={{ stroke: "#ffffff", strokeWidth: 1 }}
@@ -110,10 +123,10 @@ const ReadModal = ({ isOpen, setIsOpen }: Props) => {
 				</div>
 				{outgo.map((el) => {
 					return (
-						<div className="list" key={el.id}>
+						<div className="list" key={el.outgoId}>
 							<ColorRedDiv>지출</ColorRedDiv>
 							<p className="date ft-size">{dateAsDots(el.date)}</p>
-							<p className="tag ft-size">{el.outgoTag}</p>
+							<p className="tag ft-size">{el.outgoTag.tagName}</p>
 							<p className="name ft-size">{el.outgoName}</p>
 							<p className="method ft-size">{el.payment}</p>
 							<p className="outgo_money ft-size">{`${el.money.toLocaleString()}원`}</p>
@@ -123,11 +136,11 @@ const ReadModal = ({ isOpen, setIsOpen }: Props) => {
 				})}
 				{income.map((el) => {
 					return (
-						<div className="list" key={el.id}>
+						<div className="list" key={el.incomeId}>
 							<ColorBlueDiv>수입</ColorBlueDiv>
 							<p className="date ft-size">{dateAsDots(el.date)}</p>
-							<p className="tag ft-size">{el.incomeTag}</p>
-							<p className="name ft-size">{el.income_name}</p>
+							<p className="tag ft-size">{el.incomeTag.tagName}</p>
+							<p className="name ft-size">{el.incomeName}</p>
 							<p className="method ft-size">{"x"}</p>
 							<p className="income_money ft-size">{`${el.money.toLocaleString()}원`}</p>
 							<p className="memo ft-size">{el.memo}</p>
@@ -206,7 +219,7 @@ const Container = styled.div`
 			display: flex;
 			align-items: center;
 			background: ${(props) => props.theme.COLORS.LIGHT_BLUE};
-			padding: 1rem 1.3rem;
+			padding: 0.8rem 1.3rem;
 			border-radius: 4px;
 
 			svg {

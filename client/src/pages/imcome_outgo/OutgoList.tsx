@@ -35,17 +35,17 @@ const OutgoList = ({ outgo, checkedList, checkHandler }: Props) => {
 		<Container className="ledger__lists">
 			{outgo.map((el) => {
 				return (
-					<li className="ledger__list" key={el.id}>
+					<li className="ledger__list" key={el.outgoId}>
 						<input
 							type="checkbox"
-							checked={checkedList.outgo.includes(el.id)}
+							checked={checkedList.outgo.includes(el.outgoId)}
 							onChange={(e) => {
-								checkHandler(e, el.id, "outgo");
+								checkHandler(e, el.outgoId, "outgo");
 							}}
 						/>
 						<ColorRedDiv>지출</ColorRedDiv>
 						<p>{dateAsDots(el.date)}</p>
-						<p>{el.outgoTag}</p>
+						<p>{el.outgoTag.tagName}</p>
 						<p>{el.outgoName}</p>
 						<p>{el.payment}</p>
 						<p className="money__red">{el.money.toLocaleString()}원</p>

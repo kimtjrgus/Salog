@@ -7,6 +7,7 @@ import { hideToast, showToast } from "src/store/slices/toastSlice";
 import { debounce } from "src/utils/timeFunc";
 import { styled } from "styled-components";
 import { type RootState } from "src/store";
+import { api } from "src/utils/refreshToken";
 
 interface valuesType {
 	[key: string]: any;
@@ -17,14 +18,14 @@ interface valuesType {
 }
 
 interface incomeType {
-	id: number;
+	fixedIncomeId: number;
 	date: string;
 	money: number;
 	incomeName: string;
 }
 
 interface outgoType {
-	id: number;
+	fixedOutgoId: number;
 	date: string;
 	money: number;
 	outgoName: string;
@@ -69,8 +70,8 @@ const Fixed = () => {
 	const onClickUpdateList = (id: number, type: string) => {
 		const active =
 			type === "outgo"
-				? fixedOutgo.filter((el) => el.id === id)[0]
-				: fixedIncome.filter((el) => el.id === id)[0];
+				? fixedOutgo.filter((el) => el.fixedOutgoId === id)[0]
+				: fixedIncome.filter((el) => el.fixedIncomeId === id)[0];
 
 		// active 상태 저장
 		if (type === "outgo") {
@@ -160,14 +161,20 @@ const Fixed = () => {
 
 	const handleClickSubmitBtn = () => {
 		if (values.division === "outgo") {
-			axios
-				.post("http://localhost:8000/fixedOutgo", {
+			api
+				.post("/fixedOutgo/post", {
 					date: values.date,
 					money: Number(values.money),
 					outgoName: values.name,
 				})
 				.then((res) => {
 					setFixedOutgo([...fixedOutgo, res.data]);
+					setValues({
+						division: "",
+						date: "",
+						name: "",
+						money: "0",
+					});
 
 					dispatch(
 						showToast({
@@ -180,14 +187,20 @@ const Fixed = () => {
 					console.error(error);
 				});
 		} else {
-			axios
-				.post("http://localhost:8000/fixedIncome", {
+			api
+				.post("/fixedIncome/post", {
 					date: values.date,
 					money: Number(values.money),
 					incomeName: values.name,
 				})
 				.then((res) => {
 					setFixedIncome([...fixedIncome, res.data]);
+					setValues({
+						division: "",
+						date: "",
+						name: "",
+						money: "0",
+					});
 					dispatch(
 						showToast({
 							message: "작성이 완료되었습니다",
@@ -203,8 +216,8 @@ const Fixed = () => {
 
 	const handleClickUpdateBtn = () => {
 		if (updateValues.division === "outgo") {
-			axios
-				.patch(`http://localhost:8000/fixedOutgo/${updateValues.id}`, {
+			api
+				.patch(`/fixedOutgo/update/${updateValues.id}`, {
 					date: updateValues.date,
 					money: Number(updateValues.money),
 					outgoName: updateValues.name,
@@ -212,7 +225,7 @@ const Fixed = () => {
 				.then((res) => {
 					setFixedOutgo((prevData) => {
 						const newData = prevData.map((item) => {
-							if (item.id === updateValues.id) {
+							if (item.fixedOutgoId === updateValues.id) {
 								return res.data;
 							}
 							return item;
@@ -227,8 +240,8 @@ const Fixed = () => {
 					console.error(error);
 				});
 		} else {
-			axios
-				.patch(`http://localhost:8000/fixedIncome/${updateValues.id}`, {
+			api
+				.patch(`/fixedIncome/update/${updateValues.id}`, {
 					date: updateValues.date,
 					money: Number(updateValues.money),
 					incomeName: updateValues.name,
@@ -236,7 +249,7 @@ const Fixed = () => {
 				.then((res) => {
 					setFixedIncome((prevData) => {
 						const newData = prevData.map((item) => {
-							if (item.id === updateValues.id) {
+							if (item.fixedIncomeId === updateValues.id) {
 								return res.data;
 							}
 							return item;
@@ -258,14 +271,21 @@ const Fixed = () => {
 
 	const handleDeleteList = () => {
 		if (deleteValue.type === "outgo") {
-			axios
-				.delete(`http://localhost:8000/fixedOutgo/${deleteValue.id}`)
+			api
+				.delete(`/fixedOutgo/delete/${deleteValue.id}`)
 				.then(() => {
 					setFixedOutgo((prevData) => {
 						const data = prevData.filter((el) => {
-							return el.id !== deleteValue.id;
+							return el.fixedOutgoId !== deleteValue.id;
 						});
 						return data;
+					});
+					setUpdateValues({
+						id: 0,
+						division: "",
+						date: "",
+						name: "",
+						money: "0",
 					});
 					setIsOpen(false);
 					dispatch(
@@ -280,13 +300,20 @@ const Fixed = () => {
 				});
 		} else {
 			axios
-				.delete(`http://localhost:8000/fixedIncome/${deleteValue.id}`)
+				.delete(`/fixedIncome/delete/${deleteValue.id}`)
 				.then(() => {
 					setFixedIncome((prevData) => {
 						const data = prevData.filter((el) => {
-							return el.id !== deleteValue.id;
+							return el.fixedIncomeId !== deleteValue.id;
 						});
 						return data;
+					});
+					setUpdateValues({
+						id: 0,
+						division: "",
+						date: "",
+						name: "",
+						money: "0",
 					});
 					setIsOpen(false);
 					dispatch(
@@ -326,21 +353,21 @@ const Fixed = () => {
 	);
 
 	useEffect(() => {
-		axios
-			.get("http://localhost:8000/fixedIncome")
+		api
+			.get("/fixedOutgo/get?page=1&size=10&date=2024-01-00")
 			.then((res) => {
-				setFixedIncome(res.data);
+				setFixedOutgo(res.data.data);
 			})
 			.catch((error) => {
 				console.error(error);
 			});
-		axios
-			.get("http://localhost:8000/fixedOutgo")
+		api
+			.get(`/fixedIncome/get?page=1&size=10&date=2024-01-00`)
 			.then((res) => {
-				setFixedOutgo(res.data);
+				setFixedIncome(res.data.data);
 			})
 			.catch((error) => {
-				console.error(error);
+				console.log(error);
 			});
 	}, []);
 
@@ -462,7 +489,7 @@ const Fixed = () => {
 									<h5>지출</h5>
 									<div className="list__div">
 										{fixedOutgo.map((el) => (
-											<List key={el.id} date={el.date}>
+											<List key={el.fixedOutgoId} $date={el.date}>
 												<div className="list__day__outgo">
 													{new Date(el.date).getDate()}일
 												</div>
@@ -494,7 +521,7 @@ const Fixed = () => {
 									<h5>수입</h5>
 									<div className="list__div">
 										{fixedIncome.map((el) => (
-											<List key={el.id} date={el.date}>
+											<List key={el.fixedIncomeId} $date={el.date}>
 												<div className="list__day__income">
 													{new Date(el.date).getDate()}일
 												</div>
@@ -585,10 +612,12 @@ const Fixed = () => {
 								<ul className="outgo__lists__update">
 									{fixedOutgo.map((el) => (
 										<UpdateList
-											key={el.id}
-											className={outgoActiveItemId === el.id ? "active" : ""}
+											key={el.fixedOutgoId}
+											className={
+												outgoActiveItemId === el.fixedOutgoId ? "active" : ""
+											}
 											onClick={() => {
-												onClickUpdateList(el.id, "outgo");
+												onClickUpdateList(el.fixedOutgoId, "outgo");
 											}}
 										>
 											<div className="list__day__income">
@@ -603,7 +632,10 @@ const Fixed = () => {
 											<button
 												onClick={(e) => {
 													e.stopPropagation();
-													setDeleteValue({ id: el.id, type: "outgo" });
+													setDeleteValue({
+														id: el.fixedOutgoId,
+														type: "outgo",
+													});
 													setIsOpen(true);
 												}}
 											>
@@ -615,10 +647,12 @@ const Fixed = () => {
 								<ul className="outgo__lists__update">
 									{fixedIncome.map((el) => (
 										<UpdateList
-											key={el.id}
-											className={incomeActiveItemId === el.id ? "active" : ""}
+											key={el.fixedIncomeId}
+											className={
+												incomeActiveItemId === el.fixedIncomeId ? "active" : ""
+											}
 											onClick={() => {
-												onClickUpdateList(el.id, "income");
+												onClickUpdateList(el.fixedIncomeId, "income");
 											}}
 										>
 											<div className="list__day__income">
@@ -633,7 +667,10 @@ const Fixed = () => {
 											<button
 												onClick={(e) => {
 													e.stopPropagation();
-													setDeleteValue({ id: el.id, type: "income" });
+													setDeleteValue({
+														id: el.fixedIncomeId,
+														type: "income",
+													});
 													setIsOpen(true);
 												}}
 											>
@@ -970,7 +1007,7 @@ const ListContainer = styled.div`
   }
 `;
 
-const List = styled.div<{ date: string }>`
+const List = styled.div<{ $date: string }>`
 	display: flex;
 	margin-top: 1.2rem;
 	align-items: center;
@@ -983,10 +1020,10 @@ const List = styled.div<{ date: string }>`
 		align-items: center;
 		padding: 2rem 2.5rem;
 		background: ${(props) =>
-			new Date(props.date).getDate() - new Date().getDate() < 0 ||
-			new Date(props.date).getDate() - new Date().getDate() >= 7
+			new Date(props.$date).getDate() - new Date().getDate() < 0 ||
+			new Date(props.$date).getDate() - new Date().getDate() >= 7
 				? props.theme.COLORS.LIGHT_GREEN
-				: new Date(props.date).getDate() - new Date().getDate() < 3
+				: new Date(props.$date).getDate() - new Date().getDate() < 3
 				  ? props.theme.COLORS.LIGHT_RED
 				  : props.theme.COLORS.LIGHT_YELLOW};
 		border-radius: 8px;
