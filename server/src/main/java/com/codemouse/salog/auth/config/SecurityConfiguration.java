@@ -70,13 +70,13 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                         // 수입
                         .antMatchers(HttpMethod.POST, "/income/post").hasRole("USER")
                         .antMatchers(HttpMethod.PATCH, "/income/update").hasRole("USER")
-                        .antMatchers(HttpMethod.GET, "/income").hasRole("USER")
+                        .antMatchers(HttpMethod.GET, "/income/**").hasRole("USER")
                         .antMatchers(HttpMethod.DELETE, "/income/delete").hasRole("USER")
 
                         // 지출
                         .antMatchers(HttpMethod.POST, "/outgo/post").hasRole("USER")
                         .antMatchers(HttpMethod.PATCH, "/outgo/update").hasRole("USER")
-                        .antMatchers(HttpMethod.GET, "/outgo").hasRole("USER")
+                        .antMatchers(HttpMethod.GET, "/outgo/**").hasRole("USER")
                         .antMatchers(HttpMethod.DELETE, "/outgo/delete").hasRole("USER")
 
                         // 고정 수입
@@ -88,7 +88,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                         // 고정 지출
                         .antMatchers(HttpMethod.POST, "/fixedOutgo/post").hasRole("USER")
                         .antMatchers(HttpMethod.PATCH, "/fixedOutgo/update").hasRole("USER")
-                        .antMatchers(HttpMethod.GET, "/fixedOutgo").hasRole("USER")
+                        .antMatchers(HttpMethod.GET, "/fixedOutgo/get").hasRole("USER")
                         .antMatchers(HttpMethod.DELETE, "/fixedOutgo/delete").hasRole("USER")
 
                         // 예산
