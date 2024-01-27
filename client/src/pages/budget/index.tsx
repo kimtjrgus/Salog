@@ -419,11 +419,11 @@ const BarContainer = styled.div`
 	@keyframes fade-in {
 		0% {
 			opacity: 0;
-			transform: translateY(20px);
+			height: 0px;
 		}
 		100% {
 			opacity: 1;
-			transform: translateY(0);
+			height: 100%;
 		}
 	}
 
@@ -431,11 +431,12 @@ const BarContainer = styled.div`
 		margin-top: 1rem;
 		display: flex;
 		flex-direction: column;
+		justify-content: end;
 		align-items: center;
 
 		div {
 			opacity: 0;
-			animation: fade-in 0.5s ease-in-out forwards;
+			animation: fade-in 1s ease-in-out forwards;
 			border-radius: 4px;
 			width: 25px;
 			height: 100%;
@@ -468,7 +469,7 @@ const BarContainer = styled.div`
 			border-radius: 4px;
 			width: 25px;
 			height: 70px;
-
+			animation: fade-in 1s ease-in-out forwards;
 			background: ${(props) => props.theme.COLORS.LIGHT_GREEN};
 			margin-bottom: 1rem;
 		}
