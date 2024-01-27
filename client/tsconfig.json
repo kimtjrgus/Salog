@@ -20,6 +20,7 @@
     "strictFunctionTypes": true,                // 서브타입은 파라미터로 받지 않음.
     "strictPropertyInitialization": true,       // 초기화 되지 않은 class 변수는 constructor에서 초기화를 보장(타입 + 초기값)
     */  
+     "types": ["@nivo/line"],
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true, // switch 구문을 쓰면서 자주하는 실수를 잡아 줍 (break 미사용)
