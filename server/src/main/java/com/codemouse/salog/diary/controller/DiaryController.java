@@ -37,7 +37,7 @@ public class DiaryController {
     }
 
     // patch
-    @PatchMapping("/{diary-id}/update")
+    @PatchMapping("/update/{diary-id}")
     @ResponseStatus(HttpStatus.OK)
     public void updateDiary (@RequestHeader(name = "Authorization") String token,
                              @PathVariable("diary-id") @Positive long diaryId,
@@ -83,7 +83,7 @@ public class DiaryController {
     }
 
     // delete
-    @DeleteMapping("/{diary-id}/delete")
+    @DeleteMapping("/delete/{diary-id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDiary (@RequestHeader(name = "Authorization") String token,
                              @PathVariable("diary-id") @Positive long diaryId){
