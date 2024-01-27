@@ -24,22 +24,25 @@ public class IncomeController {
     private final TokenBlackListService tokenBlackListService;
 
     @PostMapping("/post")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void postIncome(@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> postIncome(@RequestHeader(name = "Authorization") String token,
                            @Valid @RequestBody IncomeDto.Post requestBody) {
         tokenBlackListService.isBlackListed(token);
 
-        incomeService.createIncome(token, requestBody);
+        IncomeDto.Response response = incomeService.createIncome(token, requestBody);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PatchMapping("/update/{income-id}")
     @ResponseStatus(HttpStatus.OK)
-    public void updateIncome(@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> updateIncome(@RequestHeader(name = "Authorization") String token,
                              @PathVariable("income-id") @Positive long incomeId,
                              @Valid @RequestBody IncomeDto.Patch requestBody) {
         tokenBlackListService.isBlackListed(token);
 
-        incomeService.updateIncome(token, incomeId, requestBody);
+        IncomeDto.Response response = incomeService.updateIncome(token, incomeId, requestBody);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping

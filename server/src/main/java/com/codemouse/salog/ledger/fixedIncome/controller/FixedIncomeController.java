@@ -24,22 +24,24 @@ public class FixedIncomeController {
     private final TokenBlackListService tokenBlackListService;
 
     @PostMapping("/post")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void postFixedIncome (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> postFixedIncome (@RequestHeader(name = "Authorization") String token,
                                 @Valid @RequestBody FixedIncomeDto.Post requestBody) {
         tokenBlackListService.isBlackListed(token);
 
-        fixedIncomeService.createFixedIncome(token, requestBody);
+        FixedIncomeDto.Response response = fixedIncomeService.createFixedIncome(token, requestBody);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PatchMapping("/update/{fixedIncome-id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void patchFixedIncome (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> patchFixedIncome (@RequestHeader(name = "Authorization") String token,
                                  @PathVariable("fixedIncome-id") @Positive long fixedIncomeId,
                                  @Valid @RequestBody FixedIncomeDto.Patch requestBody) {
         tokenBlackListService.isBlackListed(token);
 
-        fixedIncomeService.updateFixedIncome(token, fixedIncomeId, requestBody);
+        FixedIncomeDto.Response response = fixedIncomeService.updateFixedIncome(token, fixedIncomeId, requestBody);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/get")
