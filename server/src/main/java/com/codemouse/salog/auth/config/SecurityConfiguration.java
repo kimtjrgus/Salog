@@ -73,14 +73,43 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                         .antMatchers(HttpMethod.GET, "/income").hasRole("USER")
                         .antMatchers(HttpMethod.DELETE, "/income/delete").hasRole("USER")
 
+                        // 지출
+                        .antMatchers(HttpMethod.POST, "/outgo/post").hasRole("USER")
+                        .antMatchers(HttpMethod.PATCH, "/outgo/update").hasRole("USER")
+                        .antMatchers(HttpMethod.GET, "/outgo").hasRole("USER")
+                        .antMatchers(HttpMethod.DELETE, "/outgo/delete").hasRole("USER")
+
                         // 고정 수입
                         .antMatchers(HttpMethod.POST, "/fixedIncome/post").hasRole("USER")
                         .antMatchers(HttpMethod.PATCH, "/fixedIncome/update").hasRole("USER")
                         .antMatchers(HttpMethod.GET, "/fixedIncome/get").hasRole("USER")
                         .antMatchers(HttpMethod.DELETE, "/fixedIncome/delete").hasRole("USER")
 
+                        // 고정 지출
+                        .antMatchers(HttpMethod.POST, "/fixedOutgo/post").hasRole("USER")
+                        .antMatchers(HttpMethod.PATCH, "/fixedOutgo/update").hasRole("USER")
+                        .antMatchers(HttpMethod.GET, "/fixedOutgo").hasRole("USER")
+                        .antMatchers(HttpMethod.DELETE, "/fixedOutgo/delete").hasRole("USER")
+
+                        // 예산
+                        .antMatchers(HttpMethod.POST, "/monthlyBudget/post").hasRole("USER")
+                        .antMatchers(HttpMethod.PATCH, "/monthlyBudget/update").hasRole("USER")
+                        .antMatchers(HttpMethod.GET, "/monthlyBudget").hasRole("USER")
+                        .antMatchers(HttpMethod.DELETE, "/monthlyBudget/delete").hasRole("USER")
+
+                        // 일기
+                        .antMatchers(HttpMethod.POST, "/diary/post").hasRole("USER")
+                        .antMatchers(HttpMethod.PATCH, "/diary/update").hasRole("USER")
+                        .antMatchers(HttpMethod.GET, "/diary").hasRole("USER")
+                        .antMatchers(HttpMethod.DELETE, "/diary/delete").hasRole("USER")
+                        .antMatchers(HttpMethod.GET, "/diary/search").hasRole("USER")
+
+                        // 캘린더
+                        .antMatchers(HttpMethod.GET, "/calendar").hasRole("USER")
+
                         // 태그
                         .antMatchers(HttpMethod.GET, "/ledgerTags").hasRole("USER")
+                        .antMatchers(HttpMethod.GET, "/diaryTags").hasRole("USER")
 
                 );
         return http.build();
