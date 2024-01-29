@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @RestController
@@ -20,23 +21,6 @@ import java.util.List;
 @AllArgsConstructor
 public class LedgerTagController {
     private final LedgerTagService ledgerTagService;
-    private final TokenBlackListService tokenBlackListService;
-
-    @PostMapping("/income/post")
-    public void postIncomeTag(@RequestHeader(name = "Authorization") String token,
-                              @RequestBody LedgerTagDto.Post tagPostDto) {
-        tokenBlackListService.isBlackListed(token);
-
-        ledgerTagService.postLedgerTag(token,tagPostDto);
-    }
-
-    @PostMapping("/outgo/post")
-    public void postOutgoTag(@RequestHeader(name = "Authorization") String token,
-                             @RequestBody LedgerTagDto.Post tagPostDto) {
-        tokenBlackListService.isBlackListed(token);
-
-        ledgerTagService.postLedgerTag(token,tagPostDto);
-    }
 
     @GetMapping("/income")
     public ResponseEntity<?> getAllIncomeTags (@RequestHeader(name = "Authorization") String token) {
