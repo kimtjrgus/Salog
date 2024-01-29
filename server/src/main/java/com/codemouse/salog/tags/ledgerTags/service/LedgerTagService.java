@@ -29,6 +29,7 @@ public class LedgerTagService {
     private final IncomeRepository incomeRepository;
     private final OutgoRepository outgoRepository;
 
+    // todo 2024-01-29 수입, 지출 중복 태그 제거 로직 여기로 리펙토링해야함
     public LedgerTag postLedgerTag (String token, LedgerTagDto.Post tagDto){
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
         LedgerTag ledgerTag = mapper.ledgerTagPostDtoToLedgerTag(tagDto);
