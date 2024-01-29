@@ -38,7 +38,8 @@ public enum ExceptionCode {
     FIXED_OUTGO_NOT_FOUND(404, "FIXED_OUTGO_NOT_FOUND 존재하지 않는 고정 지출"),
 
     // 월간 예산
-    BUDGET_NOT_FOUND(404, "BUDGET_NOT_FOUND 존재하지 않는 월별 예산");
+    BUDGET_NOT_FOUND(404, "BUDGET_NOT_FOUND 존재하지 않는 월별 예산"),
+    BUDGET_EXIST(400, "BUDGET_EXIST 이미 존재하는 예산");
 
     private int status;
 
