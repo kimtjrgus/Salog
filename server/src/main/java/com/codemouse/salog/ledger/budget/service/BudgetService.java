@@ -35,9 +35,14 @@ public class BudgetService {
         MonthlyBudget budget = budgetMapper.budgetPostDtoToBudget(budgetPostDto);
 
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
-        budget.setMember(member);
 
-        budgetRepository.save(budget);
+        // 한 달에 하나의 예산만 등록
+        if (budgetRepository.findByMonth(member.getMemberId(),budget.getDate().getYear(),budget.getDate().getMonthValue()) != null) {
+            throw new BusinessLogicException(ExceptionCode.BUDGET_EXIST);
+        } else {
+            budget.setMember(member);
+            budgetRepository.save(budget);
+        }
     }
 
     public void updateBudget(String token, long budgetId, BudgetDto.Patch budgetPatchDto) {
