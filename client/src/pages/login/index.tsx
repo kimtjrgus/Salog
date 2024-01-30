@@ -48,6 +48,8 @@ const Login = () => {
 					path: "/",
 					expires: current,
 				});
+				localStorage.setItem("accessToken", res.data.accessToken);
+
 				current.setMinutes(current.getMinutes() + 1440);
 				setCookie("refreshToken", res.data.refreshToken, {
 					path: "/",
