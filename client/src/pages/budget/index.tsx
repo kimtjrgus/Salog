@@ -2,7 +2,13 @@ import { styled } from "styled-components";
 import { SvgIcon } from "@mui/material";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "src/utils/refreshToken";
+import moment from "moment";
+import Modal from "./Modal";
+import { useDispatch, useSelector } from "react-redux";
+import { hideToast } from "src/store/slices/toastSlice";
+import Toast, { ToastType } from "src/components/Layout/Toast";
+import { type RootState } from "src/store";
 
 export interface budgetType {
 	budget: number;
@@ -15,9 +21,8 @@ interface tagType {
 	tagSum: number;
 }
 
-interface monthlyOutgoType {
-	month: number;
-	monthlyIncome: number;
+interface monthlyType {
+	monthlyTotal: number;
 	tags: tagType[];
 }
 
@@ -27,133 +32,254 @@ const Budget = () => {
 		totalOutgo: 0,
 		dayRemain: 0,
 	});
+	const [lastMonthlyBudget, setLastMonthlyBudget] = useState<budgetType>({
+		budget: 0,
+		totalOutgo: 0,
+		dayRemain: 0,
+	});
 
-	const [monthlyIncome, setMonthlyIncome] = useState<monthlyOutgoType>({
-		month: 0,
-		monthlyIncome: 0,
+	const [monthlyOutgo, setMonthlyOutgo] = useState<monthlyType>({
+		monthlyTotal: 0,
 		tags: [],
 	});
 
-	console.log(monthlyBudget);
+	const [monthlyIncome, setMonthlyIncome] = useState<monthlyType>({
+		monthlyTotal: 0,
+		tags: [],
+	});
+
+	const [isOpen, setIsOpen] = useState<boolean>(false);
+
+	const modal = useSelector((state: RootState) => state.persistedReducer.toast);
+
+	const dispatch = useDispatch();
+
+	const remainingDay = () => {
+		// 현재 날짜를 가져옵니다.
+		const currentDate = new Date();
+
+		// 이번 달의 마지막 날짜를 가져옵니다.
+		const lastDayOfMonth = new Date(
+			currentDate.getFullYear(),
+			currentDate.getMonth() + 1,
+			0,
+		);
+
+		// 이번 달의 남은 일수를 계산합니다.
+		const remainingDays = lastDayOfMonth.getDate() - currentDate.getDate() + 1;
+
+		return remainingDays;
+	};
 
 	useEffect(() => {
-		axios
-			.get("http://localhost:8000/monthlyBudget")
+		api
+			.get(`/monthlyBudget?date=${moment().format("YYYY-MM")}`)
 			.then((res) => {
-				setMonthlyBudget(res.data[0]);
+				res.data === ""
+					? setMonthlyBudget({
+							budget: 0,
+							totalOutgo: 0,
+							dayRemain: 0,
+					  })
+					: setMonthlyBudget(res.data);
 			})
 			.catch((error) => {
 				console.error(error);
 			});
-		axios
-			.get("http://localhost:8000/monthlyIncome")
+		api
+			.get(
+				`/monthlyBudget?date=${moment()
+					.subtract(1, "months")
+					.format("YYYY-MM")}`,
+			)
 			.then((res) => {
-				setMonthlyIncome(res.data[0]);
+				res.data === ""
+					? setLastMonthlyBudget({
+							budget: 0,
+							totalOutgo: 0,
+							dayRemain: 0,
+					  })
+					: setLastMonthlyBudget(res.data);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+		api
+			.get(`/income/monthly?date=${moment().format("YYYY-MM-DD")}`)
+			.then((res) => {
+				setMonthlyIncome(res.data);
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+		api
+			.get(`/outgo/monthly?date=${moment().format("YYYY-MM-DD")}`)
+			.then((res) => {
+				setMonthlyOutgo(res.data);
 			})
 			.catch((error) => {
 				console.error(error);
 			});
 	}, []);
 
+	useEffect(() => {
+		// 전역상태를 이용한 토스트 창 띄우기
+		setTimeout(() => {
+			if (modal.visible) {
+				modal.type === "success"
+					? Toast(ToastType.success, modal.message)
+					: Toast(ToastType.error, modal.message);
+				dispatch(hideToast());
+			}
+		}, 100);
+	}, [modal, dispatch]);
+
 	return (
-		<Container>
-			<div className="header">
-				<h3>예산</h3>
-				<button>
-					<SvgIcon
-						component={CreateOutlinedIcon}
-						sx={{ stroke: "#ffffff", strokeWidth: 1 }}
-					/>
-					<p>예산 작성하기</p>
-				</button>
-			</div>
-			<p className="subtitle">
-				예산을 설정하여 지출을 효과적으로 관리해보세요!
-			</p>
-			<ul className="money__info">
-				<li className="info__list">
-					<h6>이번 달 지출</h6>
-					<p>{monthlyBudget.totalOutgo.toLocaleString()}원</p>
-				</li>
-				<li className="info__list">
-					<h6>이번 달 수입</h6>
-					<p>{monthlyIncome.monthlyIncome.toLocaleString()}원</p>
-				</li>
-				<li className="info__list">
-					<h6>예산</h6>
-					<p>{monthlyBudget.budget.toLocaleString()}원</p>
-				</li>
-			</ul>
-			<GraphContainer>
-				<StatList>
-					<h3>{`${monthlyBudget.dayRemain}월 예산`}</h3>
-					<h4>{monthlyBudget.budget.toLocaleString()}원</h4>
-					<hr />
-					<BarChartContainer
-						width={`${Math.floor(
-							(monthlyBudget?.totalOutgo / monthlyBudget?.budget) * 100,
-						)}`}
+		<>
+			<Container>
+				<div className="header">
+					<h3>예산</h3>
+					<button
+						onClick={() => {
+							setIsOpen(true);
+						}}
 					>
-						<div className="legends">
-							<div className="legend__square"></div>
-							<p>예산</p>
-							<div className="legend__square"></div>
-							<p>지출</p>
-						</div>
-						<div className="bar">
-							<div className="bar__item">
-								{Math.floor(
-									(monthlyBudget?.totalOutgo / monthlyBudget?.budget) * 100,
-								) > 10 ? (
-									<span className="bar__percent">
-										{`${Math.floor(
-											(monthlyBudget?.totalOutgo / monthlyBudget?.budget) * 100,
-										)}`}
-										%
-									</span>
-								) : null}
+						<SvgIcon
+							component={CreateOutlinedIcon}
+							sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+						/>
+						<p>예산 작성하기</p>
+					</button>
+				</div>
+				<p className="subtitle">
+					예산을 설정하여 지출을 효과적으로 관리해보세요!
+				</p>
+				<ul className="money__info">
+					<li className="info__list">
+						<h6>이번 달 지출</h6>
+						<p>{monthlyOutgo.monthlyTotal.toLocaleString()}원</p>
+					</li>
+					<li className="info__list">
+						<h6>이번 달 수입</h6>
+						<p>{monthlyIncome.monthlyTotal.toLocaleString()}원</p>
+					</li>
+					<li className="info__list">
+						<h6>예산</h6>
+						<p>{monthlyBudget.budget.toLocaleString()}원</p>
+					</li>
+				</ul>
+				<GraphContainer>
+					<StatList>
+						<h3>{`${
+							new Date(moment().format("YYYY-MM-DD")).getMonth() + 1
+						}월 예산`}</h3>
+						<h4>{monthlyBudget.budget.toLocaleString()}원</h4>
+						<hr />
+						<BarChartContainer>
+							<div className="legends">
+								<div className="legend__square"></div>
+								<p>예산</p>
+								<div className="legend__square"></div>
+								<p>지출</p>
 							</div>
-							<span className="bar__outgo">
-								{monthlyBudget?.totalOutgo.toLocaleString()}원
-							</span>
+							<Bar
+								width={`${
+									isNaN(
+										Math.floor(
+											(monthlyBudget.totalOutgo / monthlyBudget.budget) * 100,
+										),
+									)
+										? 0
+										: Math.floor(
+												(monthlyBudget.totalOutgo / monthlyBudget.budget) * 100,
+										  )
+								}`}
+								className="bar"
+							>
+								<div className="bar__item">
+									{Math.floor(
+										(monthlyBudget?.totalOutgo / monthlyBudget?.budget) * 100,
+									) > 10 ? (
+										<span className="bar__percent">
+											{`${Math.floor(
+												(monthlyBudget?.totalOutgo / monthlyBudget?.budget) *
+													100,
+											)}`}
+											%
+										</span>
+									) : null}
+								</div>
+								<span className="bar__outgo">
+									{monthlyBudget?.totalOutgo.toLocaleString()}원
+								</span>
+							</Bar>
+						</BarChartContainer>
+						<hr className="bottom__hr" />
+						<div className="list__bottom">
+							<div className="color__info">
+								<div className="circle"></div>
+								<p>남은 예산</p>
+								<p>
+									{(
+										monthlyBudget.budget - monthlyBudget.totalOutgo
+									).toLocaleString()}
+									원
+								</p>
+							</div>
+							<div className="color__info">
+								<div className="circle"></div>
+								<p>하루 예산</p>
+								<p>
+									{monthlyBudget.budget === 0
+										? 0
+										: Math.floor(
+												(monthlyBudget.budget - monthlyOutgo.monthlyTotal) /
+													remainingDay(),
+										  ).toLocaleString()}
+									원
+								</p>
+							</div>
 						</div>
-					</BarChartContainer>
-					<hr className="bottom__hr" />
-					<div className="list__bottom">
-						<div className="color__info">
-							<div className="circle"></div>
-							<p>남은 예산</p>
-							<p>
-								{(
-									monthlyBudget.budget - monthlyBudget.totalOutgo
-								).toLocaleString()}
-								원
-							</p>
-						</div>
-						<div className="color__info">
-							<div className="circle"></div>
-							<p>하루 예산</p>
-							<p>{Math.floor(monthlyBudget.budget / 30).toLocaleString()}원</p>
-						</div>
-					</div>
-				</StatList>
-				<BarContainer>
-					<h4>지난달 예산 및 결과</h4>
-					<ul className="bar">
-						<li className="bar__li">
-							<div></div>
-							<p>500,000원</p>
-							<p>12월 예산</p>
-						</li>
-						<li className="bar__li__outgo">
-							<div></div>
-							<p>350,000원</p>
-							<p>1월 지출</p>
-						</li>
-					</ul>
-				</BarContainer>
-			</GraphContainer>
-		</Container>
+					</StatList>
+					<BarContainer>
+						<h4>지난달 예산 및 결과</h4>
+						<ul className="bar">
+							<LastMonthBar
+								height={`${
+									(lastMonthlyBudget.budget /
+										(lastMonthlyBudget.budget + monthlyOutgo.monthlyTotal)) *
+									100
+								}`}
+							>
+								<div></div>
+								<p>{lastMonthlyBudget.budget.toLocaleString()}원</p>
+								<p>{`${
+									new Date().getMonth() === 0 ? 12 : new Date().getMonth() === 0
+								}월 예산`}</p>
+							</LastMonthBar>
+							<MonthBar
+								height={`${
+									(monthlyOutgo.monthlyTotal /
+										(lastMonthlyBudget.budget + monthlyOutgo.monthlyTotal)) *
+									100
+								}`}
+							>
+								<div></div>
+								<p>{`${monthlyOutgo.monthlyTotal.toLocaleString()}원`}</p>
+								<p>{`${new Date().getMonth() + 1}월 지출`}</p>
+							</MonthBar>
+						</ul>
+					</BarContainer>
+				</GraphContainer>
+			</Container>
+			{isOpen && (
+				<Modal
+					setIsOpen={setIsOpen}
+					monthlyBudget={monthlyBudget}
+					setMonthlyBudget={setMonthlyBudget}
+				/>
+			)}
+		</>
 	);
 };
 
@@ -188,18 +314,22 @@ const Container = styled.div`
 	}
 
 	.money__info {
-		width: 78.5rem;
+		max-width: 75rem;
 		display: flex;
 		margin-top: 4rem;
 		border: 1px solid #e4e4e4;
-		border-right: none;
 		border-radius: 4px;
 
 		.info__list {
+			min-width: 25rem;
 			white-space: nowrap;
 			padding: 2.5rem;
 			padding-right: 15rem;
 			border-right: 1px solid #e4e4e4;
+
+			&:nth-child(3) {
+				border-right: none;
+			}
 
 			h6 {
 				font-size: 1.2rem;
@@ -311,7 +441,7 @@ const StatList = styled.li`
 	}
 `;
 
-const BarChartContainer = styled.div<{ width: string }>`
+const BarChartContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	padding: 0.3rem 2rem;
@@ -342,55 +472,6 @@ const BarChartContainer = styled.div<{ width: string }>`
 	}
 
 	.bar {
-		margin-top: 1.5rem;
-		border-radius: 4px;
-		width: 100%;
-		height: 26px;
-		background: #d9d9d9;
-
-		.bar__item {
-			display: flex;
-			align-items: center;
-			justify-content: center; /* 수정된 부분 */
-
-			background: #1bbf83;
-			border-radius: ${(props) =>
-				Number(props.width) < 100 ? "4px 0 0 4px" : "4px"};
-			width: ${(props) => (Number(props.width) > 100 ? 100 : props.width)}%;
-			height: 26px;
-		}
-
-		.bar__percent {
-			color: white;
-			font-size: 1.2rem;
-			font-weight: 500;
-		}
-
-		.bar__outgo {
-			color: #7c7878;
-			white-space: nowrap;
-			font-size: 1rem;
-			margin-left: ${(props) =>
-				Number(props.width) < 8
-					? 0
-					: Number(props.width) > 85
-					  ? 0
-					  : Number(props.width) - 8}%;
-
-			float: ${(props) =>
-				Number(props.width) < 8
-					? "left"
-					: Number(props.width) > 85
-					  ? "right"
-					  : "none"};
-
-			margin-top: ${(props) =>
-				Number(props.width) < 8
-					? "0.5rem"
-					: Number(props.width) > 85
-					  ? "0.5rem"
-					  : "0"};
-		}
 	}
 `;
 
@@ -415,76 +496,144 @@ const BarContainer = styled.div`
 		margin-top: 2rem;
 		padding: 0 2rem;
 	}
+`;
+
+const Bar = styled.div<{ width: string }>`
+	margin-top: 1.5rem;
+	border-radius: 4px;
+	width: 100%;
+	height: 26px;
+	background: #d9d9d9;
+
+	@keyframes fade-in1 {
+		0% {
+			width: 0px;
+		}
+		100% {
+			width: ${(props) => (Number(props.width) > 100 ? 100 : props.width)}%;
+		}
+	}
+
+	.bar__item {
+		display: flex;
+		align-items: center;
+		justify-content: center; /* 수정된 부분 */
+		/* animation: fade-in1 1s ease-in-out forwards; */
+		background: #1bbf83;
+		border-radius: ${(props) =>
+			Number(props.width) < 100 ? "4px 0 0 4px" : "4px"};
+		width: ${(props) => (Number(props.width) > 100 ? 100 : props.width)}%;
+		height: 26px;
+	}
+
+	.bar__percent {
+		color: white;
+		font-size: 1.2rem;
+		font-weight: 500;
+	}
+
+	.bar__outgo {
+		color: #7c7878;
+		white-space: nowrap;
+		font-size: 1rem;
+		margin-left: ${(props) =>
+			Number(props.width) < 8
+				? 0
+				: Number(props.width) > 85
+				  ? 0
+				  : Number(props.width) - 8}%;
+
+		float: ${(props) =>
+			Number(props.width) < 8
+				? "left"
+				: Number(props.width) > 85
+				  ? "right"
+				  : "none"};
+
+		margin-top: ${(props) =>
+			Number(props.width) < 8
+				? "0.5rem"
+				: Number(props.width) > 85
+				  ? "0.5rem"
+				  : "0"};
+	}
+`;
+
+const LastMonthBar = styled.li<{ height: string }>`
+	margin-top: 1rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: end;
+	align-items: center;
 
 	@keyframes fade-in {
 		0% {
-			opacity: 0;
 			height: 0px;
 		}
 		100% {
-			opacity: 1;
-			height: 100%;
+			height: ${(props) => (isNaN(Number(props.height)) ? 100 : props.height)}%;
 		}
 	}
 
-	.bar__li {
-		margin-top: 1rem;
-		display: flex;
-		flex-direction: column;
-		justify-content: end;
-		align-items: center;
+	div {
+		animation: fade-in 1s ease-in-out forwards;
+		border-radius: 4px;
+		width: 25px;
+		height: ${(props) => (isNaN(Number(props.height)) ? 100 : props.height)}%;
+		background: #bfbbbb;
+		margin-bottom: 1rem;
+	}
 
-		div {
-			opacity: 0;
-			animation: fade-in 1s ease-in-out forwards;
-			border-radius: 4px;
-			width: 25px;
-			height: 100%;
-			background: #bfbbbb;
-			margin-bottom: 1rem;
+	p {
+		font-size: 1.4rem;
+		font-weight: 600;
+
+		color: #444444;
+
+		&:nth-child(3) {
+			font-size: 1.2rem;
+			font-weight: 400;
+			margin-top: 0.7rem;
 		}
+	}
+`;
 
-		p {
-			font-size: 1.4rem;
-			font-weight: 600;
+const MonthBar = styled.li<{ height: string }>`
+	margin-top: 1rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: end;
+	align-items: center;
 
-			color: #444444;
-
-			&:nth-child(3) {
-				font-size: 1.2rem;
-				font-weight: 400;
-				margin-top: 0.7rem;
-			}
+	@keyframes fade-in0 {
+		0% {
+			height: 0px;
+		}
+		100% {
+			height: ${(props) => (isNaN(Number(props.height)) ? 100 : props.height)}%;
 		}
 	}
 
-	.bar__li__outgo {
-		margin-top: 1rem;
-		display: flex;
-		flex-direction: column;
-		justify-content: end;
-		align-items: center;
+	div {
+		border-radius: 4px;
+		width: 25px;
+		height: ${(props) => (isNaN(Number(props.height)) ? 100 : props.height)}%;
+		animation: fade-in0 1s ease-in-out forwards;
+		background: ${(props) =>
+			isNaN(Number(props.height)) ? "#bfbbbb" : props.theme.COLORS.LIGHT_GREEN};
+		margin-bottom: 1rem;
+	}
 
-		div {
-			border-radius: 4px;
-			width: 25px;
-			height: 70px;
-			animation: fade-in 1s ease-in-out forwards;
-			background: ${(props) => props.theme.COLORS.LIGHT_GREEN};
-			margin-bottom: 1rem;
-		}
+	p {
+		font-size: 1.4rem;
+		font-weight: 600;
 
-		p {
-			font-size: 1.4rem;
-			font-weight: 600;
+		color: #444444;
 
-			color: #444444;
-
-			&:nth-child(3) {
-				font-size: 1.2rem;
-				font-weight: 400;
-				margin-top: 0.7rem;
-			}
+		&:nth-child(3) {
+			font-size: 1.2rem;
+			font-weight: 400;
+			margin-top: 0.7rem;
 		}
 	}
 `;
