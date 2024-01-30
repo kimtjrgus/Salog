@@ -4,7 +4,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { api } from "src/utils/refreshToken";
 import { styled } from "styled-components";
-import { type modalType } from ".";
+import { type incomeType, type outgoType, type modalType } from ".";
 
 interface calendarType {
 	date: string;
@@ -15,9 +15,16 @@ interface calendarType {
 interface propsType {
 	isOpen: modalType;
 	setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
+	monthlyOutgo: outgoType;
+	monthlyIncome: incomeType;
 }
 
-const DashboardCalendar = ({ isOpen, setIsOpen }: propsType) => {
+const DashboardCalendar = ({
+	isOpen,
+	setIsOpen,
+	monthlyOutgo,
+	monthlyIncome,
+}: propsType) => {
 	const [value, onChange] = useState(new Date());
 
 	const [calendar, setCalendar] = useState<calendarType[]>([]);
@@ -49,6 +56,8 @@ const DashboardCalendar = ({ isOpen, setIsOpen }: propsType) => {
 	};
 
 	useEffect(() => {
+		console.log("calendar get");
+
 		api
 			.get(`/calendar?date=${moment(startDate).format("YYYY-MM-DD")}`)
 			.then((res) => {
@@ -57,7 +66,7 @@ const DashboardCalendar = ({ isOpen, setIsOpen }: propsType) => {
 			.catch((error) => {
 				console.log(error);
 			});
-	}, [startDate]);
+	}, [startDate, monthlyIncome, monthlyOutgo]);
 
 	return (
 		<Container>
