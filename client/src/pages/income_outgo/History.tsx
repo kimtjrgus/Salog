@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { SvgIcon } from "@mui/material";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import DoNotDisturbRoundedIcon from "@mui/icons-material/DoNotDisturbRounded";
 import { type incomeType, type outgoType, type checkedType } from ".";
 import { v4 as uuidv4 } from "uuid";
 
@@ -34,57 +35,67 @@ const HistoryList = ({ sortedArray, checkedList, checkHandler }: Props) => {
 
 	return (
 		<Container className="ledger__lists">
-			{sortedArray.map((el) => {
-				if (el && "incomeTag" in el) {
-					// el이 incomeType인 경우
-					return (
-						<li className="ledger__list" key={uuidv4()}>
-							<input
-								type="checkbox"
-								checked={checkedList.income.includes(el.incomeId)}
-								onChange={(e) => {
-									checkHandler(e, el.incomeId, "income");
-								}}
-							/>
-							<ColorBlueDiv>수입</ColorBlueDiv>
-							<p>{dateAsDots(el.date)}</p>
-							<p>{el.incomeTag.tagName}</p>
-							<p>{el.incomeName}</p>
-							<p>{"x"}</p>
-							<p className="money__blue">{el.money.toLocaleString()}원</p>
-							<p>{el.memo}</p>
-							<SvgIcon
-								component={ReceiptLongOutlinedIcon}
-								sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-							/>
-						</li>
-					);
-				} else {
-					// el이 outgoType인 경우
-					return (
-						<li className="ledger__list" key={uuidv4()}>
-							<input
-								type="checkbox"
-								checked={checkedList.outgo.includes(el.outgoId)}
-								onChange={(e) => {
-									checkHandler(e, el.outgoId, "outgo");
-								}}
-							/>
-							<ColorRedDiv>지출</ColorRedDiv>
-							<p>{dateAsDots(el.date)}</p>
-							<p>{el.outgoTag.tagName}</p>
-							<p>{el.outgoName}</p>
-							<p>{el.payment}</p>
-							<p className="money__red">{el.money.toLocaleString()}원</p>
-							<p>{el.memo}</p>
-							<SvgIcon
-								component={ReceiptLongOutlinedIcon}
-								sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-							/>
-						</li>
-					);
-				}
-			})}
+			{sortedArray.length === 0 ? (
+				<NullContainer>
+					<SvgIcon
+						component={DoNotDisturbRoundedIcon}
+						sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+					/>
+					<p>작성된 목록이 없습니다.</p>
+				</NullContainer>
+			) : (
+				sortedArray.map((el) => {
+					if (el && "incomeTag" in el) {
+						// el이 incomeType인 경우
+						return (
+							<li className="ledger__list" key={uuidv4()}>
+								<input
+									type="checkbox"
+									checked={checkedList.income.includes(el.incomeId)}
+									onChange={(e) => {
+										checkHandler(e, el.incomeId, "income");
+									}}
+								/>
+								<ColorBlueDiv>수입</ColorBlueDiv>
+								<p>{dateAsDots(el.date)}</p>
+								<p>{el.incomeTag.tagName}</p>
+								<p>{el.incomeName}</p>
+								<p>{"x"}</p>
+								<p className="money__blue">{el.money.toLocaleString()}원</p>
+								<p>{el.memo}</p>
+								<SvgIcon
+									component={ReceiptLongOutlinedIcon}
+									sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+								/>
+							</li>
+						);
+					} else {
+						// el이 outgoType인 경우
+						return (
+							<li className="ledger__list" key={uuidv4()}>
+								<input
+									type="checkbox"
+									checked={checkedList.outgo.includes(el.outgoId)}
+									onChange={(e) => {
+										checkHandler(e, el.outgoId, "outgo");
+									}}
+								/>
+								<ColorRedDiv>지출</ColorRedDiv>
+								<p>{dateAsDots(el.date)}</p>
+								<p>{el.outgoTag.tagName}</p>
+								<p>{el.outgoName}</p>
+								<p>{el.payment}</p>
+								<p className="money__red">{el.money.toLocaleString()}원</p>
+								<p>{el.memo}</p>
+								<SvgIcon
+									component={ReceiptLongOutlinedIcon}
+									sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+								/>
+							</li>
+						);
+					}
+				})
+			)}
 		</Container>
 	);
 };
@@ -175,4 +186,26 @@ const ColorBlueDiv = styled.div`
 	padding: 0.5rem 1rem;
 	font-size: 1.2rem;
 	color: white;
+`;
+
+const NullContainer = styled.div`
+	width: 100%;
+	height: 20rem;
+	display: flex;
+	gap: 1rem;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	border: 1px solid #c7c7c7;
+	border-top: none;
+
+	> svg {
+		font-size: 6.6rem;
+		color: #c7c7c7;
+	}
+
+	p {
+		font-size: 1.5rem;
+		color: gray;
+	}
 `;

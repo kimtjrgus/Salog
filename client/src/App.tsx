@@ -7,7 +7,7 @@ import Dashboard from "./pages/dashboard";
 import Diary from "./pages/diary";
 import DiaryDetail from "./pages/diary_detail";
 import DiaryWrite from "./pages/diary_write";
-import History from "./pages/imcome_outgo";
+import History from "./pages/income_outgo";
 import Login from "./pages/login";
 import PasswordFind from "./pages/password";
 import SignUp from "./pages/sign_up";

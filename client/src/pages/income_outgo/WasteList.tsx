@@ -1,10 +1,11 @@
 import styled from "styled-components";
 import { SvgIcon } from "@mui/material";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
-import { type outgoType, type checkedType } from ".";
+import DoNotDisturbRoundedIcon from "@mui/icons-material/DoNotDisturbRounded";
+import { type wasteType, type checkedType } from ".";
 
 interface Props {
-	outgo: outgoType[];
+	waste: wasteType[];
 	checkedList: checkedType;
 	checkHandler: (
 		e: React.ChangeEvent<HTMLInputElement>,
@@ -13,7 +14,7 @@ interface Props {
 	) => void;
 }
 
-const OutgoList = ({ outgo, checkedList, checkHandler }: Props) => {
+const WasteList = ({ waste, checkedList, checkHandler }: Props) => {
 	const dateAsDots = (element: string) => {
 		const originalDate = element;
 		const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
@@ -33,35 +34,45 @@ const OutgoList = ({ outgo, checkedList, checkHandler }: Props) => {
 
 	return (
 		<Container className="ledger__lists">
-			{outgo.map((el) => {
-				return (
-					<li className="ledger__list" key={el.outgoId}>
-						<input
-							type="checkbox"
-							checked={checkedList.outgo.includes(el.outgoId)}
-							onChange={(e) => {
-								checkHandler(e, el.outgoId, "outgo");
-							}}
-						/>
-						<ColorRedDiv>지출</ColorRedDiv>
-						<p>{dateAsDots(el.date)}</p>
-						<p>{el.outgoTag.tagName}</p>
-						<p>{el.outgoName}</p>
-						<p>{el.payment}</p>
-						<p className="money__red">{el.money.toLocaleString()}원</p>
-						<p>{el.memo}</p>
-						<SvgIcon
-							component={ReceiptLongOutlinedIcon}
-							sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-						/>
-					</li>
-				);
-			})}
+			{waste.length === 0 ? (
+				<NullContainer>
+					<SvgIcon
+						component={DoNotDisturbRoundedIcon}
+						sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+					/>
+					<p>작성된 목록이 없습니다.</p>
+				</NullContainer>
+			) : (
+				waste.map((el) => {
+					return (
+						<li className="ledger__list" key={el.outgoId}>
+							<input
+								type="checkbox"
+								checked={checkedList.waste.includes(el.outgoId)}
+								onChange={(e) => {
+									checkHandler(e, el.outgoId, "waste");
+								}}
+							/>
+							<ColorRedDiv>지출</ColorRedDiv>
+							<p>{dateAsDots(el.date)}</p>
+							<p>{el.outgoTag.tagName}</p>
+							<p>{el.outgoName}</p>
+							<p>{"x"}</p>
+							<p className="money__red">{el.money.toLocaleString()}원</p>
+							<p>{el.memo}</p>
+							<SvgIcon
+								component={ReceiptLongOutlinedIcon}
+								sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+							/>
+						</li>
+					);
+				})
+			)}
 		</Container>
 	);
 };
 
-export default OutgoList;
+export default WasteList;
 
 const Container = styled.ul`
 	display: flex;
@@ -136,4 +147,26 @@ const ColorRedDiv = styled.div`
 	padding: 0.5rem 1rem;
 	font-size: 1.2rem;
 	color: white;
+`;
+
+const NullContainer = styled.div`
+	width: 100%;
+	height: 20rem;
+	display: flex;
+	gap: 1rem;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	border: 1px solid #c7c7c7;
+	border-top: none;
+
+	> svg {
+		font-size: 6.6rem;
+		color: #c7c7c7;
+	}
+
+	p {
+		font-size: 1.5rem;
+		color: gray;
+	}
 `;

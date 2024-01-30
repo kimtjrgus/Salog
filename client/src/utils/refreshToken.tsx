@@ -21,13 +21,9 @@ const RefreshToken = () => {
 		api.interceptors.response.use(
 			(response) => response,
 			async (error) => {
-				console.log("에러 핸들링", error);
-
-				if (
-					(error.response && error.response.status === 401) ||
-					error.response.status === 500
-				) {
+				if (error.response && error.response.status === 401) {
 					const refreshToken = getCookie("refreshToken");
+					const accessToken = localStorage.getItem("accessToken");
 					const current = new Date();
 					current.setMinutes(current.getMinutes() + 30);
 
@@ -35,6 +31,7 @@ const RefreshToken = () => {
 						const response = await axios.post(
 							`${process.env.REACT_APP_SERVER_URL}/refresh`,
 							{
+								accessToken,
 								refreshToken,
 							},
 						);
@@ -45,8 +42,11 @@ const RefreshToken = () => {
 							path: "/",
 							expires: current,
 						});
+						localStorage.setItem("accessToken", newAccessToken);
 
 						// 이전 요청을 재시도
+						console.log(error.config);
+
 						return await api.request(error.config);
 					} catch (error) {
 						console.log("토큰 재발급 실패:", error);
