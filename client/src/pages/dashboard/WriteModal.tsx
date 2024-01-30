@@ -5,12 +5,18 @@ import { SvgIcon } from "@mui/material";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
-import { type modalType } from ".";
-import React, { useState } from "react";
+import { type incomeType, type outgoType, type modalType } from ".";
+import React, { useCallback, useEffect, useState } from "react";
+import { debounce } from "src/utils/timeFunc";
+import { api } from "src/utils/refreshToken";
+import { useDispatch } from "react-redux";
+import { showToast } from "src/store/slices/toastSlice";
 
 interface Props {
 	isOpen: modalType;
 	setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
+	setMonthlyOutgo: React.Dispatch<React.SetStateAction<outgoType>>;
+	setMonthlyIncome: React.Dispatch<React.SetStateAction<incomeType>>;
 }
 
 interface hoverType {
@@ -19,6 +25,7 @@ interface hoverType {
 }
 
 interface valuesType {
+	[key: string]: string;
 	division: string;
 	money: string;
 	category: string;
@@ -27,11 +34,17 @@ interface valuesType {
 	memo: string;
 }
 
-const WriteModal = ({ isOpen, setIsOpen }: Props) => {
+const WriteModal = ({
+	isOpen,
+	setIsOpen,
+	setMonthlyOutgo,
+	setMonthlyIncome,
+}: Props) => {
 	const [isHovered, setIsHovered] = useState<hoverType>({
 		hover: false,
 		click: false,
 	});
+	const [isDisabled, setIsDisabled] = useState<boolean>(true);
 
 	const [values, setValues] = useState<valuesType>({
 		division: "outgo",
@@ -41,6 +54,10 @@ const WriteModal = ({ isOpen, setIsOpen }: Props) => {
 		account: "",
 		memo: "",
 	});
+
+	console.log(values);
+
+	const dispatch = useDispatch();
 
 	// input hover, click, blur 감지 후 실행 함수
 	const handleMouseEnter = () => {
@@ -79,6 +96,10 @@ const WriteModal = ({ isOpen, setIsOpen }: Props) => {
 		setValues({ ...values, method: e.target.value });
 	};
 
+	const onChangeCategory = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setValues({ ...values, category: e.target.value });
+	};
+
 	const onChangeAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setValues({ ...values, account: e.target.value });
 	};
@@ -86,6 +107,104 @@ const WriteModal = ({ isOpen, setIsOpen }: Props) => {
 	const onChangeMemo = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setValues({ ...values, memo: e.target.value });
 	};
+
+	const checkValues = useCallback(
+		debounce((values: valuesType) => {
+			let isBlank = false;
+			let isNotValid = true;
+
+			// 빈 값 체크
+			for (const key in values) {
+				if (values[key] === "") {
+					if (key === "method" && values.division === "income") {
+						continue;
+					}
+					isBlank = true;
+				}
+			}
+
+			if (!isBlank) {
+				isNotValid = false;
+			}
+
+			setIsDisabled(isNotValid);
+		}, 700),
+		[],
+	);
+	const onClickSubmit = () => {
+		values.division === "outgo"
+			? api
+					.post("/outgo/post", {
+						date: isOpen.day,
+						outgoName: values.account,
+						money: Number(values.money),
+						memo: values.memo,
+						outgoTag: values.category,
+						wasteList: false,
+						payment: values.method,
+						receiptImg: "",
+					})
+					.then(() => {
+						if (
+							new Date(isOpen.day).getMonth() ===
+							new Date(moment().format("YYYY-MM-DD")).getMonth()
+						) {
+							api
+								.get(`/outgo/monthly?date=${moment().format("YYYY-MM-DD")}`)
+								.then((res) => {
+									setMonthlyOutgo(res.data);
+								})
+								.catch((error) => {
+									console.log(error);
+								});
+						}
+
+						dispatch(
+							showToast({ message: "작성이 완료되었습니다", type: "success" }),
+						);
+					})
+					.catch((error) => {
+						console.log(error);
+					})
+			: api
+					.post("/income/post", {
+						date: isOpen.day,
+						incomeName: values.account,
+						money: Number(values.money),
+						memo: values.memo,
+						incomeTag: values.category,
+						receiptImg: "",
+					})
+					.then(() => {
+						if (
+							new Date(isOpen.day).getMonth() ===
+							new Date(moment().format("YYYY-MM-DD")).getMonth()
+						) {
+							api
+								.get(`/income/monthly?date=${moment().format("YYYY-MM-DD")}`)
+								.then((res) => {
+									setMonthlyIncome(res.data);
+								})
+								.catch((error) => {
+									console.log(error);
+								});
+						}
+						dispatch(
+							showToast({ message: "작성이 완료되었습니다", type: "success" }),
+						);
+					})
+					.catch((error) => {
+						console.log(error);
+					});
+		setIsOpen((prev) => {
+			const updated = { ...prev };
+			return { ...updated, writeIcon: false };
+		});
+	};
+
+	useEffect(() => {
+		checkValues(values);
+	}, [values]);
 
 	return (
 		<Container $isOpen={isOpen.writeIcon}>
@@ -164,9 +283,30 @@ const WriteModal = ({ isOpen, setIsOpen }: Props) => {
 			</div>
 			<div className="category">
 				<p>카테고리</p>
-				<select className="category__select">
-					<option>선택</option>
-					<option value="식비">카테고리 완성 되면 추후 추가 예정</option>
+				<select className="category__select" onChange={onChangeCategory}>
+					{values.division === "outgo" ? (
+						<>
+							<option value="">선택</option>
+							<option value="출금">출금</option>
+							<option value="식품">식비</option>
+							<option value="쇼핑">쇼핑</option>
+							<option value="취미">취미</option>
+							<option value="교통">교통</option>
+							<option value="통신">통신</option>
+							<option value="의류">의류</option>
+							<option value="뷰티">뷰티</option>
+							<option value="교육">교육</option>
+							<option value="여행">여행</option>
+						</>
+					) : (
+						<>
+							<option value="">선택</option>
+							<option value="입금">입금</option>
+							<option value="급여">급여</option>
+							<option value="이자">이자</option>
+							<option value="투자">투자</option>
+						</>
+					)}
 				</select>
 				<SvgIcon
 					className="deleteIcon"
@@ -177,10 +317,16 @@ const WriteModal = ({ isOpen, setIsOpen }: Props) => {
 			<div className="category">
 				<p>결제 수단</p>
 				<select className="category__select" onChange={onChangeMethod}>
-					<option>선택</option>
-					<option value="현금">현금</option>
-					<option value="카드">카드</option>
-					<option value="이체">이체</option>
+					{values.division === "income" ? (
+						<option value="x">x</option>
+					) : (
+						<>
+							<option value="">선택</option>
+							<option value="현금">현금</option>
+							<option value="카드">카드</option>
+							<option value="이체">이체</option>
+						</>
+					)}
 				</select>
 				<SvgIcon
 					className="deleteIcon"
@@ -207,7 +353,9 @@ const WriteModal = ({ isOpen, setIsOpen }: Props) => {
 			<div className="explanation">
 				<p>🖊️ 영수증 업로드시 자동으로 항목이 작성됩니다</p>
 			</div>
-			<button>작성하기</button>
+			<button disabled={isDisabled} onClick={onClickSubmit}>
+				작성하기
+			</button>
 		</Container>
 	);
 };
@@ -441,6 +589,11 @@ const Container = styled.div<{ $isOpen: boolean }>`
     margin-top: 3.5rem;
     color: white;
     font-weight: 500;
+
+    &:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
   }
 
 `;
