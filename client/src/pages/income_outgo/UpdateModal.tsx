@@ -2,20 +2,25 @@ import { SvgIcon } from "@mui/material";
 import { styled } from "styled-components";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import { useCallback, useEffect, useState } from "react";
 import { debounce } from "src/utils/timeFunc";
-import { type outgoType, type incomeType, type modalType } from ".";
+import {
+	type outgoType,
+	type incomeType,
+	type modalType,
+	type checkedType,
+} from ".";
 import { useDispatch } from "react-redux";
 import { showToast } from "src/store/slices/toastSlice";
 import { api } from "src/utils/refreshToken";
-import type moment from "moment";
 
 interface Props {
 	setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
+	checkedList: checkedType;
+	outgo: outgoType[];
+	income: incomeType[];
 	setIncome: React.Dispatch<React.SetStateAction<incomeType[]>>;
 	setOutgo: React.Dispatch<React.SetStateAction<outgoType[]>>;
-	getMoment: moment.Moment;
 }
 
 // type valuesType = Record<string, Record<string, string>>;
@@ -43,23 +48,17 @@ interface valuesType {
 	memo: string;
 }
 
-const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
-	const [values, setValues] = useState<valuesType[]>([
-		{
-			id: 1,
-			division: "",
-			date: "",
-			tag: "",
-			name: "",
-			payment: "",
-			money: "",
-			memo: "",
-		},
-	]);
+const UpdateModal = ({
+	setIsOpen,
+	checkedList,
+	outgo,
+	income,
+	setIncome,
+	setOutgo,
+}: Props) => {
+	const [values, setValues] = useState<valuesType[]>([]);
 	const [isDisabled, setIsDisabled] = useState<boolean>(true);
 	const dispatch = useDispatch();
-
-	console.log(values);
 
 	// const onChangeMoney = (e: React.ChangeEvent<HTMLInputElement>) => {
 	// 	const inputValue = e.target.value;
@@ -100,32 +99,6 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
 
 		setValues(updatedValues);
 	};
-	const onClickPlusBtn = () => {
-		const initialValues: valueType = {
-			division: "",
-			date: "",
-			tag: "",
-			name: "",
-			payment: "",
-			money: "",
-			memo: "",
-		};
-
-		const newRow = {
-			id: values.length !== 0 ? values[values.length - 1].id + 1 : 1,
-			...initialValues,
-		};
-		setValues((prevValues) => [...prevValues, newRow]);
-	};
-
-	const handleDeleteList = (id: number) => {
-		const filter = values.filter((row) => row.id !== id);
-		setValues([...filter]);
-		// setValues((prevValues) => {
-		// 	const { [id]: deletedValue, ...updatedValues } = prevValues;
-		// 	return updatedValues;
-		// });
-	};
 
 	const checkValues = useCallback(
 		debounce((values: valuesType) => {
@@ -158,7 +131,7 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
 		values.map((value) => {
 			value.division === "outgo"
 				? api
-						.post("/outgo/post", {
+						.patch(`/outgo/update/${value.id}`, {
 							date: value.date,
 							outgoName: value.name,
 							money: Number(value.money),
@@ -169,24 +142,22 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
 							receiptImg: "",
 						})
 						.then((res) => {
-							console.log(res.data);
-							// 작성한 데이터의 날짜와 현재 열려있는 페이지의 날짜가 같다면 저장(상태 최신화를 위해서 작성한 코드)
-							if (
-								new Date(res.data.date).getFullYear() ===
-									new Date(getMoment.format("YYYY-MM-DD")).getFullYear() &&
-								new Date(res.data.date).getMonth() + 1 ===
-									new Date(getMoment.format("YYYY-MM-DD")).getMonth() + 1
-							) {
-								setOutgo((prev: outgoType[]) => {
-									return [...prev, res.data];
-								});
-							}
+							setOutgo((prev: outgoType[]) => {
+								const updatedOutgo = [...prev];
+								const index = updatedOutgo.findIndex(
+									(el) => el.outgoId === value.id,
+								);
+								if (index !== -1) {
+									updatedOutgo[index] = res.data;
+								}
+								return updatedOutgo;
+							});
 						})
 						.catch((error) => {
 							console.log(error);
 						})
 				: api
-						.post("/income/post", {
+						.post(`/income/update/${value.id}`, {
 							date: value.date,
 							incomeName: value.name,
 							money: Number(value.money),
@@ -195,17 +166,16 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
 							receiptImg: "",
 						})
 						.then((res) => {
-							console.log(res.data);
-							if (
-								new Date(res.data.date).getFullYear() ===
-									new Date(getMoment.format("YYYY-MM-DD")).getFullYear() &&
-								new Date(res.data.date).getMonth() + 1 ===
-									new Date(getMoment.format("YYYY-MM-DD")).getMonth() + 1
-							) {
-								setIncome((prev: incomeType[]) => {
-									return [...prev, res.data];
-								});
-							}
+							setIncome((prev: incomeType[]) => {
+								const updatedIncome = [...prev];
+								const index = updatedIncome.findIndex(
+									(el) => el.incomeId === value.id,
+								);
+								if (index !== -1) {
+									updatedIncome[index] = res.data;
+								}
+								return updatedIncome;
+							});
 						})
 						.catch((error) => {
 							console.log(error);
@@ -214,10 +184,50 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
 		});
 		setIsOpen((prev) => {
 			const updated = { ...prev };
-			return { ...updated, writeModal: false };
+			return { ...updated, updateModal: false };
 		});
 		dispatch(showToast({ message: "작성이 완료되었습니다", type: "success" }));
 	};
+
+	useEffect(() => {
+		setValues((prevValues) => {
+			const updatedValues = [...prevValues];
+			if (checkedList.outgo.length !== 0) {
+				checkedList.outgo.forEach((id) => {
+					const filtered = outgo.filter((el) => el.outgoId === id)[0];
+					const initialValue: valuesType = {
+						id: filtered.outgoId,
+						division: "outgo",
+						date: filtered.date,
+						tag: filtered.outgoTag.tagName,
+						name: filtered.outgoName,
+						payment: filtered.payment,
+						money: String(filtered.money),
+						memo: filtered.memo,
+					};
+					updatedValues.push(initialValue);
+				});
+			}
+
+			if (checkedList.income.length) {
+				checkedList.income.forEach((id) => {
+					const filtered = income.filter((el) => el.incomeId === id)[0];
+					const initialValue: valuesType = {
+						id: filtered.incomeId,
+						division: "income",
+						date: filtered.date,
+						tag: filtered.incomeTag.tagName,
+						name: filtered.incomeName,
+						payment: "",
+						money: String(filtered.money),
+						memo: filtered.memo,
+					};
+					updatedValues.push(initialValue);
+				});
+			}
+			return updatedValues;
+		});
+	}, []);
 
 	useEffect(() => {
 		checkValues(values);
@@ -232,7 +242,7 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
 					onClick={() => {
 						setIsOpen((prev) => {
 							const updated = { ...prev };
-							return { ...updated, writeModal: false };
+							return { ...updated, updateModal: false };
 						});
 					}}
 					sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}
@@ -251,13 +261,14 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
 					<p>메모</p>
 				</div>
 				<Lists>
-					{values.map((value, idx) => {
+					{values?.map((value, idx) => {
 						return (
 							<li className="list" key={value.id}>
 								<div className="select">
 									<select
 										className="category__select"
 										name="division"
+										value={value.division}
 										onChange={(e) => {
 											handleInputChange(e, value.id);
 										}}
@@ -389,26 +400,10 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
 										handleInputChange(e, value.id);
 									}}
 								/>
-								<SvgIcon
-									className="list__delete"
-									component={ClearOutlinedIcon}
-									sx={{ stroke: "#ffffff", strokeWidth: 0.8 }}
-									onClick={() => {
-										handleDeleteList(value.id);
-									}}
-								/>
 							</li>
 						);
 					})}
 				</Lists>
-				<div className="row__plus" onClick={onClickPlusBtn}>
-					<SvgIcon
-						className="list__delete"
-						component={AddCircleOutlineOutlinedIcon}
-						sx={{ stroke: "#ffffff", strokeWidth: 0.8 }}
-					/>
-					<p>행 추가</p>
-				</div>
 				<button disabled={isDisabled} onClick={onClickSubmit}>
 					작성 완료
 				</button>
@@ -417,7 +412,7 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
 	);
 };
 
-export default LedgerWrite;
+export default UpdateModal;
 
 const Background = styled.div`
 	width: 100vw;
@@ -557,7 +552,7 @@ const Lists = styled.ul`
 	.list {
 		display: flex;
 		gap: 2rem;
-		margin-bottom: 1rem;
+		margin-bottom: 1.5rem;
 
 		.select {
 			display: flex;
