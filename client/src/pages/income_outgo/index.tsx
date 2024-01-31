@@ -23,6 +23,7 @@ import { showToast, hideToast } from "src/store/slices/toastSlice";
 import Toast, { ToastType } from "src/components/Layout/Toast";
 import { type RootState } from "src/store";
 import { api } from "src/utils/refreshToken";
+import UpdateModal from "./UpdateModal";
 
 export interface outgoType {
 	outgoId: number;
@@ -91,6 +92,7 @@ export interface checkedType {
 export interface modalType {
 	writeModal: boolean;
 	deleteModal: boolean;
+	updateModal: boolean;
 }
 
 interface filterType {
@@ -121,6 +123,7 @@ const History = () => {
 	const [isOpen, setIsOpen] = useState<modalType>({
 		writeModal: false,
 		deleteModal: false,
+		updateModal: false,
 	});
 
 	const [filtered, setFiltered] = useState<filterType>({
@@ -546,6 +549,11 @@ const History = () => {
 				dispatch(hideToast());
 			}
 		}, 100);
+		setCheckedList({
+			income: [],
+			outgo: [],
+			waste: [],
+		});
 	}, [modal, dispatch]);
 
 	return (
@@ -691,6 +699,12 @@ const History = () => {
 								className={`delete__list ${
 									location.pathname === "/waste" ? "disable" : ""
 								}`}
+								onClick={() => {
+									setIsOpen((prev) => {
+										const updated = { ...prev };
+										return { ...updated, updateModal: true };
+									});
+								}}
 							>
 								<SvgIcon
 									component={CreateOutlinedIcon}
@@ -791,6 +805,16 @@ const History = () => {
 					setIncome={setIncome}
 					setOutgo={setOutgo}
 					getMoment={getMoment}
+				/>
+			)}
+			{isOpen.updateModal && (
+				<UpdateModal
+					setIsOpen={setIsOpen}
+					outgo={outgo}
+					income={income}
+					checkedList={checkedList}
+					setIncome={setIncome}
+					setOutgo={setOutgo}
 				/>
 			)}
 			{isOpen.deleteModal && (
