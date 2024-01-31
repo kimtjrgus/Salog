@@ -5,6 +5,7 @@ import { getCookie, removeCookie, setCookie } from "./cookie";
 
 export const api = axios.create({
 	baseURL: process.env.REACT_APP_SERVER_URL,
+	headers: { "Content-Type": "application/json" },
 });
 
 const RefreshToken = () => {
@@ -21,7 +22,7 @@ const RefreshToken = () => {
 		api.interceptors.response.use(
 			(response) => response,
 			async (error) => {
-				if (error.response && error.response.status === 401) {
+				if (error.response.status === 401) {
 					const refreshToken = getCookie("refreshToken");
 					const accessToken = localStorage.getItem("accessToken");
 					const current = new Date();
@@ -45,14 +46,12 @@ const RefreshToken = () => {
 						localStorage.setItem("accessToken", newAccessToken);
 
 						// 이전 요청을 재시도
-						console.log(error.config);
-
 						return await api.request(error.config);
 					} catch (error) {
 						console.log("토큰 재발급 실패:", error);
 						// refreshToken 재발급에 실패한 경우 로그아웃 처리 등을 수행할 수 있습니다.
-						removeCookie("accessToken", { path: "/" });
 						removeCookie("refreshToken", { path: "/" });
+						removeCookie("accessToken", { path: "/" });
 						navigate("/login", { replace: true });
 					}
 				}
