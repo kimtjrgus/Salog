@@ -55,8 +55,6 @@ const WriteModal = ({
 		memo: "",
 	});
 
-	console.log(values);
-
 	const dispatch = useDispatch();
 
 	// input hover, click, blur 감지 후 실행 함수
