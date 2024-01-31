@@ -56,8 +56,6 @@ const DashboardCalendar = ({
 	};
 
 	useEffect(() => {
-		console.log("calendar get");
-
 		api
 			.get(`/calendar?date=${moment(startDate).format("YYYY-MM-DD")}`)
 			.then((res) => {
