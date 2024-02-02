@@ -8,7 +8,6 @@ import { Input } from "../login";
 import Reactquill from "./TextEditor";
 import moment from "moment";
 import { api } from "src/utils/refreshToken";
-import useTokenCheck from "src/hooks/useTokenCheck";
 
 export interface valuesType {
 	title: string;
@@ -21,9 +20,12 @@ const DiaryWrite = () => {
 	const [category, setCategory] = useState<string>("");
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const [tagModal, setTagModal] = useState<boolean>(false);
-	useTokenCheck();
 
-	console.log(categories);
+	// BODY에서 처음 올라온 img만 저장하여 서버로 전송(imgSrc)
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(values.body, "text/html");
+	const imgTag = doc.querySelector("img");
+	const imgSrc = imgTag?.getAttribute("src");
 
 	const navigate = useNavigate();
 
@@ -114,7 +116,7 @@ const DiaryWrite = () => {
 					date: moment().format("YYYY-MM-DD"),
 					title: values.title,
 					body: values.body,
-					img: "",
+					img: imgSrc ?? "",
 					tagList: categories,
 				})
 				.then(() => {

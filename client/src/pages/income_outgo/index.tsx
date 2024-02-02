@@ -944,7 +944,7 @@ const MainLists = styled.div`
 			}
 
 			&:nth-child(3) {
-				width: 8.2rem;
+				width: 8.5rem;
 				cursor: pointer;
 				display: flex;
 				align-items: center;
