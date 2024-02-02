@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { styled } from "styled-components";
 import Quill from "quill";
+
 import { ImageActions } from "@xeger/quill-image-actions";
 import { ImageFormats } from "@xeger/quill-image-formats";
+import { storage } from "src/firebase";
+import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
 
 Quill.register("modules/imageActions", ImageActions);
 Quill.register("modules/imageFormats", ImageFormats);
@@ -15,21 +18,72 @@ interface propsType {
 }
 
 const ReactQuillComponent = (props: propsType) => {
+	const quillRef = useRef<any>(null);
+
+	const quill = quillRef.current;
+	console.log(quill);
+
+	const imageHandler = async (): Promise<void> => {
+		const input = document.createElement("input");
+		input.setAttribute("type", "file");
+		input.setAttribute("accept", "image/*");
+		input.click();
+		await new Promise<void>((resolve) => {
+			input.addEventListener("change", () => {
+				const editor = quillRef.current.getEditor();
+				const file = input?.files?.[0];
+				const range = editor.getSelection(true);
+				if (file) {
+					const storageRef = ref(storage, `image/${Date.now()}`);
+					const uploadTask = uploadBytes(storageRef, file);
+					uploadTask
+						.then((snapshot) => {
+							getDownloadURL(snapshot.ref)
+								.then((url) => {
+									editor.insertEmbed(range.index, "image", url);
+									editor.setSelection(range.index + 1);
+								})
+								.catch((error) => {
+									console.log(error);
+								})
+								.finally(() => {
+									resolve();
+								});
+						})
+						.catch((error) => {
+							console.log(error);
+						});
+				} else {
+					resolve();
+				}
+			});
+		});
+	};
+
 	const modules = React.useMemo(
 		() => ({
 			imageActions: {},
 			imageFormats: {},
-			toolbar: [
-				[{ header: [1, 2, 3, false] }],
-				["bold", "italic", "underline", "strike"],
-				[{ list: "ordered" }, { list: "bullet" }],
-				["image"],
-				[{ align: [] }, { color: [] }],
-				["clean"],
-			],
-			//   handlers: { image: imageHandler },
-			// ImageResize: { modules: ["Resize"] },
-			// imageDrop: true,
+			toolbar: {
+				container: [
+					[{ header: [1, 2, 3, false] }],
+					[{ align: [] }],
+					["bold", "italic", "underline", "strike"],
+					[{ list: "ordered" }, { list: "bullet" }],
+					[
+						{
+							color: [],
+						},
+						{ background: [] },
+					],
+					["image"],
+				],
+				handlers: { image: imageHandler },
+				imageDrop: true,
+				ImageResize: {
+					modules: ["Resize"],
+				},
+			},
 		}),
 		[],
 	);
@@ -54,6 +108,7 @@ const ReactQuillComponent = (props: propsType) => {
 		<QuillContainer>
 			<ReactQuill
 				theme="snow"
+				ref={quillRef}
 				modules={modules}
 				formats={formats}
 				value={props.body || ""}

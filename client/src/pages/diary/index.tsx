@@ -5,7 +5,6 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import NotData from "../../assets/NotData.png";
 import { Input } from "../login";
-import Test from "../../assets/Test.jpeg";
 import dateAsKor from "src/utils/dateAsKor";
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -181,7 +180,7 @@ const Diary = () => {
 												{/* <p>지출 내역: 4개 / 수입 내역: 0개</p> */}
 											</Info>
 										</ListMain>
-										<img src={Test} alt="이미지" />
+										{diary.img !== "" && <img src={diary.img} alt="이미지" />}
 									</List>
 								);
 							})}
@@ -341,6 +340,10 @@ const List = styled.li`
 	border-radius: 4px;
 	box-shadow: 1px 1px 1px rgb(0, 0, 0, 25%);
 	cursor: pointer;
+
+	img {
+		width: 17rem;
+	}
 `;
 
 const ListMain = styled.div`
