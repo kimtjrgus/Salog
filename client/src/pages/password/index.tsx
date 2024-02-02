@@ -1,5 +1,5 @@
 import { styled } from "styled-components";
-import { Input, PasswordLabel, SubmitBtn } from "../login";
+import { Input, PasswordLabel, SubmitBtn } from "../../pages/login";
 import { ReactComponent as Logo } from "../../assets/Slogo.svg";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -9,7 +9,7 @@ import {
 	type confirmType,
 	type errorType,
 	type inputType,
-} from "../sign_up";
+} from "../../pages/sign_up";
 import { checkEmail, checkPassword } from "src/utils/validCheck";
 import axios from "axios";
 import Toast, { ToastType } from "src/components/Layout/Toast";
