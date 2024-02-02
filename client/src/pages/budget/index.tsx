@@ -254,7 +254,7 @@ const Budget = () => {
 								<div></div>
 								<p>{lastMonthlyBudget.budget.toLocaleString()}원</p>
 								<p>{`${
-									new Date().getMonth() === 0 ? 12 : new Date().getMonth() === 0
+									new Date().getMonth() === 0 ? 12 : new Date().getMonth()
 								}월 예산`}</p>
 							</LastMonthBar>
 							<MonthBar
