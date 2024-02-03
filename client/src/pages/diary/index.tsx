@@ -45,7 +45,6 @@ interface tagType {
 const Diary = () => {
   const [diaries, setDiaries] = useState<diaryType[]>([]);
   const [tagLists, setTagLists] = useState<tagType[]>([]);
-  console.log(diaries);
   const [searchVal, setSearchVal] = useState<string>("");
   // 무한 스크롤에 사용 될 페이지와 로딩 상태
   const [page, setPage] = useState(1);
@@ -62,10 +61,6 @@ const Diary = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showButton, setShowButton] = useState(false); // top 버튼을 보여주는 상태
   const debouncedSearchVal = useDebounce(searchVal, 300); // 300ms 딜레이로 디바운스 적용
-
-  //   const mapArray = filterDiary.length > 0 ? filterDiary : diaries;
-
-  // const { scrollY, containerRef } = useScroll();
 
   const path = useLocation().pathname;
   const search = useLocation().search;
