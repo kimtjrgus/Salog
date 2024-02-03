@@ -16,6 +16,8 @@ export interface valuesType {
 
 const DiaryWrite = () => {
 	const [values, setValues] = useState<valuesType>({ title: "", body: "" });
+	console.log(values);
+
 	const [categories, setCategories] = useState<string[]>([]);
 
 	const [category, setCategory] = useState<string>("");
@@ -110,7 +112,7 @@ const DiaryWrite = () => {
 			Toast(ToastType.error, "내용을 10자 이상 입력해주세요");
 		} else {
 			api
-				.patch(`/diary/${id}/update`, {
+				.patch(`/diary/update/${id}`, {
 					title: values.title,
 					body: values.body,
 					tagList: categories,

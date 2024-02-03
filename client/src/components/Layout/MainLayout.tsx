@@ -26,13 +26,12 @@ const Full = styled.div`
 
 const Inner = styled.div`
 	display: flex;
-	height: 92.5vh;
+	height: 100vh;
 `;
 
 const Container = styled.div`
 	width: 92%;
-	height: 100vh;
-	overflow-y: hidden;
+	height: 100%;
 	max-width: 130.5rem;
 	margin: 0 auto;
 	padding-top: 7.5rem;

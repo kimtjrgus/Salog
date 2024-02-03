@@ -17,13 +17,14 @@
     "@typescript-eslint/strict-boolean-expressions" : 0,
     "@typescript-eslint/no-non-null-assertion" : "off",
     "react/react-in-jsx-scope": "off",
-    "prettier/prettier": [
-            "error",
-            {
-                "useTabs": true,
-                "endOfLine": "auto",
-                "singleQuote": false
-            }
-        ]
+    "prettier/prettier": 0
+    // [
+    //         "error",
+    //         {
+    //             "useTabs": true,
+    //             "endOfLine": "auto",
+    //             "singleQuote": false
+    //         }
+    // ]
   }
 }

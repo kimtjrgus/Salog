@@ -77,6 +77,22 @@ export default OutgoList;
 const Container = styled.ul`
 	display: flex;
 	flex-direction: column;
+	max-height: 39.3rem;
+	overflow: overlay;
+
+	&::-webkit-scrollbar {
+		width: 3px; /* 스크롤바의 너비 */
+	}
+
+	&::-webkit-scrollbar-thumb {
+		height: 30%; /* 스크롤바의 길이 */
+		background: ${(props) =>
+			props.theme.COLORS.LIGHT_BLUE}; /* 스크롤바의 색상 */
+	}
+
+	&::-webkit-scrollbar-track {
+		background: rgba(33, 122, 244, 0.1); /*스크롤바 뒷 배경 색상*/
+	}
 
 	.ledger__list {
 		border: 1px solid #c7c7c7;
@@ -96,10 +112,11 @@ const Container = styled.ul`
 
 		p {
 			font-size: 1.2rem;
-			white-space: nowrap;
+			white-space: wrap;
 
 			&:nth-child(3) {
-				width: 8.3rem;
+				width: 8.5rem;
+				white-space: nowrap;
 			}
 
 			&:nth-child(5) {

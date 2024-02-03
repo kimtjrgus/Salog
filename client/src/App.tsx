@@ -9,14 +9,14 @@ import DiaryDetail from "./pages/diary_detail";
 import DiaryWrite from "./pages/diary_write";
 import History from "./pages/income_outgo";
 import Login from "./pages/login";
-import PasswordFind from "./pages/password";
 import SignUp from "./pages/sign_up";
 import PublicRoute from "./components/Common/PublicRoute";
 import DiaryUpdate from "./pages/diary_update";
 import ScrollToTop from "./utils/scrollToTop";
 import Fixed from "./pages/fixed_account";
 import Budget from "./pages/budget";
-import MonthRadio from "./pages/monthRadio";
+import MonthRadio from "./pages/monthChart";
+import PasswordFind from "./pages/password";
 
 function App() {
 	return (

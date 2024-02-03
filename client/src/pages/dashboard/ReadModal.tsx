@@ -247,7 +247,7 @@ const Container = styled.div`
 			}
 
 			&:nth-child(2) {
-				width: 8.2rem;
+				width: 8.5rem;
 			}
 			&:nth-child(3) {
 				width: 5rem;
@@ -277,7 +277,7 @@ const Container = styled.div`
 	.date {
 		overflow: hidden;
 		overflow-wrap: break-word;
-		width: 8.2rem;
+		width: 8.5rem;
 	}
 
 	.tag {

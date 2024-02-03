@@ -240,7 +240,7 @@ const MonthRadio = () => {
 
 	return (
 		<Container>
-			<h3>1월 지출 분석</h3>
+			<h3>{`${new Date().getMonth() + 1}월 지출 분석`}</h3>
 			<TopContainer>
 				<LineGraph>
 					<div className="left__line">
@@ -325,9 +325,7 @@ const MonthRadio = () => {
 										<p>{lastMonthlyOutgo.monthlyTotal.toLocaleString()}원</p>
 										{/* getMonth()는 0~11 이기 때문에 0만 예외처리 */}
 										<p>{`${
-											new Date().getMonth() === 0
-												? 12
-												: new Date().getMonth() === 0
+											new Date().getMonth() === 0 ? 12 : new Date().getMonth()
 										}월 지출`}</p>
 									</LastBarList>
 									<LastBarList height={`100`}>
@@ -356,9 +354,7 @@ const MonthRadio = () => {
 										<p>{lastMonthlyOutgo.monthlyTotal.toLocaleString()}원</p>
 										{/* getMonth()는 0~11 이기 때문에 0만 예외처리 */}
 										<p>{`${
-											new Date().getMonth() === 0
-												? 12
-												: new Date().getMonth() === 0
+											new Date().getMonth() === 0 ? 12 : new Date().getMonth()
 										}월 지출`}</p>
 									</LastBarList>
 									<BarList height={`${currentRadio * 100}`}>
