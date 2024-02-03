@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface DiaryTagLinkRepository extends JpaRepository<DiaryTagLink, Long> {
     List<DiaryTagLink> findByDiaryTagTagNameAndDiaryTagMember(String tagName, Member member);
-    Long countByDiaryTag(DiaryTag diaryTag);
+    int countByDiaryTag(DiaryTag diaryTag);
 
     @Transactional
     @Modifying // update나 delete는 해당 어노테이션을 추가해줘야함. (@Query만 사용할 경우 기본 select)
