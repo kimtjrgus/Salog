@@ -348,7 +348,7 @@ const Quill = styled(QuillContainer)`
 	}
 `;
 
-const BookContainer = styled.div`
+export const BookContainer = styled.div`
 	width: 30%;
 	height: 50vh;
 	margin-top: 5rem;
