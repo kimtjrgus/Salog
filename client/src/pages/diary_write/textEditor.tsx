@@ -163,7 +163,23 @@ export const QuillContainer = styled.div`
 	}
 
 	.ql-editor {
-		padding: 12px 0px;
+		padding: 12px 1rem;
+		padding-bottom: 3rem;
+		padding-right: 2rem;
+		&::-webkit-scrollbar {
+			width: 6px; /* 스크롤바의 너비 */
+			background-color: transparent; /* 스크롤바 배경색을 투명으로 설정 */
+		}
+
+		&::-webkit-scrollbar-thumb {
+			height: 30%; /* 스크롤바의 길이 */
+			background: ${(props) =>
+				props.theme.COLORS.LIGHT_BLUE}; /* 스크롤바의 색상 */
+		}
+
+		&::-webkit-scrollbar-track {
+			background: rgba(33, 122, 244, 0.1); /*스크롤바 뒷 배경 색상*/
+		}
 	}
 
 	.ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
@@ -183,6 +199,11 @@ export const QuillContainer = styled.div`
 	.ql-snow .ql-picker.ql-header .ql-picker-label::before,
 	.ql-snow .ql-picker.ql-header .ql-picker-item::before {
 		color: gray;
+	}
+
+	.ql-container > .ql-editor.ql-blank::before {
+		left: 1rem;
+		right: 2rem;
 	}
 
 	.ql-snow .ql-stroke {
