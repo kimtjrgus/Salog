@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.util.List;
 
 @RestController
 @RequestMapping("/diary")
@@ -72,6 +73,15 @@ public class DiaryController {
                 diaryService.findTitleDiaries(token, page, size, title);
 
         return new ResponseEntity<>(pageDiaries, HttpStatus.OK);
+    }
+
+    // diaryCalendar get
+    @GetMapping("/calendar")
+    public ResponseEntity<?> getDiaryCalendar(@RequestHeader(name = "Authorization") String token,
+                                              @RequestParam String date){
+        List<DiaryDto.ResponseCalender> response = diaryService.getDiaryCalendar(token, date);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // delete

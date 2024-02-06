@@ -31,6 +31,7 @@ import javax.validation.Validator;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -269,6 +270,24 @@ public class DiaryService {
                 .collect(Collectors.toList());
 
         return new MultiResponseDto<>(diaryDtoList, diaryPage);
+    }
+
+    // Get Diary Calendar
+    public List<DiaryDto.ResponseCalender> getDiaryCalendar(String token, String date){
+        tokenBlackListService.isBlackListed(token);
+        long memberId = jwtTokenizer.getMemberId(token);
+
+        String[] dateParts = date.split("-");
+        int year = Integer.parseInt(dateParts[0]);
+        int month = Integer.parseInt(dateParts[1]);
+
+        // 해당 '년'과 '월'에 대한 일기의 날짜만을 가져옴, 중복제거
+        List<LocalDate> dates = diaryRepository.findDistinctDatesByMemberIdAndYearAndMonth(memberId, year, month);
+
+        // 결과를 DiaryDto.ResponseCalender 객체의 리스트로 변환
+        return dates.stream()
+                .map(DiaryDto.ResponseCalender::new)
+                .collect(Collectors.toList());
     }
 
     // delete
