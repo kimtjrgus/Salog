@@ -42,17 +42,19 @@ public class IncomeService {
     private final LedgerTagService tagService;
     private final Validator validator;
 
-    public void createIncome(String token, IncomeDto.Post incomePostDto) {
+    public IncomeDto.Response createIncome(String token, IncomeDto.Post incomePostDto) {
         Income income = incomeMapper.incomePostDtoToIncome(incomePostDto);
 
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
         income.setMember(member);
 
         // 태그
-        tagHandler(incomePostDto.getIncomeTag(), token, income);
+        Income savedIncome = tagHandler(incomePostDto.getIncomeTag(), token, income);
+
+        return incomeMapper.incomeToIncomeResponseDto(savedIncome);
     }
 
-    public void updateIncome(String token, long incomeId, IncomeDto.Patch incomePatchDto) {
+    public IncomeDto.Response updateIncome(String token, long incomeId, IncomeDto.Patch incomePatchDto) {
 
         Income income = incomeMapper.incomePatchDtoToIncome(incomePatchDto);
         Income findIncome = findVerifiedIncome(incomeId);
@@ -67,7 +69,9 @@ public class IncomeService {
                 .ifPresent(findIncome::setMemo);
 
         // 태그
-        tagHandler(incomePatchDto.getIncomeTag(), token, findIncome);
+        Income savedIncome = tagHandler(incomePatchDto.getIncomeTag(), token, findIncome);
+
+        return incomeMapper.incomeToIncomeResponseDto(savedIncome);
     }
 
     public MultiResponseDto<IncomeDto.Response> getIncomes(String token, int page, int size, String incomeTag, String date) {
@@ -168,7 +172,7 @@ public class IncomeService {
     }
 
     // 태그 등록, 중복 체크
-    private void tagHandler(String incomePostDto, String token, Income income) {
+    private Income tagHandler(String incomePostDto, String token, Income income) {
         LedgerTag ledgerTag = null;
 
         if (incomePostDto != null) {
@@ -197,8 +201,9 @@ public class IncomeService {
             income.setLedgerTag(ledgerTag);
         }
 
-        incomeRepository.save(income);
-
+        Income savedIncome = incomeRepository.save(income);
         tagService.deleteUnusedIncomeTagsByMemberId(token);
+
+        return savedIncome;
     }
 }

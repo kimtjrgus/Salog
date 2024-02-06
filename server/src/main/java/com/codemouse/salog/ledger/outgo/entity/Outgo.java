@@ -22,7 +22,7 @@ public class Outgo {
     private LocalDate date;
 
     @Column(nullable = false)
-    private Long money;
+    private int money;
 
     @Column
     private String outgoName;

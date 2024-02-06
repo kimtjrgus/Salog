@@ -46,39 +46,38 @@ public class OutgoService {
 
     // POST
     @Transactional
-    public void postOutgo (String token, OutgoDto.Post outgoDTO){
+    public OutgoDto.Response postOutgo (String token, OutgoDto.Post outgoDTO){
         tokenBlackListService.isBlackListed(token);
 
         Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
         Outgo outgo = outgoMapper.OutgoPostDtoToOutgo(outgoDTO);
         outgo.setMember(member);
         // 태그 생성 로직
-        tagHandler(outgoDTO.getOutgoTag(), token, outgo);
+        Outgo savedOutgo = tagHandler(outgoDTO.getOutgoTag(), token, outgo);
+
+        return outgoMapper.OutgoToOutgoResponseDto(savedOutgo);
     }
 
     // PATCH
     @Transactional
-    public void patchOutgo (String token, long outgoId, OutgoDto.Patch outgoDto){
+    public OutgoDto.Response patchOutgo (String token, long outgoId, OutgoDto.Patch outgoDto){
         tokenBlackListService.isBlackListed(token);
 
         Outgo outgo = outgoMapper.OutgoPatchDtoToOutgo(outgoDto);
         Outgo findOutgo = findVerifiedOutgo(outgoId);
         memberService.verifiedRequest(token, findOutgo.getMember().getMemberId());
 
-        Optional.ofNullable(outgo.getDate()).ifPresent(findOutgo::setDate);
-        Optional.ofNullable(outgo.getOutgoName()).ifPresent(findOutgo::setOutgoName);
-        Optional.ofNullable(outgo.getMoney()).ifPresent(findOutgo::setMoney);
-        Optional.ofNullable(outgo.getPayment()).ifPresent(findOutgo::setPayment);
-        Optional.ofNullable(outgo.getMemo()).ifPresent(findOutgo::setMemo);
-        Optional.ofNullable(outgo.getReceiptImg()).ifPresent(findOutgo::setReceiptImg);
-        Optional.ofNullable(outgo.isWasteList()).ifPresent(findOutgo::setWasteList);
+        Optional.of(outgo.getDate()).ifPresent(findOutgo::setDate);
+        Optional.of(outgo.getOutgoName()).ifPresent(findOutgo::setOutgoName);
+        Optional.of(outgo.getMoney()).ifPresent(findOutgo::setMoney);
+        Optional.of(outgo.getPayment()).ifPresent(findOutgo::setPayment);
+        Optional.of(outgo.getMemo()).ifPresent(findOutgo::setMemo);
+        Optional.of(outgo.getReceiptImg()).ifPresent(findOutgo::setReceiptImg);
+        Optional.of(outgo.isWasteList()).ifPresent(findOutgo::setWasteList);
 
-        if(outgoDto.getOutgoTag() != null){
-            tagHandler(outgoDto.getOutgoTag(), token, findOutgo);
-        }
-        else{
-            outgoRepository.save(findOutgo);
-        }
+        Outgo savedOutgo = tagHandler(outgoDto.getOutgoTag(), token, findOutgo);
+
+        return outgoMapper.OutgoToOutgoResponseDto(savedOutgo);
     }
 
     // GET All List
@@ -120,14 +119,15 @@ public class OutgoService {
         List<LedgerTagDto.MonthlyResponse> sumByTags = results.stream()
                 .map(result -> {
                     String tagName = (String) result[0];
-                    long tagSum = ((Number) result[1]).longValue();
+                    long tagSum = (result[1] != null ? ((Number) result[1]).longValue() : 0L);
                     return new LedgerTagDto.MonthlyResponse(tagName, tagSum);
                 })
                 .collect(Collectors.toList());
 
         // 월간 지출 합계를 계산합니다.
-        long monthlyOutgo =
-                sumByTags.stream().mapToLong(LedgerTagDto.MonthlyResponse::getTagSum).sum();
+        long monthlyOutgo = Optional.ofNullable(
+                outgoRepository.findTotalOutgoByMonth(memberId, year, month))
+                .orElse(0L);
 
         return new OutgoDto.MonthlyResponse(monthlyOutgo, sumByTags);
     }
@@ -145,7 +145,7 @@ public class OutgoService {
         List<LedgerTagDto.MonthlyResponse> sumByTags = results.stream()
                 .map(result -> {
                     String tagName = (String) result[0];
-                    long tagSum = ((Number) result[1]).longValue();
+                    long tagSum = (result[1] != null ? ((Number) result[1]).longValue() : 0L);
                     return new LedgerTagDto.MonthlyResponse(tagName, tagSum);
                 })
                 .collect(Collectors.toList());
@@ -195,7 +195,7 @@ public class OutgoService {
     }
 
     // 태그 등록, 중복 체크
-    private void tagHandler(String outgoPostDto, String token, Outgo outgo) {
+    private Outgo tagHandler(String outgoPostDto, String token, Outgo outgo) {
         LedgerTag ledgerTag = null;
 
         if (outgoPostDto != null) {
@@ -218,8 +218,10 @@ public class OutgoService {
             outgo.setLedgerTag(ledgerTag);
         }
 
-        outgoRepository.save(outgo);
+        Outgo savedOutgo = outgoRepository.save(outgo);
         ledgerTagService.deleteUnusedOutgoTagsByMemberId(token);
+
+        return savedOutgo;
     }
 
     // 페이지 생성 중복 코드 통일

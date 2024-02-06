@@ -46,14 +46,17 @@ public class DiaryTagService {
     }
 
     // All DiaryTagList
-    public List<DiaryTagDto.Response> getAllDiaryTagList(String token){
+    public List<DiaryTagDto.ResponseTagList> getAllDiaryTagList(String token){
         tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
         List<DiaryTag> diaryTags = diaryTagRepository.findAllByMemberMemberId(memberId);
 
-        List<DiaryTagDto.Response> tagList = new ArrayList<>();
+        List<DiaryTagDto.ResponseTagList> tagList = new ArrayList<>();
         for (DiaryTag diaryTag : diaryTags) {
-            DiaryTagDto.Response tagDto = mapper.DiaryTagToDiaryTagResponseDto(diaryTag);
+            int diaryCount = diaryTagLinkRepository.countByDiaryTag(diaryTag);
+            DiaryTagDto.ResponseTagList tagDto = new DiaryTagDto.ResponseTagList(
+                    diaryTag.getDiaryTagId(), diaryTag.getTagName(), diaryCount);
+
             tagList.add(tagDto);
         }
 
@@ -81,7 +84,7 @@ public class DiaryTagService {
 
         for (DiaryTag tag : allTags) {
             // 태그와 연결된 다이어리 개수 조회
-            long diaryCount = diaryTagLinkRepository.countByDiaryTag(tag);
+            int diaryCount = diaryTagLinkRepository.countByDiaryTag(tag);
 
             if (diaryCount == 0) {
                 // 다이어리와 연결점이 없는 경우 태그 삭제

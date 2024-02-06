@@ -295,6 +295,8 @@ public class DiaryService {
                 tagService.deleteDiaryTag(token ,diaryTag.getDiaryTagId());
             }
         }
+        // 중간 테이블의 레코드를 삭제
+        diaryTagLinkRepository.deleteByDiaryId(diaryId);
 
         diaryRepository.deleteById(diaryId);
     }

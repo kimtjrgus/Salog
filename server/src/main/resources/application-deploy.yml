@@ -1,0 +1,55 @@
+server:
+  port: 80
+  error:
+    whitelabel:
+      enabled: false
+spring:
+  profiles: deploy
+  datasource:
+    url: jdbc:mysql://${AWS_RDS_URL}/salogdb
+    username: admin
+    password: ${AWS_RDS_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect # mysql8버전
+    hibernate:
+      ddl-auto: update
+    show-sql: true      # SQL 쿼리 출력
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        color-codes: true
+        use_sql_comments: true
+    defer-datasource-initialization: true  # 데이터 소스 초기화 지연 설정
+  output:
+    ansi:
+      enabled: ALWAYS
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+email:
+  sender:
+    man: ${EMAIL}
+    password: ${EMAIL_PASSWORD}
+logging:
+  level:
+    org:
+      hibernate:
+        #        SQL: debug           # jpa 설정에서 쿼리를 보여주므로 필요 없음.
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
+jwt:
+  key: ${JWT_SECRET_KEY}
+  access-token-expiration-minutes: 60
+  refresh-token-expiration-minutes: 1440

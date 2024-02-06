@@ -21,7 +21,7 @@ public class FixedOutgo {
     private LocalDate date;
 
     @Column(nullable = false)
-    private long money;
+    private int money;
 
     @Column
     private String outgoName;

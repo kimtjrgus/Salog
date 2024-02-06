@@ -23,24 +23,26 @@ public class FixedOutgoController {
 
     // POST
     @PostMapping("/post")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void postFixedOutgo (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> postFixedOutgo (@RequestHeader(name = "Authorization") String token,
                                 @Valid @RequestBody FixedOutgoDto.Post requestBody){
-        fixedOutgoService.createFixedOutgo(token, requestBody);
+        FixedOutgoDto.Response response = fixedOutgoService.createFixedOutgo(token, requestBody);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     // PATCH
     @PatchMapping("/update/{fixedOutgo-id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void patchFixedOutgo (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> patchFixedOutgo (@RequestHeader(name = "Authorization") String token,
                                  @PathVariable("fixedOutgo-id") @Positive long fixedOutgoId,
                                  @Valid @RequestBody FixedOutgoDto.Patch requestBody){
-        fixedOutgoService.updateFixedOutgo(token, fixedOutgoId, requestBody);
+        FixedOutgoDto.Response response = fixedOutgoService.updateFixedOutgo(token, fixedOutgoId, requestBody);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // GET
     @GetMapping("/get")
-    public ResponseEntity getAllFixedOutgos (@RequestHeader(name = "Authorization") String token,
+    public ResponseEntity<?> getAllFixedOutgos (@RequestHeader(name = "Authorization") String token,
                                              @Positive @RequestParam int page,
                                              @Positive @RequestParam int size,
                                              @Valid @RequestParam String date){

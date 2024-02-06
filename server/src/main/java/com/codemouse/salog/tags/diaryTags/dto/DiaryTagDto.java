@@ -17,7 +17,15 @@ public class DiaryTagDto {
     @AllArgsConstructor
     @Getter
     public static class Response {
-        private Long diaryTagId;
+        private long diaryTagId;
         private String tagName;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public static class ResponseTagList {
+        private long diaryTagId;
+        private String tagName;
+        private int diaryCount;
     }
 }
