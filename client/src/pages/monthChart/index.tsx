@@ -428,18 +428,24 @@ const MonthRadio = () => {
         </Budget>
         <Waste>
           <h5>낭비 리스트</h5>
-          <div className="waste__container">
-            <div className="waste__header">
-              <div>사용 내역</div>
-              <div>금액</div>
+          {wasteList.length === 0 ? (
+            <div className="null__container">
+              이번 달 추가된 낭비 리스트가 없습니다.
             </div>
-            {wasteList.map((waste, idx) => (
-              <div className="waste__lists" key={idx}>
-                <div>{waste.outgoName}</div>
-                <div>{waste.money}</div>
+          ) : (
+            <div className="waste__container">
+              <div className="waste__header">
+                <div>사용 내역</div>
+                <div>금액</div>
               </div>
-            ))}
-          </div>
+              {wasteList.map((waste, idx) => (
+                <div className="waste__lists" key={idx}>
+                  <div>{waste.outgoName}</div>
+                  <div>{waste.money}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </Waste>
       </BottomContainer>
     </Container>
@@ -943,6 +949,16 @@ const Waste = styled.div`
   padding: 1.5rem;
   width: 25%;
   height: 100%;
+
+  .null__container {
+    width: 100%;
+    height: 16rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.05rem;
+    color: rgb(98, 98, 115);
+  }
 
   h5 {
     font-size: 1.3rem;
