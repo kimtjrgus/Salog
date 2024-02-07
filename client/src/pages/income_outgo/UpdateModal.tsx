@@ -206,7 +206,7 @@ const UpdateModal = ({
       const updated = { ...prev };
       return { ...updated, updateModal: false };
     });
-    dispatch(showToast({ message: "작성이 완료되었습니다", type: "success" }));
+    dispatch(showToast({ message: "수정이 완료되었습니다", type: "success" }));
   };
 
   useEffect(() => {
@@ -387,15 +387,9 @@ const UpdateModal = ({
                 <input
                   type="text"
                   className="account__name"
-                  // name={
-                  // 	values[value.id]?.division === "outgo"
-                  // 		? "outgoName"
-                  // 		: values[value.id]?.division === "income"
-                  // 		  ? "incomeName"
-                  // 		  : ""
-                  // }
                   name="name"
                   value={value.name}
+                  maxLength={15}
                   onChange={(e) => {
                     handleInputChange(e, value.id);
                   }}
@@ -444,6 +438,7 @@ const UpdateModal = ({
                   className="memo"
                   name="memo"
                   value={value.memo}
+                  maxLength={20}
                   onChange={(e) => {
                     handleInputChange(e, value.id);
                   }}
@@ -453,7 +448,7 @@ const UpdateModal = ({
           })}
         </Lists>
         <button disabled={isDisabled} onClick={onClickSubmit}>
-          작성 완료
+          수정 완료
         </button>
       </Container>
     </Background>

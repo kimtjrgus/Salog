@@ -359,15 +359,9 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
                 <input
                   type="text"
                   className="account__name"
-                  // name={
-                  // 	values[value.id]?.division === "outgo"
-                  // 		? "outgoName"
-                  // 		: values[value.id]?.division === "income"
-                  // 		  ? "incomeName"
-                  // 		  : ""
-                  // }
                   name="name"
                   value={value.name}
+                  maxLength={15}
                   onChange={(e) => {
                     handleInputChange(e, value.id);
                   }}
@@ -403,8 +397,6 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
                 <input
                   className="account__name"
                   value={values[idx].money}
-                  size={16}
-                  // onChange={onChangeMoney}
                   onChange={(e) => {
                     handleInputChange(e, value.id);
                   }}
@@ -416,6 +408,7 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
                   className="memo"
                   name="memo"
                   value={value.memo}
+                  maxLength={20}
                   onChange={(e) => {
                     handleInputChange(e, value.id);
                   }}
