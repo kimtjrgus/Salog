@@ -116,6 +116,10 @@ const UpdateModal = ({
             if (key === "payment" && value.division === "income") {
               continue;
             }
+            // 메모는 null 가능
+            if (key === "memo" && value.memo === "") {
+              continue;
+            }
             isBlank = true;
           }
           if (key === "money" && value[key] === "0") isBlank = true;
@@ -326,16 +330,16 @@ const UpdateModal = ({
                     {value.division === "outgo" ? (
                       <>
                         <option value="">선택</option>
-                        <option value="출금">출금</option>
-                        <option value="식품">식비</option>
-                        <option value="쇼핑">쇼핑</option>
-                        <option value="취미">취미</option>
-                        <option value="교통">교통</option>
-                        <option value="통신">통신</option>
-                        <option value="의류">의류</option>
-                        <option value="뷰티">뷰티</option>
-                        <option value="교육">교육</option>
-                        <option value="여행">여행</option>
+                        <option value="출금">💰 출금</option>
+                        <option value="식품">🍚 식비</option>
+                        <option value="쇼핑">🛒 쇼핑</option>
+                        <option value="취미">🕹️ 취미</option>
+                        <option value="교통">🚗 교통</option>
+                        <option value="통신">🛜 통신</option>
+                        <option value="의류">👕 의류</option>
+                        <option value="뷰티">💄 뷰티</option>
+                        <option value="교육">📚 교육</option>
+                        <option value="여행">✈️ 여행</option>
                       </>
                     ) : value.division === "income" ? (
                       <>
@@ -346,7 +350,7 @@ const UpdateModal = ({
                         <option value="투자">투자</option>
                       </>
                     ) : (
-                      <option value="">분류를 선택하세요</option>
+                      <option value="">-</option>
                     )}
                   </select>
                   <SvgIcon
@@ -387,8 +391,10 @@ const UpdateModal = ({
                         <option value="카드">카드</option>
                         <option value="이체">이체</option>
                       </>
-                    ) : (
+                    ) : value.division === "income" ? (
                       <option value="">x</option>
+                    ) : (
+                      <option value="">-</option>
                     )}
                   </select>
                   <SvgIcon
