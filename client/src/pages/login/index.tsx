@@ -59,7 +59,7 @@ const Login = () => {
 					.get("/members/get")
 					.then((res) => {
 						dispatch(login(res.data.data));
-						navigate("/");
+						navigate("/dashboard");
 					})
 					.catch((error) => {
 						console.log(error);

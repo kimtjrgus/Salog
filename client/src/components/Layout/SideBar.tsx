@@ -42,7 +42,7 @@ export const SideBar = () => {
 			<Container>
 				<NavTitle>ACCOUNT BOOK</NavTitle>
 				<Lists>
-					<NavStyle to="/">
+					<NavStyle to="/dashboard">
 						<SvgIcon
 							component={GridViewIcon}
 							sx={{ stroke: "#ffffff", strokeWidth: 0.5 }}

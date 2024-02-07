@@ -57,7 +57,7 @@ const WasteList = ({ waste, checkedList, checkHandler }: Props) => {
 							<p>{dateAsDots(el.date)}</p>
 							<p>{el.outgoTag.tagName}</p>
 							<p>{el.outgoName}</p>
-							<p>{"x"}</p>
+							<p>{el.payment}</p>
 							<p className="money__red">{el.money.toLocaleString()}원</p>
 							<p>{el.memo}</p>
 							<SvgIcon
