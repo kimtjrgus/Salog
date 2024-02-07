@@ -325,11 +325,6 @@ const History = () => {
         const deletePromise = api.delete(`/income/delete/${id}`);
         deletePromises.push(deletePromise);
       });
-    checkedList.waste.length !== 0 &&
-      checkedList.waste.forEach((id) => {
-        const deletePromise = api.delete(`/waste/delete/${id}`);
-        deletePromises.push(deletePromise);
-      });
 
     Promise.all(deletePromises)
       .then(() => {
@@ -356,11 +351,6 @@ const History = () => {
               });
               return data;
             });
-          });
-        }
-
-        if (checkedList.waste.length !== 0) {
-          checkedList.waste.forEach((id) => {
             setWaste((prevData) => {
               const data = prevData.filter((el) => {
                 return el.outgoId !== id;
@@ -369,7 +359,6 @@ const History = () => {
             });
           });
         }
-
         // 클라이언트에서 데이터 제거
         const updatedCheckedList = { ...checkedList };
 
@@ -561,6 +550,12 @@ const History = () => {
     fetchData().catch((error) => {
       console.log(error);
     });
+    setCheckedList({
+      income: [],
+      outgo: [],
+      waste: [],
+    });
+    setIsAllChecked(false);
   }, [outgo, income, waste]);
 
   useEffect(() => {
