@@ -327,7 +327,7 @@ const UpdateModal = ({
                       handleInputChange(e, value.id);
                     }}
                   >
-                    {value.division === "outgo" ? (
+                    {/* {value.division === "outgo" ? (
                       <>
                         <option value="">선택</option>
                         <option value="출금">💰 출금</option>
@@ -340,6 +340,31 @@ const UpdateModal = ({
                         <option value="뷰티">💄 뷰티</option>
                         <option value="교육">📚 교육</option>
                         <option value="여행">✈️ 여행</option>
+                      </>
+                    ) : value.division === "income" ? (
+                      <>
+                        <option value="">선택</option>
+                        <option value="입금">입금</option>
+                        <option value="급여">급여</option>
+                        <option value="이자">이자</option>
+                        <option value="투자">투자</option>
+                      </>
+                    ) : (
+                      <option value="">-</option>
+                    )} */}
+                    {value.division === "outgo" ? (
+                      <>
+                        <option value="">선택</option>
+                        <option value="출금">출금</option>
+                        <option value="식품">식비</option>
+                        <option value="쇼핑">쇼핑</option>
+                        <option value="취미">취미</option>
+                        <option value="교통">교통</option>
+                        <option value="통신">통신</option>
+                        <option value="의류">의류</option>
+                        <option value="뷰티">뷰티</option>
+                        <option value="교육">교육</option>
+                        <option value="여행">여행</option>
                       </>
                     ) : value.division === "income" ? (
                       <>
