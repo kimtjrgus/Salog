@@ -31,7 +31,6 @@ import javax.validation.Validator;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -284,7 +283,6 @@ public class DiaryService {
         // 해당 '년'과 '월'에 대한 일기의 날짜만을 가져옴, 중복제거
         List<LocalDate> dates = diaryRepository.findDistinctDatesByMemberIdAndYearAndMonth(memberId, year, month);
 
-        // 결과를 DiaryDto.ResponseCalender 객체의 리스트로 변환
         return dates.stream()
                 .map(DiaryDto.ResponseCalender::new)
                 .collect(Collectors.toList());
@@ -304,15 +302,21 @@ public class DiaryService {
                 .map(DiaryTagLink::getDiaryTag)
                 .collect(Collectors.toList());
 
+        // 해당 다이어리와 연결된 모든 태그를 가져옴
+        List<DiaryTagLink> links = diary.getDiaryTagLinks();
+
+        for (DiaryTagLink link : links) {
+            if (diaryTagLinkRepository.existsById(link.getDiaryTagLinkId())) {
+                diaryTagLinkRepository.deleteById(link.getDiaryTagLinkId());
+            }
+        }
+
         // 태그를 사용하는 다른 다이어리가 있는지 확인 후, 없으면 태그 삭제
         for (DiaryTag diaryTag : diaryTags) {
-            List<DiaryTagLink> links = diaryTag.getDiaryTagLinks();
-            if (links.size() == 1 && links.get(0).getDiary().getDiaryId().equals(diaryId)) {
+            if (links.isEmpty()) {
                 tagService.deleteDiaryTag(token ,diaryTag.getDiaryTagId());
             }
         }
-        // 중간 테이블의 레코드를 삭제
-        diaryTagLinkRepository.deleteByDiaryId(diaryId);
 
         diaryRepository.deleteById(diaryId);
     }
