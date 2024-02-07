@@ -387,73 +387,110 @@ const History = () => {
       });
   };
 
-  const handleAddWaste = () => {
-    checkedList.outgo.forEach((id) => {
+  const handleAddWaste = async () => {
+    const promises = checkedList.outgo.map(async (id) => {
       const idx = outgo.findIndex((el) => el.outgoId === id);
-      api
-        .patch(`/outgo/update/${id}`, {
-          ...outgo[idx],
-          outgoTag: outgo[idx].outgoTag.tagName,
-          wasteList: true,
-        })
-        .then((res) => {
-          setWaste((prevData) => {
-            return [...prevData, res.data];
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-          dispatch(
-            showToast({
-              message: "이미 존재하는 항목입니다",
-              type: "error",
-            })
-          );
-        });
+
+      // 이미 wasteList가 true인 경우 오류 메시지 표시
+      if (outgo[idx].wasteList) {
+        dispatch(
+          showToast({
+            message: "이미 존재하는 항목입니다",
+            type: "error",
+          })
+        );
+        return null; // 중복된 요소를 처리하지 않고 null을 반환하여 다음 작업으로 넘어감
+      }
+
+      return await api.patch(`/outgo/update/${id}`, {
+        ...outgo[idx],
+        outgoTag: outgo[idx].outgoTag.tagName,
+        wasteList: true,
+      });
     });
 
-    dispatch(
-      showToast({
-        message: "낭비리스트가 추가되었습니다",
-        type: "success",
-      })
-    );
-    navigate("/waste");
+    const results = await Promise.all(promises);
+
+    const updatedOutgo = [...outgo];
+    const updatedWaste = [...waste];
+    results.forEach((res) => {
+      if (res) {
+        const idx = updatedOutgo.findIndex(
+          (el) => el.outgoId === res.data.outgoId
+        );
+        updatedOutgo[idx] = res.data;
+        updatedWaste.push(res.data);
+      }
+    });
+
+    // 데이터 업데이트
+    setOutgo(updatedOutgo);
+    setWaste(updatedWaste);
+
+    if (results.some((res) => res)) {
+      dispatch(
+        showToast({
+          message: "낭비리스트가 추가되었습니다",
+          type: "success",
+        })
+      );
+      navigate("/waste");
+    }
+    // } else {
+    //   dispatch(
+    //     showToast({
+    //       message: "요청을 처리하는 동안 오류가 발생했습니다",
+    //       type: "error",
+    //     })
+    //   );
+    // }
   };
 
-  const handleDeleteWaste = () => {
-    checkedList.waste.forEach((id) => {
+  const handleDeleteWaste = async () => {
+    const deletePromises = checkedList.waste.map(async (id) => {
       const idx = outgo.findIndex((el) => el.outgoId === id);
-      api
-        .patch(`/outgo/update/${id}`, {
-          ...outgo[idx],
-          outgoTag: outgo[idx].outgoTag.tagName,
-          wasteList: false,
-        })
-        .then(() => {
-          setWaste((prevData) => {
-            const data = prevData.filter((el) => {
-              return el.outgoId !== id;
-            });
-            return data;
-          });
-          setIsAllChecked(false); // isAllChecked 값을 false로 설정
-          setCheckedList({
-            income: [],
-            outgo: [],
-            waste: [],
-          });
-          dispatch(
-            showToast({
-              message: "낭비리스트 삭제가 완료되었습니다",
-              type: "success",
-            })
-          );
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      return await api.patch(`/outgo/update/${id}`, {
+        ...outgo[idx],
+        outgoTag: outgo[idx].outgoTag.tagName,
+        wasteList: false,
+      });
     });
+
+    try {
+      const responses = await Promise.all(deletePromises);
+
+      const updatedOutgo = [...outgo];
+      const updatedWaste = waste.filter(
+        (el) => !checkedList.waste.includes(el.outgoId)
+      );
+
+      responses.forEach((res) => {
+        const idx = updatedOutgo.findIndex(
+          (el) => el.outgoId === res.data.outgoId
+        );
+        updatedOutgo[idx] = res.data;
+        console.log(updatedOutgo);
+      });
+
+      setOutgo(updatedOutgo);
+      setWaste(updatedWaste);
+
+      setIsAllChecked(false);
+      setCheckedList({
+        income: [],
+        outgo: [],
+        waste: [],
+      });
+
+      dispatch(
+        showToast({
+          message: "낭비리스트 삭제가 완료되었습니다",
+          type: "success",
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const onCursorActive = () => {
