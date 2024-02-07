@@ -71,7 +71,7 @@ public class OutgoService {
         Optional.of(outgo.getOutgoName()).ifPresent(findOutgo::setOutgoName);
         Optional.of(outgo.getMoney()).ifPresent(findOutgo::setMoney);
         Optional.of(outgo.getPayment()).ifPresent(findOutgo::setPayment);
-        Optional.of(outgo.getMemo()).ifPresent(findOutgo::setMemo);
+        Optional.ofNullable(outgo.getMemo()).ifPresent(findOutgo::setMemo);
         Optional.of(outgo.getReceiptImg()).ifPresent(findOutgo::setReceiptImg);
         Optional.of(outgo.isWasteList()).ifPresent(findOutgo::setWasteList);
 
