@@ -17,7 +17,14 @@
     "@typescript-eslint/strict-boolean-expressions" : 0,
     "@typescript-eslint/no-non-null-assertion" : "off",
     "react/react-in-jsx-scope": "off",
-    "prettier/prettier": 0
+    "prettier/prettier": 0,
+    "@typescript-eslint/no-misused-promises": [
+    "error",
+    {
+      "checksVoidReturn": false
+    }
+  ]
+
     // [
     //         "error",
     //         {

@@ -186,8 +186,8 @@ const Container = styled.ul`
 `;
 
 const ColorRedDiv = styled.div`
-	width: 40px;
-	height: 22px;
+	width: 4rem;
+	height: 2.2rem;
 	white-space: nowrap;
 	border-radius: 1.5rem;
 	background-color: ${(props) => props.theme.COLORS.LIGHT_RED};
@@ -197,8 +197,8 @@ const ColorRedDiv = styled.div`
 `;
 
 const ColorBlueDiv = styled.div`
-	width: 40px;
-	height: 22px;
+	width: 4rem;
+	height: 2.2rem;
 	white-space: nowrap;
 	border-radius: 1.5rem;
 	background-color: ${(props) => props.theme.COLORS.LIGHT_BLUE};

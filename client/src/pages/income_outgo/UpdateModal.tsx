@@ -116,6 +116,10 @@ const UpdateModal = ({
             if (key === "payment" && value.division === "income") {
               continue;
             }
+            // 메모는 null 가능
+            if (key === "memo" && value.memo === "") {
+              continue;
+            }
             isBlank = true;
           }
           if (key === "money" && value[key] === "0") isBlank = true;
@@ -124,6 +128,10 @@ const UpdateModal = ({
 
       if (!isBlank) {
         isNotValid = false;
+      }
+
+      if (values.length === 0) {
+        isNotValid = true;
       }
 
       setIsDisabled(isNotValid);
@@ -202,7 +210,7 @@ const UpdateModal = ({
       const updated = { ...prev };
       return { ...updated, updateModal: false };
     });
-    dispatch(showToast({ message: "작성이 완료되었습니다", type: "success" }));
+    dispatch(showToast({ message: "수정이 완료되었습니다", type: "success" }));
   };
 
   useEffect(() => {
@@ -323,6 +331,31 @@ const UpdateModal = ({
                       handleInputChange(e, value.id);
                     }}
                   >
+                    {/* {value.division === "outgo" ? (
+                      <>
+                        <option value="">선택</option>
+                        <option value="출금">💰 출금</option>
+                        <option value="식품">🍚 식비</option>
+                        <option value="쇼핑">🛒 쇼핑</option>
+                        <option value="취미">🕹️ 취미</option>
+                        <option value="교통">🚗 교통</option>
+                        <option value="통신">🛜 통신</option>
+                        <option value="의류">👕 의류</option>
+                        <option value="뷰티">💄 뷰티</option>
+                        <option value="교육">📚 교육</option>
+                        <option value="여행">✈️ 여행</option>
+                      </>
+                    ) : value.division === "income" ? (
+                      <>
+                        <option value="">선택</option>
+                        <option value="입금">입금</option>
+                        <option value="급여">급여</option>
+                        <option value="이자">이자</option>
+                        <option value="투자">투자</option>
+                      </>
+                    ) : (
+                      <option value="">-</option>
+                    )} */}
                     {value.division === "outgo" ? (
                       <>
                         <option value="">선택</option>
@@ -346,7 +379,7 @@ const UpdateModal = ({
                         <option value="투자">투자</option>
                       </>
                     ) : (
-                      <option value="">분류를 선택하세요</option>
+                      <option value="">-</option>
                     )}
                   </select>
                   <SvgIcon
@@ -358,15 +391,9 @@ const UpdateModal = ({
                 <input
                   type="text"
                   className="account__name"
-                  // name={
-                  // 	values[value.id]?.division === "outgo"
-                  // 		? "outgoName"
-                  // 		: values[value.id]?.division === "income"
-                  // 		  ? "incomeName"
-                  // 		  : ""
-                  // }
                   name="name"
                   value={value.name}
+                  maxLength={15}
                   onChange={(e) => {
                     handleInputChange(e, value.id);
                   }}
@@ -387,8 +414,10 @@ const UpdateModal = ({
                         <option value="카드">카드</option>
                         <option value="이체">이체</option>
                       </>
-                    ) : (
+                    ) : value.division === "income" ? (
                       <option value="">x</option>
+                    ) : (
+                      <option value="">-</option>
                     )}
                   </select>
                   <SvgIcon
@@ -413,6 +442,7 @@ const UpdateModal = ({
                   className="memo"
                   name="memo"
                   value={value.memo}
+                  maxLength={20}
                   onChange={(e) => {
                     handleInputChange(e, value.id);
                   }}
@@ -422,7 +452,7 @@ const UpdateModal = ({
           })}
         </Lists>
         <button disabled={isDisabled} onClick={onClickSubmit}>
-          작성 완료
+          수정 완료
         </button>
       </Container>
     </Background>
@@ -436,7 +466,7 @@ const Background = styled.div`
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 100;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
 `;

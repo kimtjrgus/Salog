@@ -15,7 +15,16 @@ const COLORS = {
 	LIGHT_YELLOW: "#FFB11A",
 };
 
+const device = {
+  Extra: `screen and (min-width: 1330px)`,
+  large: `screen and (min-width: 992px)`,
+  tablet: `screen and (min-width: 768px)`,
+  small: `screen and (min-width: 600px)`, 
+  mobile: `screen and (max-width: 360px)`,
+}
+
 const Theme = {
 	COLORS,
+	device
 };
 export default { COLORS, Theme };

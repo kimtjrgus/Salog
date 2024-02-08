@@ -22,7 +22,7 @@ const GlobalStyle = createGlobalStyle`
 
     @font-face {
     font-family: 'Raleway-Bold';
-    src: url("./fonts/Raleway-Bold.otf") format("truetype");
+    src: url("./fonts/Raleway-Bold.ttf") format("truetype");
     }
 
     :root{
@@ -40,14 +40,36 @@ const GlobalStyle = createGlobalStyle`
         box-sizing: border-box;
     }
 
-    html {
+    html, body {
         font-size: 62.5%;
+        color: var(--color-black);
+        margin: 0px;
+        padding: 0px;
+        font-family: 'Pretendard-Regular';
     }
 
-    body {
-        color: var(--color-black);
-        font-family: 'Pretendard-Regular';
-        font-size: 1.6rem;
+     @media (min-width:1920) and (max-width: 2559px) {
+        html {
+        font-size: 10.5px;
+        }
+    }
+
+    @media (min-width:1330px) and (max-width: 1919px) {
+        html {
+        font-size: 10px;
+        }
+    }
+
+     @media (min-width:1173px) and (max-width: 1329px) {
+        html {
+        font-size: 9px;
+        }
+    }
+
+     @media (min-width:960px) and (max-width: 1172px) {
+        html {
+        font-size: 8.5px;
+        }
     }
 
     h1,h2,h3,h4,h5,h6{
@@ -71,6 +93,7 @@ const GlobalStyle = createGlobalStyle`
     }
 
     button {
+        font-family: 'Pretendard-Regular';
         border: none;
         background: transparent;
         padding: 0;

@@ -18,43 +18,59 @@
           "뷰티",
           "의류"
         ],
-        "outgoTag": ["급여", "투자", "이자", "입금"]
+        "outgoTag": [
+          "급여",
+          "투자",
+          "이자",
+          "입금"
+        ]
       }
     }
   ],
   "outgo": [
     {
-      "id": 1,
       "date": "2023-12-05",
-      "outgoName": "폰값",
-      "money": 100000,
-      "memo": "휴대폰 결제",
-      "outgoTag": "통신",
+      "outgoName": "BBQ",
+      "money": 22000,
+      "memo": "핫후라이드",
+      "outgoTag": "식품",
       "wasteList": false,
       "payment": "카드",
-      "reciptImg": "imagesdasd"
+      "reciptImg": "",
+      "id": 2
     },
     {
-      "id": 2,
-      "date": "2023-12-05",
-      "outgoName": "폰값",
-      "money": 100000,
-      "memo": "망사용료가 올라서 별로네요..",
-      "outgoTag": "통신",
+      "date": "2023-12-22",
+      "outgoName": "거래처",
+      "money": 59000,
+      "memo": "메모",
+      "outgoTag": "식품",
       "wasteList": false,
       "payment": "카드",
-      "reciptImg": "imagesdasd"
+      "reciptImg": "",
+      "id": 3
     },
     {
-      "id": 3,
-      "date": "2023-12-05",
-      "outgoName": "후라이드참잘하는집",
-      "money": 100000,
-      "memo": "휴대폰 결제",
-      "outgoTag": "통신",
+      "date": "2023-12-08",
+      "outgoName": "거래처",
+      "money": 24000,
+      "memo": "메모1",
+      "outgoTag": "식품",
       "wasteList": false,
       "payment": "카드",
-      "reciptImg": "imagesdasd"
+      "reciptImg": "",
+      "id": 4
+    },
+    {
+      "date": "2023-12-08",
+      "outgoName": "거래처2",
+      "money": 4000,
+      "memo": "메모2",
+      "outgoTag": "식품",
+      "wasteList": false,
+      "payment": "카드",
+      "reciptImg": "",
+      "id": 5
     }
   ],
   "income": [
@@ -67,27 +83,39 @@
       "memo": "월급"
     },
     {
-      "id": 2,
-      "incomeTag": "입금",
-      "date": "2023-12-05",
-      "money": 2000000,
-      "income_name": "회사",
-      "memo": "월급"
+      "date": "2023-12-14",
+      "income_name": "주식",
+      "money": 255000,
+      "memo": "5% 수익",
+      "incomeTag": "쇼핑",
+      "reciptImg": "",
+      "id": 2
     }
   ],
   "wasteList": [
     {
-      "id": 1,
-      "date": "2023-11-23",
-      "money": 100000,
-      "outgoName": "통신비",
-      "memo": "asdasd",
-      "outgoTag": "통신",
-      "wasteList": true,
-      "reciptImg": "imagesdasd"
+      "date": "2023-12-08",
+      "outgoName": "거래처2",
+      "money": 4000,
+      "memo": "메모2",
+      "outgoTag": "식품",
+      "wasteList": false,
+      "payment": "카드",
+      "reciptImg": "",
+      "id": 5
+    },
+    {
+      "date": "2023-12-22",
+      "outgoName": "거래처",
+      "money": 59000,
+      "memo": "메모",
+      "outgoTag": "식품",
+      "wasteList": false,
+      "payment": "카드",
+      "reciptImg": "",
+      "id": 3
     }
   ],
-
   "monthlyOutgo": [
     {
       "month": 12,
@@ -143,8 +171,8 @@
   "monthlyBudget": [
     {
       "budget": 500000,
-      "totalOutgo": 305400,
-      "dayRemain": 12
+      "totalOutgo": 105000,
+      "dayRemain": 1
     }
   ],
   "getCalendar": [
@@ -171,30 +199,48 @@
   ],
   "fixedOutgo": [
     {
-      "fixedOutgo": 1,
+      "id": 1,
       "date": "2023-12-03",
       "money": 14000,
       "outgoName": "유튜브 프리미엄"
     },
     {
-      "fixedOutgo": 2,
-      "date": "2023-12-13",
-      "money": 250000,
+      "id": 2,
+      "date": "2024-01-25",
+      "money": 220000,
       "outgoName": "vti 미국주식"
     },
     {
-      "fixedOutgo": 2,
+      "id": 3,
       "date": "2023-12-19",
       "money": 38000,
       "outgoName": "휴대폰 요금"
+    },
+    {
+      "date": "2024-01-27",
+      "money": 5000,
+      "outgoName": "일정 추가",
+      "id": 4
+    },
+    {
+      "date": "2024-01-15",
+      "money": 50000,
+      "outgoName": "일정",
+      "id": 5
     }
   ],
   "fixedIncome": [
     {
-      "fixedIncome": 1,
+      "id": 1,
       "date": "2023-12-10",
       "money": 3100000,
       "incomeName": "월급"
+    },
+    {
+      "date": "2024-01-29",
+      "money": 5000,
+      "incomeName": "vit 미국주식",
+      "id": 2
     }
   ]
 }

@@ -1,16 +1,16 @@
 import { ResponsivePie } from "@nivo/pie";
 
 const PieChart = ({ stat }: any) => {
-	const handle = {
-		padClick: (data: any) => {
-			console.log(data);
-		},
+  const handle = {
+    padClick: (data: any) => {
+      console.log(data);
+    },
 
-		legendClick: (data: any) => {
-			console.log(data);
-		},
-	};
-	return (
+    legendClick: (data: any) => {
+      console.log(data);
+    },
+  };
+  return (
     // chart height이 100%이기 때문이 chart를 덮는 마크업 요소에 height 설정
     <ResponsivePie
       /**
@@ -84,16 +84,16 @@ const PieChart = ({ stat }: any) => {
          */
         labels: {
           text: {
-            fontSize: 14,
+            fontSize: "1.6rem",
             fill: "#000000",
           },
         },
         /**
          * legend style (default로 하단에 있는 색상별 key 표시)
          */
-		  legends: {
+        legends: {
           text: {
-            fontSize: 12,
+            fontSize: "1.2rem",
             fill: "#4F4F4F",
           },
         },
@@ -106,18 +106,18 @@ const PieChart = ({ stat }: any) => {
        * legend 설정 (default로 하단에 있는 색상별 key 표시)
        */
       legends={[
-		  {
-          anchor: "right", // 위치
+        {
+          anchor: "top-right", // 위치
           direction: "column", // item 그려지는 방향
           justify: false, // 글씨, 색상간 간격 justify 적용 여부
-          translateX: 60, // chart와 X 간격
-          translateY: -15, // chart와 Y 간격
+          translateX: 65, // chart와 X 간격
+          translateY: 0, // chart와 Y 간격
           itemsSpacing: 1, // item간 간격
           itemWidth: 30, // item width
-          itemHeight: 20, // item height
+          itemHeight: 18, // item height
           itemDirection: "left-to-right", // item 내부에 그려지는 방향
           itemOpacity: 1, // item opacity
-          symbolSize: 10, // symbol (색상 표기) 크기
+          symbolSize: 8, // symbol (색상 표기) 크기
           symbolShape: "square", // symbol (색상 표기) 모양
           effects: [
             {

@@ -77,6 +77,7 @@ const Container = styled.div`
   margin-bottom: 5rem;
 
   .react-calendar {
+    font-size: 1.6rem; // 반응형
     border: none;
     padding: 1.5rem;
     border-radius: 8px;
@@ -85,12 +86,13 @@ const Container = styled.div`
   }
 
   .react-calendar__navigation {
-    height: 30px;
+    height: 3rem;
     border-radius: 20px 20px 0 0;
 
     span {
       font-size: 1.6rem;
       font-weight: 600;
+      white-space: nowrap;
     }
   }
 

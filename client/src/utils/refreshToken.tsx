@@ -15,6 +15,7 @@ const RefreshToken = () => {
 		api.interceptors.request.use((config) => {
 			const accessToken = getCookie("accessToken");
 			config.headers.Authorization = `${accessToken}`;
+			config.withCredentials = true;
 			return config;
 		});
 

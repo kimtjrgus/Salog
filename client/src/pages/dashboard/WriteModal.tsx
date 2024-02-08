@@ -13,349 +13,353 @@ import { useDispatch } from "react-redux";
 import { showToast } from "src/store/slices/toastSlice";
 
 interface Props {
-	isOpen: modalType;
-	setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
-	setMonthlyOutgo: React.Dispatch<React.SetStateAction<outgoType>>;
-	setMonthlyIncome: React.Dispatch<React.SetStateAction<incomeType>>;
+  isOpen: modalType;
+  setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
+  setMonthlyOutgo: React.Dispatch<React.SetStateAction<outgoType>>;
+  setMonthlyIncome: React.Dispatch<React.SetStateAction<incomeType>>;
 }
 
 interface hoverType {
-	hover: boolean;
-	click: boolean;
+  hover: boolean;
+  click: boolean;
 }
 
 interface valuesType {
-	[key: string]: string;
-	division: string;
-	money: string;
-	category: string;
-	method: string;
-	account: string;
-	memo: string;
+  [key: string]: string;
+  division: string;
+  money: string;
+  category: string;
+  method: string;
+  account: string;
+  memo: string;
 }
 
 const WriteModal = ({
-	isOpen,
-	setIsOpen,
-	setMonthlyOutgo,
-	setMonthlyIncome,
+  isOpen,
+  setIsOpen,
+  setMonthlyOutgo,
+  setMonthlyIncome,
 }: Props) => {
-	const [isHovered, setIsHovered] = useState<hoverType>({
-		hover: false,
-		click: false,
-	});
-	const [isDisabled, setIsDisabled] = useState<boolean>(true);
+  const [isHovered, setIsHovered] = useState<hoverType>({
+    hover: false,
+    click: false,
+  });
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
 
-	const [values, setValues] = useState<valuesType>({
-		division: "outgo",
-		money: "0",
-		category: "",
-		method: "",
-		account: "",
-		memo: "",
-	});
+  const [values, setValues] = useState<valuesType>({
+    division: "outgo",
+    money: "0",
+    category: "",
+    method: "",
+    account: "",
+    memo: "",
+  });
 
-	const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-	// input hover, click, blur 감지 후 실행 함수
-	const handleMouseEnter = () => {
-		setIsHovered({ ...isHovered, hover: true });
-	};
-	const handleMouseLeave = () => {
-		setIsHovered({ ...isHovered, hover: false });
-	};
-	const handleMouseClick = () => {
-		setIsHovered({ ...isHovered, click: true });
-	};
-	const handleMouseBlur = () => {
-		setIsHovered({ ...isHovered, click: false });
-	};
+  // input hover, click, blur 감지 후 실행 함수
+  const handleMouseEnter = () => {
+    setIsHovered({ ...isHovered, hover: true });
+  };
+  const handleMouseLeave = () => {
+    setIsHovered({ ...isHovered, hover: false });
+  };
+  const handleMouseClick = () => {
+    setIsHovered({ ...isHovered, click: true });
+  };
+  const handleMouseBlur = () => {
+    setIsHovered({ ...isHovered, click: false });
+  };
 
-	const onChangeMoney = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const inputValue = e.target.value;
+  const onChangeMoney = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
 
-		// 입력값에 e가 입력되는 것은 추후에 막아볼 예정
-		if (inputValue.startsWith("0")) {
-			setValues({ ...values, money: inputValue.substring(1) });
-		} else {
-			setValues({ ...values, money: inputValue });
-		}
-	};
+    // 입력값에 e가 입력되는 것은 추후에 막아볼 예정
+    if (inputValue.startsWith("0")) {
+      setValues({ ...values, money: inputValue.substring(1) });
+    } else {
+      setValues({ ...values, money: inputValue });
+    }
+  };
 
-	const onClickCloseBtn = () => {
-		setIsOpen({ ...isOpen, writeIcon: false });
-	};
+  const onClickCloseBtn = () => {
+    setIsOpen({ ...isOpen, writeIcon: false });
+  };
 
-	const onChangeLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setValues({ ...values, division: e.target.value });
-	};
+  const onChangeLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValues({ ...values, division: e.target.value });
+  };
 
-	const onChangeMethod = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setValues({ ...values, method: e.target.value });
-	};
+  const onChangeMethod = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setValues({ ...values, method: e.target.value });
+  };
 
-	const onChangeCategory = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setValues({ ...values, category: e.target.value });
-	};
+  const onChangeCategory = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setValues({ ...values, category: e.target.value });
+  };
 
-	const onChangeAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setValues({ ...values, account: e.target.value });
-	};
+  const onChangeAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValues({ ...values, account: e.target.value });
+  };
 
-	const onChangeMemo = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setValues({ ...values, memo: e.target.value });
-	};
+  const onChangeMemo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValues({ ...values, memo: e.target.value });
+  };
 
-	const checkValues = useCallback(
-		debounce((values: valuesType) => {
-			let isBlank = false;
-			let isNotValid = true;
+  const checkValues = useCallback(
+    debounce((values: valuesType) => {
+      let isBlank = false;
+      let isNotValid = true;
 
-			// 빈 값 체크
-			for (const key in values) {
-				if (values[key] === "") {
-					if (key === "method" && values.division === "income") {
-						continue;
-					}
-					isBlank = true;
-				}
-			}
+      // 빈 값 체크
+      for (const key in values) {
+        if (values[key] === "") {
+          if (key === "method" && values.division === "income") {
+            continue;
+          }
+          if (key === "memo" && values.memo === "") {
+            continue;
+          }
+          isBlank = true;
+        }
+        if (key === "money" && values[key] === "0") isBlank = true;
+      }
 
-			if (!isBlank) {
-				isNotValid = false;
-			}
+      if (!isBlank) {
+        isNotValid = false;
+      }
 
-			setIsDisabled(isNotValid);
-		}, 700),
-		[],
-	);
-	const onClickSubmit = () => {
-		values.division === "outgo"
-			? api
-					.post("/outgo/post", {
-						date: isOpen.day,
-						outgoName: values.account,
-						money: Number(values.money),
-						memo: values.memo,
-						outgoTag: values.category,
-						wasteList: false,
-						payment: values.method,
-						receiptImg: "",
-					})
-					.then(() => {
-						if (
-							new Date(isOpen.day).getMonth() ===
-							new Date(moment().format("YYYY-MM-DD")).getMonth()
-						) {
-							api
-								.get(`/outgo/monthly?date=${moment().format("YYYY-MM-DD")}`)
-								.then((res) => {
-									setMonthlyOutgo(res.data);
-								})
-								.catch((error) => {
-									console.log(error);
-								});
-						}
+      setIsDisabled(isNotValid);
+    }, 700),
+    []
+  );
+  const onClickSubmit = () => {
+    values.division === "outgo"
+      ? api
+          .post("/outgo/post", {
+            date: isOpen.day,
+            outgoName: values.account,
+            money: Number(values.money),
+            memo: values.memo,
+            outgoTag: values.category,
+            wasteList: false,
+            payment: values.method,
+            receiptImg: "",
+          })
+          .then(() => {
+            if (
+              new Date(isOpen.day).getMonth() ===
+              new Date(moment().format("YYYY-MM-DD")).getMonth()
+            ) {
+              api
+                .get(`/outgo/monthly?date=${moment().format("YYYY-MM-DD")}`)
+                .then((res) => {
+                  setMonthlyOutgo(res.data);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
 
-						dispatch(
-							showToast({ message: "작성이 완료되었습니다", type: "success" }),
-						);
-					})
-					.catch((error) => {
-						console.log(error);
-					})
-			: api
-					.post("/income/post", {
-						date: isOpen.day,
-						incomeName: values.account,
-						money: Number(values.money),
-						memo: values.memo,
-						incomeTag: values.category,
-						receiptImg: "",
-					})
-					.then(() => {
-						if (
-							new Date(isOpen.day).getMonth() ===
-							new Date(moment().format("YYYY-MM-DD")).getMonth()
-						) {
-							api
-								.get(`/income/monthly?date=${moment().format("YYYY-MM-DD")}`)
-								.then((res) => {
-									setMonthlyIncome(res.data);
-								})
-								.catch((error) => {
-									console.log(error);
-								});
-						}
-						dispatch(
-							showToast({ message: "작성이 완료되었습니다", type: "success" }),
-						);
-					})
-					.catch((error) => {
-						console.log(error);
-					});
-		setIsOpen((prev) => {
-			const updated = { ...prev };
-			return { ...updated, writeIcon: false };
-		});
-	};
+            dispatch(
+              showToast({ message: "작성이 완료되었습니다", type: "success" })
+            );
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+      : api
+          .post("/income/post", {
+            date: isOpen.day,
+            incomeName: values.account,
+            money: Number(values.money),
+            memo: values.memo,
+            incomeTag: values.category,
+            receiptImg: "",
+          })
+          .then(() => {
+            if (
+              new Date(isOpen.day).getMonth() ===
+              new Date(moment().format("YYYY-MM-DD")).getMonth()
+            ) {
+              api
+                .get(`/income/monthly?date=${moment().format("YYYY-MM-DD")}`)
+                .then((res) => {
+                  setMonthlyIncome(res.data);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
+            dispatch(
+              showToast({ message: "작성이 완료되었습니다", type: "success" })
+            );
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    setIsOpen((prev) => {
+      const updated = { ...prev };
+      return { ...updated, writeIcon: false };
+    });
+  };
 
-	useEffect(() => {
-		checkValues(values);
-	}, [values]);
+  useEffect(() => {
+    checkValues(values);
+  }, [values]);
 
-	return (
-		<Container $isOpen={isOpen.writeIcon}>
-			<SvgIcon
-				className="deleteIcon"
-				component={ClearOutlinedIcon}
-				onClick={onClickCloseBtn}
-				sx={{ stroke: "#ffffff", strokeWidth: 1 }}
-			/>
-			<h4>
-				{dateAsKor(
-					moment(isOpen.day, "YYYY. M. D. a H:mm:ss").format("YYYY-MM-DD"),
-				).replace(/\d+년/, "")}{" "}
-				가계부
-			</h4>
-			<div className="money__write">
-				<div className="moneyUnit">
-					<h5
-						className={
-							isHovered.hover || isHovered.click
-								? "fromLeft hovered"
-								: !isHovered.hover && isHovered.click
-								  ? "fromLeft hovered"
-								  : "fromLeft"
-						}
-					>
-						{Number(values.money).toLocaleString()}원
-					</h5>
-					<SvgIcon
-						className="writeIcon"
-						component={EditOutlinedIcon}
-						sx={{ stroke: "#ffffff", strokeWidth: 1 }}
-					/>
-				</div>
-				<input
-					className="money__write__input"
-					value={values.money}
-					size={16}
-					onChange={onChangeMoney}
-					type="number"
-					onMouseEnter={handleMouseEnter}
-					onClick={handleMouseClick}
-					onBlur={handleMouseBlur}
-					onMouseLeave={handleMouseLeave}
-				/>
-				{values.money === "0" ||
-					(values.money === "" && (
-						<p className="p__info">금액을 입력해주세요</p>
-					))}
-			</div>
-			<div className="division">
-				<p>분류</p>
-				<div className="division__btn">
-					<div className="form_radio_btn">
-						<input
-							id="outgo"
-							type="radio"
-							name="division"
-							value="outgo"
-							onChange={onChangeLabel}
-							defaultChecked
-						/>
-						<label htmlFor="outgo">지출</label>
-					</div>
-					<div className="form_radio_btn">
-						<input
-							id="income"
-							type="radio"
-							name="division"
-							value="income"
-							onChange={onChangeLabel}
-						/>
-						<label htmlFor="income">수입</label>
-					</div>
-				</div>
-			</div>
-			<div className="category">
-				<p>카테고리</p>
-				<select className="category__select" onChange={onChangeCategory}>
-					{values.division === "outgo" ? (
-						<>
-							<option value="">선택</option>
-							<option value="출금">출금</option>
-							<option value="식품">식비</option>
-							<option value="쇼핑">쇼핑</option>
-							<option value="취미">취미</option>
-							<option value="교통">교통</option>
-							<option value="통신">통신</option>
-							<option value="의류">의류</option>
-							<option value="뷰티">뷰티</option>
-							<option value="교육">교육</option>
-							<option value="여행">여행</option>
-						</>
-					) : (
-						<>
-							<option value="">선택</option>
-							<option value="입금">입금</option>
-							<option value="급여">급여</option>
-							<option value="이자">이자</option>
-							<option value="투자">투자</option>
-						</>
-					)}
-				</select>
-				<SvgIcon
-					className="deleteIcon"
-					component={ArrowDropDownOutlinedIcon}
-					sx={{ stroke: "#ffffff", strokeWidth: 1 }}
-				/>
-			</div>
-			<div className="category">
-				<p>결제 수단</p>
-				<select className="category__select" onChange={onChangeMethod}>
-					{values.division === "income" ? (
-						<option value="x">x</option>
-					) : (
-						<>
-							<option value="">선택</option>
-							<option value="현금">현금</option>
-							<option value="카드">카드</option>
-							<option value="이체">이체</option>
-						</>
-					)}
-				</select>
-				<SvgIcon
-					className="deleteIcon"
-					component={ArrowDropDownOutlinedIcon}
-					sx={{ stroke: "#ffffff", strokeWidth: 1 }}
-				/>
-			</div>
-			<div className="account">
-				<p>거래처</p>
-				<input
-					className="account__input"
-					type="text"
-					onChange={onChangeAccount}
-				/>
-			</div>
-			<div className="account">
-				<p>메모</p>
-				<input className="account__input" type="text" onChange={onChangeMemo} />
-			</div>
-			<div className="receipt">
-				<p>영수증 업로드</p>
-				<input className="account__input" type="file" />
-			</div>
-			<div className="explanation">
-				<p>🖊️ 영수증 업로드시 자동으로 항목이 작성됩니다</p>
-			</div>
-			<button disabled={isDisabled} onClick={onClickSubmit}>
-				작성하기
-			</button>
-		</Container>
-	);
+  return (
+    <Container $isOpen={isOpen.writeIcon}>
+      <SvgIcon
+        className="deleteIcon"
+        component={ClearOutlinedIcon}
+        onClick={onClickCloseBtn}
+        sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+      />
+      <h4>
+        {dateAsKor(
+          moment(isOpen.day, "YYYY. M. D. a H:mm:ss").format("YYYY-MM-DD")
+        ).replace(/\d+년/, "")}{" "}
+        가계부
+      </h4>
+      <div className="money__write">
+        <div className="moneyUnit">
+          <h5
+            className={
+              isHovered.hover || isHovered.click
+                ? "fromLeft hovered"
+                : !isHovered.hover && isHovered.click
+                  ? "fromLeft hovered"
+                  : "fromLeft"
+            }
+          >
+            {Number(values.money).toLocaleString()}원
+          </h5>
+          <SvgIcon
+            className="writeIcon"
+            component={EditOutlinedIcon}
+            sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+          />
+        </div>
+        <input
+          className="money__write__input"
+          value={values.money}
+          size={16}
+          onChange={onChangeMoney}
+          type="number"
+          onMouseEnter={handleMouseEnter}
+          onClick={handleMouseClick}
+          onBlur={handleMouseBlur}
+          onMouseLeave={handleMouseLeave}
+        />
+        {values.money === "0" ||
+          (values.money === "" && (
+            <p className="p__info">금액을 입력해주세요</p>
+          ))}
+      </div>
+      <div className="division">
+        <p>분류</p>
+        <div className="division__btn">
+          <div className="form_radio_btn">
+            <input
+              id="outgo"
+              type="radio"
+              name="division"
+              value="outgo"
+              onChange={onChangeLabel}
+              defaultChecked
+            />
+            <label htmlFor="outgo">지출</label>
+          </div>
+          <div className="form_radio_btn">
+            <input
+              id="income"
+              type="radio"
+              name="division"
+              value="income"
+              onChange={onChangeLabel}
+            />
+            <label htmlFor="income">수입</label>
+          </div>
+        </div>
+      </div>
+      <div className="category">
+        <p>카테고리</p>
+        <select className="category__select" onChange={onChangeCategory}>
+          {values.division === "outgo" ? (
+            <>
+              <option value="">선택</option>
+              <option value="출금">출금</option>
+              <option value="식품">식비</option>
+              <option value="쇼핑">쇼핑</option>
+              <option value="취미">취미</option>
+              <option value="교통">교통</option>
+              <option value="통신">통신</option>
+              <option value="의류">의류</option>
+              <option value="뷰티">뷰티</option>
+              <option value="교육">교육</option>
+              <option value="여행">여행</option>
+            </>
+          ) : (
+            <>
+              <option value="">선택</option>
+              <option value="입금">입금</option>
+              <option value="급여">급여</option>
+              <option value="이자">이자</option>
+              <option value="투자">투자</option>
+            </>
+          )}
+        </select>
+        <SvgIcon
+          className="deleteIcon"
+          component={ArrowDropDownOutlinedIcon}
+          sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+        />
+      </div>
+      <div className="category">
+        <p>결제 수단</p>
+        <select className="category__select" onChange={onChangeMethod}>
+          {values.division === "income" ? (
+            <option value="x">x</option>
+          ) : (
+            <>
+              <option value="">선택</option>
+              <option value="현금">현금</option>
+              <option value="카드">카드</option>
+              <option value="이체">이체</option>
+            </>
+          )}
+        </select>
+        <SvgIcon
+          className="deleteIcon"
+          component={ArrowDropDownOutlinedIcon}
+          sx={{ stroke: "#ffffff", strokeWidth: 1 }}
+        />
+      </div>
+      <div className="account">
+        <p>거래처</p>
+        <input
+          className="account__input"
+          type="text"
+          onChange={onChangeAccount}
+        />
+      </div>
+      <div className="account">
+        <p>메모</p>
+        <input className="account__input" type="text" onChange={onChangeMemo} />
+      </div>
+      <div className="receipt">
+        <p>영수증 업로드</p>
+        <input className="account__input" type="file" />
+      </div>
+      <div className="explanation">
+        <p>🖊️ 영수증 업로드시 자동으로 항목이 작성됩니다</p>
+      </div>
+      <button disabled={isDisabled} onClick={onClickSubmit}>
+        작성하기
+      </button>
+    </Container>
+  );
 };
 
 const Container = styled.div<{ $isOpen: boolean }>`
@@ -365,8 +369,8 @@ const Container = styled.div<{ $isOpen: boolean }>`
   overflow-y: hidden;
   border-radius: 8px;
   background: white;
-  right: -0.2rem;
-  bottom: 3.12rem;
+  right: -0.23rem;
+  bottom: 5rem;
   margin-right: 12.5rem;
   color: rgb(70, 70, 86);
   transition: 0.3s ease-in-out;

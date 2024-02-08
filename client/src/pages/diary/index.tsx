@@ -44,6 +44,8 @@ interface tagType {
 
 const Diary = () => {
   const [diaries, setDiaries] = useState<diaryType[]>([]);
+  console.log(diaries);
+
   const [tagLists, setTagLists] = useState<tagType[]>([]);
   const [searchVal, setSearchVal] = useState<string>("");
   // 무한 스크롤에 사용 될 페이지와 로딩 상태
@@ -127,6 +129,14 @@ const Diary = () => {
       .get("/diaryTags")
       .then((res) => {
         setTagLists(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    api
+      .get("/diary/calendar?date=2024-02-00")
+      .then((res) => {
+        console.log(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -360,8 +370,10 @@ const Diary = () => {
 };
 
 const Container = styled.div`
+  width: 92%;
   display: flex;
   padding-bottom: 6.4rem;
+  padding-left: 1.5rem;
 
   /* &::-webkit-scrollbar {
 		display: none;
@@ -399,7 +411,7 @@ const Container = styled.div`
 
 const DiaryContainer = styled.div`
   margin-top: 3rem;
-  width: 70%;
+  width: 75rem;
 
   hr {
     width: 100%;

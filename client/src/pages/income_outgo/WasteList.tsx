@@ -57,7 +57,7 @@ const WasteList = ({ waste, checkedList, checkHandler }: Props) => {
 							<p>{dateAsDots(el.date)}</p>
 							<p>{el.outgoTag.tagName}</p>
 							<p>{el.outgoName}</p>
-							<p>{"x"}</p>
+							<p>{el.payment}</p>
 							<p className="money__red">{el.money.toLocaleString()}원</p>
 							<p>{el.memo}</p>
 							<SvgIcon
@@ -156,8 +156,8 @@ const Container = styled.ul`
 `;
 
 const ColorRedDiv = styled.div`
-	width: 40px;
-	height: 22px;
+	width: 4rem;
+	height: 2.2rem;
 	white-space: nowrap;
 	border-radius: 1.5rem;
 	background-color: ${(props) => props.theme.COLORS.LIGHT_RED};
