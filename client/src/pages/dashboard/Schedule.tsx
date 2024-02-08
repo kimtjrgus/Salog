@@ -58,7 +58,7 @@ const Schedule = () => {
         <div className="lists">
           {fixedOutgo.map((el) => {
             return (
-              <List key={uuidv4()} date={el.date}>
+              <List key={uuidv4()} $date={el.date}>
                 <div className="list__day__outgo">
                   {new Date(el.date).getDate()}일
                 </div>
@@ -73,7 +73,7 @@ const Schedule = () => {
           })}
           {fixedIncome.map((el) => {
             return (
-              <List key={uuidv4()} date={el.date}>
+              <List key={uuidv4()} $date={el.date}>
                 <div className="list__day__income">
                   {new Date(el.date).getDate()}일
                 </div>
@@ -159,7 +159,7 @@ const Container = styled.div`
   }
 `;
 
-const List = styled.div<{ date: string }>`
+const List = styled.div<{ $date: string }>`
   display: flex;
   margin-top: 1.2rem;
   align-items: center;
@@ -172,10 +172,10 @@ const List = styled.div<{ date: string }>`
     align-items: center;
     padding: 2rem 2.5rem;
     background: ${(props) =>
-      new Date(props.date).getDate() - new Date().getDate() < 0 ||
-      new Date(props.date).getDate() - new Date().getDate() >= 7
+      new Date(props.$date).getDate() - new Date().getDate() < 0 ||
+      new Date(props.$date).getDate() - new Date().getDate() >= 7
         ? props.theme.COLORS.LIGHT_GREEN
-        : new Date(props.date).getDate() - new Date().getDate() < 3
+        : new Date(props.$date).getDate() - new Date().getDate() < 3
           ? props.theme.COLORS.LIGHT_RED
           : props.theme.COLORS.LIGHT_YELLOW};
     border-radius: 8px;
