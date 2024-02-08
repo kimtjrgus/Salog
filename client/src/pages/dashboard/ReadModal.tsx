@@ -187,7 +187,7 @@ const Background = styled.div`
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 100;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
 `;
@@ -204,7 +204,7 @@ const Container = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 200;
+  z-index: 100;
   padding: 4rem 5rem;
 
   .deleteIcon {

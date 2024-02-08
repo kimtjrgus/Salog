@@ -123,8 +123,6 @@ const MonthRadio = () => {
     monthlyOutgo?.monthlyTotal
   );
 
-  console.log(lastTwoRadio * 100, lastRadio * 100, currentRadio * 100);
-
   // pieChart에 필요한 가공된 데이터
   const statLists = [
     {
@@ -208,10 +206,10 @@ const MonthRadio = () => {
       .catch((error) => {
         console.error(error);
       });
+    const date = moment().format("YYYY-MM");
+    const customDate = `${date}-00`;
     api
-      .get(
-        `/outgo/wasteList?page=1&size=30&date=${moment().format("YYYY-MM-DD")}`
-      )
+      .get(`/outgo/wasteList?page=1&size=30&date=${customDate}`)
       .then((res) => {
         setWasteList(res.data.data);
       })
@@ -392,7 +390,7 @@ const MonthRadio = () => {
         </Doughnut>
         <Budget>
           <h5>예산 소진율</h5>
-          <div style={{ width: 180, height: 180, marginLeft: 26 }}>
+          <div style={{ width: "18rem", height: "18rem", marginLeft: 26 }}>
             <CircularProgressbarWithChildren
               value={
                 monthlyBudget.budget === 0
@@ -412,7 +410,13 @@ const MonthRadio = () => {
                 },
               }}
             >
-              <div style={{ fontSize: 12, marginTop: -5, textAlign: "center" }}>
+              <div
+                style={{
+                  fontSize: "1.2rem",
+                  marginTop: -5,
+                  textAlign: "center",
+                }}
+              >
                 <p className="bar__percentage">
                   {monthlyBudget.budget === 0
                     ? 0
@@ -455,7 +459,9 @@ const MonthRadio = () => {
 export default MonthRadio;
 
 const Container = styled.div`
-  margin: 2rem 3rem;
+  width: 92%;
+  padding: 3rem 8rem;
+  /* margin: 2rem 3rem; */
 
   h3 {
     font-size: 2rem;
@@ -920,7 +926,7 @@ const Budget = styled.div`
   border: 1px solid #c2c2c2;
   border-radius: 4px;
   padding: 1.5rem;
-  width: 25%;
+  width: 27%;
   height: 100%;
 
   h5 {
@@ -947,7 +953,7 @@ const Waste = styled.div`
   border: 1px solid #c2c2c2;
   border-radius: 4px;
   padding: 1.5rem;
-  width: 25%;
+  width: 30%;
   height: 100%;
 
   .null__container {

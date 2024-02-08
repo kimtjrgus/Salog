@@ -8,6 +8,7 @@ import { debounce } from "src/utils/timeFunc";
 import { styled } from "styled-components";
 import { type RootState } from "src/store";
 import { api } from "src/utils/refreshToken";
+import moment from "moment";
 
 interface valuesType {
   [key: string]: any;
@@ -353,8 +354,10 @@ const Fixed = () => {
   );
 
   useEffect(() => {
+    const date = moment().format("YYYY-MM");
+    const customDate = `${date}-00`;
     api
-      .get("/fixedOutgo/get?page=1&size=10&date=2024-01-00")
+      .get(`/fixedOutgo/get?page=1&size=10&date=${customDate}`)
       .then((res) => {
         setFixedOutgo(res.data.data);
       })
@@ -362,7 +365,7 @@ const Fixed = () => {
         console.error(error);
       });
     api
-      .get(`/fixedIncome/get?page=1&size=10&date=2024-01-00`)
+      .get(`/fixedIncome/get?page=1&size=10&date=${customDate}`)
       .then((res) => {
         setFixedIncome(res.data.data);
       })
@@ -741,10 +744,11 @@ const Fixed = () => {
 export default Fixed;
 
 const Container = styled.div`
+  width: 92%;
+  padding: 3rem 8rem;
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 3rem 8rem;
 
   h3 {
     font-size: 2.2rem;
@@ -960,37 +964,37 @@ const ListContainer = styled.div`
       .explanation__list {
         margin-bottom: 0.7rem;
         display: flex;
-        justify-content: space-between;
         align-items: center;
       }
 
       .red {
         margin-left: 1.2rem;
         border-radius: 50%;
-        width: 9px;
-        height: 9px;
+        width: 0.9rem;
+        height: 0.9rem;
         background: ${(props) => props.theme.COLORS.LIGHT_RED};
       }
 
       .yellow {
         margin-left: 1.2rem;
         border-radius: 50%;
-        width: 9px;
-        height: 9px;
+        width: 0.9rem;
+        height: 0.9rem;
         background: ${(props) => props.theme.COLORS.LIGHT_YELLOW};
       }
 
       .green {
         margin-left: 1.2rem;
         border-radius: 50%;
-        width: 9px;
-        height: 9px;
+        width: 0.9rem;
+        height: 0.9rem;
         background: ${(props) => props.theme.COLORS.LIGHT_GREEN};
       }
 
       p {
         font-size: 1.1rem;
         color: #545151;
+        margin-left: 0.8rem;
       }
     }
   }
@@ -1041,8 +1045,8 @@ const List = styled.div<{ $date: string }>`
   align-items: center;
 
   .list__day__outgo {
-    width: 50px;
-    height: 35px;
+    width: 5rem;
+    height: 3.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1062,8 +1066,8 @@ const List = styled.div<{ $date: string }>`
   }
 
   .list__day__income {
-    width: 50px;
-    height: 35px;
+    width: 5rem;
+    height: 3.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1079,7 +1083,7 @@ const List = styled.div<{ $date: string }>`
   .list__write__outgo {
     display: flex;
     flex-direction: column;
-    line-height: 20px;
+    line-height: 2rem;
 
     p {
       font-size: 1.4rem;
@@ -1097,7 +1101,7 @@ const List = styled.div<{ $date: string }>`
   .list__write__income {
     display: flex;
     flex-direction: column;
-    line-height: 20px;
+    line-height: 2rem;
 
     p {
       font-size: 1.4rem;
@@ -1125,8 +1129,8 @@ const UpdateList = styled.div`
   border-radius: 8px;
 
   .list__day__income {
-    width: 40px;
-    height: 40px;
+    width: 4rem;
+    height: 4rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1142,7 +1146,7 @@ const UpdateList = styled.div`
   .list__write__outgo {
     display: flex;
     flex-direction: column;
-    height: 38px;
+    height: 3.8rem;
 
     p {
       font-size: 1.2rem;
@@ -1163,7 +1167,7 @@ const UpdateList = styled.div`
   .list__write__income {
     display: flex;
     flex-direction: column;
-    height: 38px;
+    height: 3.8rem;
 
     p {
       font-size: 1.2rem;

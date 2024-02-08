@@ -878,6 +878,7 @@ const History = () => {
 export default History;
 
 const Container = styled.div`
+  width: 90%;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -1078,6 +1079,7 @@ const MainLists = styled.div`
   }
 
   .lists__header {
+    font-size: 1.6rem; // 반응형
     border-radius: 12px 12px 0px 0px;
     display: flex;
     border: 1px solid #c7c7c7;

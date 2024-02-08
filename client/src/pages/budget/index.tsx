@@ -286,7 +286,8 @@ const Budget = () => {
 export default Budget;
 
 const Container = styled.div`
-  padding: 4rem 6rem;
+  width: 92%;
+  padding: 3rem 8rem;
 
   .header {
     display: flex;
@@ -391,6 +392,7 @@ const StatList = styled.li`
     font-size: 1.8rem;
     margin-left: 1.8rem;
     margin-top: 1rem;
+    margin-bottom: 1rem;
   }
 
   hr {
@@ -524,6 +526,7 @@ const Bar = styled.div<{ width: string }>`
       Number(props.width) < 100 ? "4px 0 0 4px" : "4px"};
     width: ${(props) => (Number(props.width) > 100 ? 100 : props.width)}%;
     height: 26px;
+    margin-bottom: 0.4rem;
   }
 
   .bar__percent {

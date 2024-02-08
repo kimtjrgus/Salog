@@ -153,6 +153,10 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
         isNotValid = false;
       }
 
+      if (values.length === 0) {
+        isNotValid = true;
+      }
+
       setIsDisabled(isNotValid);
     }, 700),
     []
@@ -447,8 +451,8 @@ const Background = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.4);
-  z-index: 100;
-  position: absolute;
+  z-index: 150;
+  position: fixed;
   top: 0;
   left: 0;
 `;
@@ -459,7 +463,7 @@ const Container = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 4rem 6rem;
-  z-index: 200;
+  z-index: 100;
   width: 95rem;
   height: 55rem;
   background: white;

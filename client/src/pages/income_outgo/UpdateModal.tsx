@@ -130,6 +130,10 @@ const UpdateModal = ({
         isNotValid = false;
       }
 
+      if (values.length === 0) {
+        isNotValid = true;
+      }
+
       setIsDisabled(isNotValid);
     }, 700),
     []
@@ -462,7 +466,7 @@ const Background = styled.div`
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 100;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
 `;
