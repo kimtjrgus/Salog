@@ -112,13 +112,14 @@ public class DiaryService {
         tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
 
         long memberId = jwtTokenizer.getMemberId(token);
+        Diary diary = diaryMapper.DiaryPatchDtoToDiary(diaryDto);
         Diary findDiary = findVerifiedDiary(diaryId);
 
         verifiedRequest(findDiary.getMember().getMemberId(), memberId);
 
-        Optional.ofNullable(diaryDto.getTitle()).ifPresent(findDiary::setTitle);
-        Optional.ofNullable(diaryDto.getBody()).ifPresent(findDiary::setBody);
-        Optional.ofNullable(diaryDto.getImg()).ifPresent(findDiary::setImg);
+        Optional.ofNullable(diary.getTitle()).ifPresent(findDiary::setTitle);
+        Optional.ofNullable(diary.getBody()).ifPresent(findDiary::setBody);
+        Optional.ofNullable(diary.getImg()).ifPresent(findDiary::setImg);
 
         // 태그 수정
         if(diaryDto.getTagList() != null) {
@@ -182,14 +183,14 @@ public class DiaryService {
     //all List get
     @Transactional
     public MultiResponseDto<DiaryDto.Response> findAllDiaries (String token, int page, int size,
-                                            String diaryTag, Integer month, String date){
+                                            String diaryTag, String date){
         tokenBlackListService.isBlackListed(token); // 로그아웃 된 회원인지 체크
         long memberId = jwtTokenizer.getMemberId(token);
 
         Page<Diary> diaryPage;
 
         // 1. Only diaryTag에 대한 쿼리
-        if (diaryTag != null && month == null && date == null) {
+        if (diaryTag != null && date == null) {
             // UTF-8로 디코딩
             String decodedTag = URLDecoder.decode(diaryTag, StandardCharsets.UTF_8);
             log.info("DecodedTag To UTF-8 : {}", decodedTag);
@@ -204,18 +205,14 @@ public class DiaryService {
             diaryPage = diaryRepository.findAllByDiaryIdIn(diaryIds,
                     PageRequest.of(page - 1, size, Sort.by("date").descending()));
         }
-        // 2. Only month에 대한 쿼리
-        else if (month != null && diaryTag == null && date == null) {
-            diaryPage = diaryRepository.findAllByMonth(memberId, month,
-                    PageRequest.of(page - 1, size, Sort.by("date").descending()));
-        }
-        // 3. Only date에 대한 쿼리
-        else if (date != null && diaryTag == null && month == null) {
+
+        // 2. date에 대한 쿼리
+        else if (date != null && diaryTag == null) {
             diaryPage = diaryRepository.findAllByMemberMemberIdAndDate(memberId, LocalDate.parse(date),
                     PageRequest.of(page - 1, size, Sort.by("date").descending()));
         }
 
-        // 4. 모두 null인 경우 전체 리스트 조회
+        // 3. 모두 null인 경우 전체 리스트 조회
         else if(diaryTag == null && date == null){
             diaryPage = diaryRepository.findAllByMemberMemberId(memberId,
                     PageRequest.of(page - 1, size, Sort.by("date").descending()));
@@ -274,6 +271,23 @@ public class DiaryService {
         return new MultiResponseDto<>(diaryDtoList, diaryPage);
     }
 
+    // Get Diary Calendar
+    public List<DiaryDto.ResponseCalender> getDiaryCalendar(String token, String date){
+        tokenBlackListService.isBlackListed(token);
+        long memberId = jwtTokenizer.getMemberId(token);
+
+        String[] dateParts = date.split("-");
+        int year = Integer.parseInt(dateParts[0]);
+        int month = Integer.parseInt(dateParts[1]);
+
+        // 해당 '년'과 '월'에 대한 일기의 날짜만을 가져옴, 중복제거
+        List<LocalDate> dates = diaryRepository.findDistinctDatesByMemberIdAndYearAndMonth(memberId, year, month);
+
+        return dates.stream()
+                .map(DiaryDto.ResponseCalender::new)
+                .collect(Collectors.toList());
+    }
+
     // delete
     @Transactional
     public void deleteDiary (String token, Long diaryId){
@@ -288,15 +302,21 @@ public class DiaryService {
                 .map(DiaryTagLink::getDiaryTag)
                 .collect(Collectors.toList());
 
+        // 해당 다이어리와 연결된 모든 태그를 가져옴
+        List<DiaryTagLink> links = diary.getDiaryTagLinks();
+
+        for (DiaryTagLink link : links) {
+            if (diaryTagLinkRepository.existsById(link.getDiaryTagLinkId())) {
+                diaryTagLinkRepository.deleteById(link.getDiaryTagLinkId());
+            }
+        }
+
         // 태그를 사용하는 다른 다이어리가 있는지 확인 후, 없으면 태그 삭제
         for (DiaryTag diaryTag : diaryTags) {
-            List<DiaryTagLink> links = diaryTag.getDiaryTagLinks();
-            if (links.size() == 1 && links.get(0).getDiary().getDiaryId().equals(diaryId)) {
+            if (links.isEmpty()) {
                 tagService.deleteDiaryTag(token ,diaryTag.getDiaryTagId());
             }
         }
-        // 중간 테이블의 레코드를 삭제
-        diaryTagLinkRepository.deleteByDiaryId(diaryId);
 
         diaryRepository.deleteById(diaryId);
     }
