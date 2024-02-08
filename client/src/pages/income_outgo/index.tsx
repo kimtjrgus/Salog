@@ -569,7 +569,7 @@ const History = () => {
       date: false,
       tag: false,
     });
-  }, [location.pathname]);
+  }, [location.pathname, getMoment]);
 
   useEffect(() => {
     // 전역상태를 이용한 토스트 창 띄우기
