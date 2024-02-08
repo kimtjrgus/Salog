@@ -44,4 +44,11 @@ public class DiaryDto {
         private String img;
         private List<DiaryTagDto.Response> tagList;
     }
+
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public static class ResponseCalender {
+        private LocalDate date;
+    }
 }

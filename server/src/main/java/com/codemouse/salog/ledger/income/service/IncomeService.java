@@ -65,7 +65,7 @@ public class IncomeService {
                 .ifPresent(findIncome::setMoney);
         Optional.of(income.getIncomeName())
                 .ifPresent(findIncome::setIncomeName);
-        Optional.of(income.getMemo())
+        Optional.ofNullable(income.getMemo())
                 .ifPresent(findIncome::setMemo);
 
         // 태그
