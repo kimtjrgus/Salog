@@ -9,14 +9,34 @@ import { ReactComponent as Naver } from "../../assets/Naver.svg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setCookie } from "src/utils/cookie";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "src/store/slices/userSlice";
-import { type AppDispatch } from "src/store";
+import { type AppDispatch, type RootState } from "src/store";
 import { api } from "src/utils/refreshToken";
+import moment from "moment";
+import circulateSchedule from "src/utils/circulateSchedule";
+import {
+  setIncomeSchedule,
+  setOutgoSchedule,
+} from "src/store/slices/scheduleSlice";
 
 interface userType {
   email: string;
   password: string;
+}
+
+interface incomeType {
+  fixedIncomeId: number;
+  date: string;
+  money: number;
+  incomeName: string;
+}
+
+interface outgoType {
+  fixedOutgoId: number;
+  date: string;
+  money: number;
+  outgoName: string;
 }
 
 const Login = () => {
@@ -25,6 +45,10 @@ const Login = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+
+  const schedule = useSelector(
+    (state: RootState) => state.persistedReducer.schedule
+  );
 
   // 이메일, 비밀번호가 변경될 때 상태를 저장하는 함수
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +79,7 @@ const Login = () => {
           path: "/",
           expires: current,
         });
+        // 전역 상태로 회원 정보를 저장
         api
           .get("/members/get")
           .then((res) => {
@@ -63,6 +88,52 @@ const Login = () => {
           })
           .catch((error) => {
             console.log(error);
+          });
+
+        // 3일 미만 남은 금융일정 전역상태로 추가
+        const date = moment().format("YYYY-MM");
+        const customDate = `${date}-00`;
+        // const outgoIdArray = JSON.parse(
+        //   localStorage.getItem("outgoSchedule") ?? "[]"
+        // );
+        // const incomeIdArray = JSON.parse(
+        //   localStorage.getItem("incomeSchedule") ?? "[]"
+        // );
+
+        api
+          .get(`/fixedOutgo/get?page=1&size=10&date=${customDate}`)
+          .then((res) => {
+            const filteredOutgo = res.data.data.filter((el: outgoType) =>
+              circulateSchedule(el.date)
+            );
+            // const doubleFilteredOutgo = filteredOutgo.filter(
+            //   (el: outgoType) => !outgoIdArray.includes(el.fixedOutgoId)
+            // );
+            dispatch(
+              setOutgoSchedule([...schedule.outgoSchedule, ...filteredOutgo])
+            );
+          })
+          .catch((error) => {
+            console.error(error);
+            // 적절한 에러 처리 방식 선택
+          });
+
+        api
+          .get(`/fixedIncome/get?page=1&size=10&date=${customDate}`)
+          .then((res) => {
+            const filteredIncome = res.data.data.filter((el: incomeType) =>
+              circulateSchedule(el.date)
+            );
+            // const doubleFilteredIncome = filteredIncome.filter(
+            //   (el: incomeType) => !incomeIdArray.includes(el.fixedIncomeId)
+            // );
+            dispatch(
+              setIncomeSchedule([...schedule.incomeSchedule, ...filteredIncome])
+            );
+          })
+          .catch((error) => {
+            console.error(error);
+            // 적절한 에러 처리 방식 선택
           });
       })
       .catch((error) => {

@@ -569,7 +569,7 @@ const History = () => {
       date: false,
       tag: false,
     });
-  }, [location.pathname]);
+  }, [location.pathname, getMoment]);
 
   useEffect(() => {
     // 전역상태를 이용한 토스트 창 띄우기
@@ -1182,6 +1182,10 @@ const DeleteModal = styled.div`
         &:last-child {
           background: ${(props) => props.theme.COLORS.LIGHT_BLUE};
           color: white;
+        }
+
+        @media (max-width: 1329px) {
+          padding: 1rem 5rem;
         }
       }
     }

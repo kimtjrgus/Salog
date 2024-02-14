@@ -59,20 +59,6 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
   const dispatch = useDispatch();
 
-  console.log(values);
-
-  // const onChangeMoney = (e: React.ChangeEvent<HTMLInputElement>) => {
-  // 	const inputValue = e.target.value;
-  // 	console.log(inputValue);
-
-  // 	// // 입력값에 e가 입력되는 것은 추후에 막아볼 예정
-  // 	// if (inputValue.startsWith("0")) {
-  // 	// 	setValues({ ...values, money: inputValue.substring(1) });
-  // 	// } else {
-  // 	// 	setValues({ ...values, money: inputValue });
-  // 	// }
-  // };
-
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     id: number
@@ -603,6 +589,7 @@ const Lists = styled.ul`
   .category__select {
     cursor: pointer;
     font-size: 1.2rem;
+    font-family: "Pretendard-Regular";
     position: relative;
     border: none;
     border-bottom: 1px solid #c9c9c9;
@@ -617,6 +604,7 @@ const Lists = styled.ul`
   }
 
   .date__select {
+    font-family: "Pretendard-Regular";
     cursor: pointer;
     font-size: 1.1rem;
     position: relative;

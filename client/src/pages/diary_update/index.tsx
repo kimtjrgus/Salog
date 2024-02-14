@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from "src/components/Layout/Modal";
+import { BookContainer } from "../diary_detail";
 import Toast, { ToastType } from "src/components/Layout/Toast";
 import dateAsKor from "src/utils/dateAsKor";
 import { styled } from "styled-components";
@@ -8,6 +9,8 @@ import { Input } from "../login";
 import ReactQuillComponent from "../diary_write/TextEditor";
 import { api } from "src/utils/refreshToken";
 import { type TagList } from "../diary";
+import { type incomeType, type outgoType } from "../income_outgo";
+import moment from "moment";
 export interface valuesType {
   title: string;
   body: string;
@@ -15,18 +18,41 @@ export interface valuesType {
 
 const DiaryUpdate = () => {
   const [values, setValues] = useState<valuesType>({ title: "", body: "" });
-
+  const [outgo, setOutgo] = useState<outgoType[]>([]);
+  const [income, setIncome] = useState<incomeType[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [category, setCategory] = useState<string>("");
   const [date, setDate] = useState<string>("");
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [tagModal, setTagModal] = useState<boolean>(false);
 
   const id = useParams().id;
-
   const navigate = useNavigate();
 
   const nowDate = dateAsKor(new Date(date).toDateString());
+
+  // BODY에서 처음 올라온 img만 저장하여 서버로 전송(imgSrc)
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(values.body, "text/html");
+  const imgTag = doc.querySelector("img");
+  const imgSrc = imgTag?.getAttribute("src");
+
+  const sumOfOutgo = () => {
+    let sum = 0;
+    outgo.forEach((el) => {
+      sum += el.money;
+    });
+    return sum;
+  };
+
+  const sumOfIncome = () => {
+    let sum = 0;
+    income.forEach((el) => {
+      sum += el.money;
+    });
+    return sum;
+  };
 
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -112,8 +138,10 @@ const DiaryUpdate = () => {
     } else {
       api
         .patch(`/diary/update/${id}`, {
+          date,
           title: values.title,
           body: values.body,
+          img: imgSrc ?? "",
           tagList: categories,
         })
         .then(() => {
@@ -129,10 +157,11 @@ const DiaryUpdate = () => {
     api
       .get(`/diary/${id}`)
       .then((res) => {
-        setValues({ title: res.data.data.title, body: res.data.data.body });
-        setDate(res.data.data.date);
+        console.log(res.data);
+        setValues({ title: res.data.title, body: res.data.body });
+        setDate(res.data.date);
         const tags: string[] = [];
-        res.data.data.tagList.forEach((tagObj: TagList) => {
+        res.data.tagList.forEach((tagObj: TagList) => {
           tags.push(tagObj.tagName);
         });
         setCategories([...categories, ...tags]);
@@ -140,7 +169,24 @@ const DiaryUpdate = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [id]);
+
+    api
+      .get(`/outgo?page=1&size=15&date=${moment().format("YYYY-MM-DD")}`)
+      .then((res) => {
+        setOutgo(res.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    api
+      .get(`/income?page=1&size=15&date=${moment().format("YYYY-MM-DD")}`)
+      .then((res) => {
+        setIncome(res.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   return (
     <>
@@ -192,7 +238,69 @@ const DiaryUpdate = () => {
           </CategoryList>
           <ReactQuillComponent body={values.body} onChangeBody={onChangeBody} />
         </WriteContainer>
-        <Calculate></Calculate>
+        <BookContainer>
+          <h3>작성한 가계부</h3>
+          <div className="outgo__lists">
+            <h5>{`지출 : ${outgo.length}건`}</h5>
+            <div className="lists__header">
+              <p>카테고리</p>
+              <p>거래처</p>
+              <p>금액</p>
+            </div>
+            <ul className="lists">
+              {outgo.length === 0 ? (
+                <p className="null__p">지출 내역이 존재하지 않습니다.</p>
+              ) : (
+                outgo.map((el) => {
+                  return (
+                    <li className="list" key={el.outgoId}>
+                      <p>{el.outgoTag.tagName}</p>
+                      <div
+                        className={`${
+                          el.outgoName.length > 10 ? "over__div" : "under__div"
+                        }`}
+                      >
+                        <p>{el.outgoName}</p>
+                      </div>
+                      <p>{el.money.toLocaleString()}원</p>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+            <p className="bottom__p">{`총 ${sumOfOutgo().toLocaleString()}원`}</p>
+          </div>
+          <div className="outgo__lists income">
+            <h5>{`수입 : ${income.length}건`}</h5>
+            <div className="lists__header">
+              <p>카테고리</p>
+              <p>거래처</p>
+              <p>금액</p>
+            </div>
+            <ul className="lists">
+              {income.length === 0 ? (
+                <p className="null__p">수입 내역이 존재하지 않습니다.</p>
+              ) : (
+                income.map((el) => {
+                  return (
+                    <li className="list" key={el.incomeId}>
+                      <p>{el.incomeTag.tagName}</p>
+                      <div
+                        className={`${
+                          el.incomeName.length > 10 ? "over__div" : "under__div"
+                        }`}
+                      >
+                        <p>{el.incomeName}</p>
+                      </div>
+                      <p>{el.money.toLocaleString()}원</p>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+            <p className="bottom__p">{`총 ${sumOfIncome().toLocaleString()}원`}</p>
+          </div>
+        </BookContainer>
       </Container>
       <Modal
         state={isOpen}
@@ -345,11 +453,6 @@ const TagModal = styled.span<{ open: boolean }>`
   font-weight: 400;
   display: ${(props) => (!props.open ? "none" : "block")};
   transition: all 0.125s ease-in 0s;
-`;
-
-const Calculate = styled.div`
-  width: 35%;
-  padding: 2rem;
 `;
 
 export default DiaryUpdate;

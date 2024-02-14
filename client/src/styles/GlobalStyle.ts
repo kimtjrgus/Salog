@@ -48,13 +48,19 @@ const GlobalStyle = createGlobalStyle`
         font-family: 'Pretendard-Regular';
     }
 
-     @media (min-width:1920) and (max-width: 2559px) {
+     @media (min-width:1920px) and (max-width: 2559px) {
+        html {
+        font-size: 11px;
+        }
+    }
+
+    @media (min-width:1441px) and (max-width: 1919px) {
         html {
         font-size: 10.5px;
         }
     }
 
-    @media (min-width:1330px) and (max-width: 1919px) {
+    @media (min-width:1330px) and (max-width: 1440px) {
         html {
         font-size: 10px;
         }
@@ -69,6 +75,12 @@ const GlobalStyle = createGlobalStyle`
      @media (min-width:960px) and (max-width: 1172px) {
         html {
         font-size: 8.5px;
+        }
+    }
+
+     @media (max-width:959px) {
+        html {
+        font-size: 8px;
         }
     }
 

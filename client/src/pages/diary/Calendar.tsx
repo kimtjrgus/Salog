@@ -1,23 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import styled from "styled-components";
-import { type diaryType } from ".";
-import PropTypes, { type InferProps } from "prop-types";
 import moment from "moment";
 import { useLocation, useNavigate } from "react-router-dom";
-// import axios from "axios";
+import { api } from "src/utils/refreshToken";
 
-interface MyComponentProps {
-  diaries: diaryType[];
+interface calendarDayType {
+  date: string;
 }
 
-const CalendarComponent: React.FC<MyComponentProps> = ({ diaries }) => {
+const CalendarComponent = () => {
   const [value, onChange] = useState(new Date());
+  const [calendarDays, setCalendarDays] = useState<calendarDayType[]>([]);
+  const [startDate, setStartDate] = useState<Date | null>(new Date(value));
 
   const path = useLocation().pathname;
   // const search = useLocation().search;
   const navigate = useNavigate();
+
+  // 캘린더의 시작일을 상태에 저장함
+  const getActiveMonth = (activeStartDate: Date | null) => {
+    setStartDate(activeStartDate);
+  };
 
   const onClickDayTile = (date: Date) => {
     const selectedDate = new Date(
@@ -26,6 +31,19 @@ const CalendarComponent: React.FC<MyComponentProps> = ({ diaries }) => {
     const dateString = selectedDate.toISOString().split("T")[0];
     navigate(`${path}?date=${dateString}`);
   };
+
+  useEffect(() => {
+    const date = moment(startDate).format("YYYY-MM");
+    const customDate = `${date}-00`;
+    api
+      .get(`/diary/calendar?date=${customDate}`)
+      .then((res) => {
+        setCalendarDays(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [startDate]);
 
   return (
     <Container>
@@ -42,34 +60,21 @@ const CalendarComponent: React.FC<MyComponentProps> = ({ diaries }) => {
         tileClassName={({ date, view }) => {
           if (view === "month") {
             if (
-              diaries.find((x) => x.date === moment(date).format("YYYY-MM-DD"))
+              calendarDays.find(
+                (x) => x.date === moment(date).format("YYYY-MM-DD")
+              )
             ) {
               return "highlight";
             }
           }
         }}
+        onActiveStartDateChange={({ activeStartDate }) => {
+          getActiveMonth(activeStartDate);
+        }}
         onClickDay={onClickDayTile}
       />
     </Container>
   );
-};
-
-CalendarComponent.propTypes = {
-  diaries: PropTypes.arrayOf(
-    PropTypes.shape({
-      diaryId: PropTypes.number.isRequired,
-      date: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      body: PropTypes.string.isRequired,
-      img: PropTypes.string.isRequired,
-      tagList: PropTypes.arrayOf(
-        PropTypes.shape({
-          diaryTagId: PropTypes.number.isRequired,
-          tagName: PropTypes.string.isRequired,
-        })
-      ).isRequired,
-    })
-  ).isRequired as InferProps<MyComponentProps>["diaries"],
 };
 
 const Container = styled.div`
@@ -94,6 +99,10 @@ const Container = styled.div`
       font-weight: 600;
       white-space: nowrap;
     }
+  }
+
+  .react-calendar__navigation button {
+    min-width: 4.1rem;
   }
 
   .react-calendar__month-view__weekdays {
@@ -124,6 +133,11 @@ const Container = styled.div`
   .hQozOV .react-calendar__tile:enabled:focus,
   .hQozOV .react-calendar__tile--active {
     color: black;
+  }
+
+  .react-calendar__navigation button:enabled:hover,
+  .react-calendar__navigation button:enabled:focus {
+    background: transparent;
   }
 
   .react-calendar__tile--now {

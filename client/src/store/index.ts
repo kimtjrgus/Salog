@@ -6,6 +6,7 @@ import {
 import ledgerSlice from "./slices/pieChartSlice";
 import userSlice from "./slices/userSlice";
 import ToastSlice from "./slices/toastSlice";
+import scheduleSlice from './slices/scheduleSlice';
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
@@ -15,12 +16,13 @@ const reducers = combineReducers({
 	user: userSlice,
 	ledger: ledgerSlice,
 	toast: ToastSlice,
+	schedule: scheduleSlice,
 });
 
 const persistConfig = {
 	key: "root",
 	storage,
-	whiteList: ["user,ledger, toast"],
+	whiteList: ["user,ledger, toast", "schedule"],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);
