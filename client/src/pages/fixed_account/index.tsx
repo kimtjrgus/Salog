@@ -1,14 +1,18 @@
-import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
 import Toast, { ToastType } from "src/components/Layout/Toast";
 import { hideToast, showToast } from "src/store/slices/toastSlice";
+import {
+  setIncomeSchedule,
+  setOutgoSchedule,
+} from "src/store/slices/scheduleSlice";
 import { debounce } from "src/utils/timeFunc";
 import { styled } from "styled-components";
 import { type RootState } from "src/store";
 import { api } from "src/utils/refreshToken";
 import moment from "moment";
+import circulateSchedule from "src/utils/circulateSchedule";
 
 interface valuesType {
   [key: string]: any;
@@ -67,6 +71,9 @@ const Fixed = () => {
 
   const dispatch = useDispatch();
   const modal = useSelector((state: RootState) => state.persistedReducer.toast);
+  const schedule = useSelector(
+    (state: RootState) => state.persistedReducer.schedule
+  );
 
   const onClickUpdateList = (id: number, type: string) => {
     const active =
@@ -169,6 +176,9 @@ const Fixed = () => {
           outgoName: values.name,
         })
         .then((res) => {
+          if (circulateSchedule(res.data.date)) {
+            dispatch(setOutgoSchedule([...schedule.outgoSchedule, res.data]));
+          }
           setFixedOutgo([...fixedOutgo, res.data]);
           setValues({
             division: "",
@@ -195,6 +205,9 @@ const Fixed = () => {
           incomeName: values.name,
         })
         .then((res) => {
+          if (circulateSchedule(res.data.date)) {
+            dispatch(setIncomeSchedule([...schedule.incomeSchedule, res.data]));
+          }
           setFixedIncome([...fixedIncome, res.data]);
           setValues({
             division: "",
@@ -224,6 +237,31 @@ const Fixed = () => {
           outgoName: updateValues.name,
         })
         .then((res) => {
+          // 수정했을 때, 일정의 날짜가 3일 미만이라면
+          if (circulateSchedule(res.data.date)) {
+            const updatedData = [
+              ...schedule.outgoSchedule.filter(
+                (item: outgoType) => item.fixedOutgoId !== updateValues.id
+              ),
+              res.data,
+            ];
+            dispatch(setOutgoSchedule(updatedData));
+          }
+          // 날짜가 3일 이상 남았다면 && 전역 상태에 등록되어 있다면
+          else if (
+            !circulateSchedule(res.data.date) &&
+            schedule.outgoSchedule.filter(
+              (item: outgoType) => item.fixedOutgoId === updateValues.id
+            ).length !== 0
+          ) {
+            const updatedData = [
+              ...schedule.outgoSchedule.filter(
+                (item: outgoType) => item.fixedOutgoId !== updateValues.id
+              ),
+            ];
+            dispatch(setOutgoSchedule(updatedData));
+          }
+
           setFixedOutgo((prevData) => {
             const newData = prevData.map((item) => {
               if (item.fixedOutgoId === updateValues.id) {
@@ -233,6 +271,14 @@ const Fixed = () => {
             });
             return newData;
           });
+          // 웹 알림을 위한 로컬 저장소 관리
+          const outgoIdArray = JSON.parse(
+            localStorage.getItem("outgoSchedule") ?? "[]"
+          );
+          const filteredArray = outgoIdArray.filter(
+            (el: number) => el !== updateValues.id
+          );
+          localStorage.setItem("outgoSchedule", JSON.stringify(filteredArray));
           dispatch(
             showToast({ message: "수정이 완료되었습니다", type: "success" })
           );
@@ -248,6 +294,30 @@ const Fixed = () => {
           incomeName: updateValues.name,
         })
         .then((res) => {
+          // 수정했을 때, 일정의 날짜가 3일 미만이라면
+          if (circulateSchedule(res.data.date)) {
+            const updatedData = [
+              ...schedule.incomeSchedule.filter(
+                (item: incomeType) => item.fixedIncomeId !== updateValues.id
+              ),
+              res.data,
+            ];
+            dispatch(setIncomeSchedule(updatedData));
+          }
+          // 날짜가 3일 이상 남았다면
+          else if (
+            !circulateSchedule(res.data.date) &&
+            schedule.incomeSchedule.filter(
+              (item: incomeType) => item.fixedIncomeId === updateValues.id
+            ).length !== 0
+          ) {
+            const updatedData = [
+              ...schedule.incomeSchedule.filter(
+                (item: incomeType) => item.fixedIncomeId !== updateValues.id
+              ),
+            ];
+            dispatch(setIncomeSchedule(updatedData));
+          }
           setFixedIncome((prevData) => {
             const newData = prevData.map((item) => {
               if (item.fixedIncomeId === updateValues.id) {
@@ -257,6 +327,14 @@ const Fixed = () => {
             });
             return newData;
           });
+          // 웹 알림을 위한 로컬저장소 관리
+          const incomeIdArray = JSON.parse(
+            localStorage.getItem("incomeSchedule") ?? "[]"
+          );
+          const filteredArray = incomeIdArray.filter(
+            (el: number) => el !== updateValues.id
+          );
+          localStorage.setItem("incomeSchedule", JSON.stringify(filteredArray));
           dispatch(
             showToast({
               message: "수정이 완료되었습니다",
@@ -275,6 +353,19 @@ const Fixed = () => {
       api
         .delete(`/fixedOutgo/delete/${deleteValue.id}`)
         .then(() => {
+          const updatedData = [
+            ...schedule.outgoSchedule.filter(
+              (item: outgoType) => item.fixedOutgoId !== deleteValue.id
+            ),
+          ];
+          dispatch(setOutgoSchedule(updatedData));
+          const outgoIdArray = JSON.parse(
+            localStorage.getItem("outgoSchedule") ?? "[]"
+          );
+          const filteredArray = outgoIdArray.filter(
+            (el: number) => el !== deleteValue.id
+          );
+          localStorage.setItem("outgoSchedule", JSON.stringify(filteredArray));
           setFixedOutgo((prevData) => {
             const data = prevData.filter((el) => {
               return el.fixedOutgoId !== deleteValue.id;
@@ -300,9 +391,22 @@ const Fixed = () => {
           console.error(error);
         });
     } else {
-      axios
+      api
         .delete(`/fixedIncome/delete/${deleteValue.id}`)
         .then(() => {
+          const updatedData = [
+            ...schedule.incomeSchedule.filter(
+              (item: incomeType) => item.fixedIncomeId !== updateValues.id
+            ),
+          ];
+          dispatch(setIncomeSchedule(updatedData));
+          const incomeIdArray = JSON.parse(
+            localStorage.getItem("incomeSchedule") ?? "[]"
+          );
+          const filteredArray = incomeIdArray.filter(
+            (el: number) => el !== deleteValue.id
+          );
+          localStorage.setItem("incomeSchedule", JSON.stringify(filteredArray));
           setFixedIncome((prevData) => {
             const data = prevData.filter((el) => {
               return el.fixedIncomeId !== deleteValue.id;
@@ -497,7 +601,13 @@ const Fixed = () => {
                   </ListNullContainer>
                 ) : (
                   <>
-                    <ul className="outgo__lists">
+                    <ul
+                      className={`${
+                        fixedOutgo.length === 0
+                          ? `outgo__lists none`
+                          : `outgo__lists`
+                      }`}
+                    >
                       <h5>지출</h5>
                       <div className="list__div">
                         {fixedOutgo.map((el) => (
@@ -530,7 +640,13 @@ const Fixed = () => {
                         </div>
                       </div>
                     </ul>
-                    <ul className="outgo__lists">
+                    <ul
+                      className={`${
+                        fixedIncome.length === 0
+                          ? `outgo__lists none`
+                          : `outgo__lists`
+                      }`}
+                    >
                       <h5>수입</h5>
                       <div className="list__div">
                         {fixedIncome.map((el) => (
@@ -634,7 +750,13 @@ const Fixed = () => {
                   </ListNullContainer>
                 ) : (
                   <>
-                    <ul className="outgo__lists__update">
+                    <ul
+                      className={`${
+                        fixedOutgo.length === 0
+                          ? `outgo__lists__update null`
+                          : `outgo__lists__update`
+                      }`}
+                    >
                       {fixedOutgo.map((el) => (
                         <UpdateList
                           key={el.fixedOutgoId}
@@ -1008,12 +1130,12 @@ const ListContainer = styled.div`
     margin-top: 1rem;
     margin-right: 4rem;
 
-     -ms-overflow-style: none; /* 인터넷 익스플로러 */
-      scrollbar-width: none; /* 파이어폭스 */
+    -ms-overflow-style: none; /* 인터넷 익스플로러 */
+    scrollbar-width: none; /* 파이어폭스 */
 
-      &::-webkit-scrollbar {
-        display: none;
-      }
+    &::-webkit-scrollbar {
+      display: none;
+    }
 
     h5 {
       font-size: 1.2rem;
@@ -1031,11 +1153,18 @@ const ListContainer = styled.div`
       }
     }
 
-      p {
-        font-size: 1.1rem;
-        color: #545151;
-      }
+    p {
+      font-size: 1.1rem;
+      color: #545151;
     }
+  }
+
+  .null {
+    margin-right: 0rem;
+  }
+
+  .none {
+    display: none;
   }
 `;
 
@@ -1250,6 +1379,10 @@ const DeleteModal = styled.div`
         &:last-child {
           background: ${(props) => props.theme.COLORS.LIGHT_BLUE};
           color: white;
+        }
+
+        @media (max-width: 1329px) {
+          padding: 1rem 5rem;
         }
       }
     }
