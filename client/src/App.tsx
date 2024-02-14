@@ -48,7 +48,7 @@ function App() {
           <Route path={"/findPassword"} element={<PasswordFind />} />
         </Route>
       </Routes>
-      <ToastContainer />
+      <ToastContainer style={{ fontSize: "1.4rem" }} />
     </>
   );
 }
