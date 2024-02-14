@@ -9,25 +9,23 @@ import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import Theme from "./styles/Theme";
-import RefreshToken from "./utils/refreshToken";
 
 export const persistor = persistStore(store);
 
 const root = ReactDOM.createRoot(
-	document.getElementById("root") as HTMLElement,
+  document.getElementById("root") as HTMLElement
 );
 root.render(
-	<Provider store={store}>
-		<PersistGate loading={null} persistor={persistor}>
-			<BrowserRouter>
-				<RefreshToken />
-				<ThemeProvider theme={Theme}>
-					<GlobalStyle />
-					<App />
-				</ThemeProvider>
-			</BrowserRouter>
-		</PersistGate>
-	</Provider>,
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <BrowserRouter>
+        <ThemeProvider theme={Theme}>
+          <GlobalStyle />
+          <App />
+        </ThemeProvider>
+      </BrowserRouter>
+    </PersistGate>
+  </Provider>
 );
 
 // If you want your app to work offline and load faster, you can change
