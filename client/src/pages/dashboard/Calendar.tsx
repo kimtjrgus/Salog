@@ -123,15 +123,22 @@ const DashboardCalendar = ({
                   data-cy={`calendar-day-${new Date(date).getDate()}`}
                 >
                   <span
-                    className="write__icon"
+                    className={`write__icon ${
+                      new Date(date).getFullYear() ===
+                        new Date().getFullYear() &&
+                      new Date(date).getMonth() === new Date().getMonth() &&
+                      new Date(date).getDate() === new Date().getDate()
+                        ? "now"
+                        : ""
+                    }`}
                     onClick={(e) => {
                       onClickWriteBtn(e, { date });
                     }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
+                      width="1.6rem"
+                      height="1.6rem"
                       viewBox="-0.5 -0.5 24 24"
                     >
                       <path
@@ -145,32 +152,32 @@ const DashboardCalendar = ({
             );
           }
           // 오늘 날짜에 가계부 수정 아이콘 표시
-          if (
-            new Date(date).getFullYear() === new Date().getFullYear() &&
-            new Date(date).getMonth() === new Date().getMonth() &&
-            new Date(date).getDate() === new Date().getDate()
-          ) {
-            return (
-              <div
-                className="write__icon"
-                onClick={(e) => {
-                  onClickWriteBtn(e, { date });
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="-0.5 -0.5 24 24"
-                >
-                  <path
-                    fill="#85b6ff"
-                    d="m21.289.98l.59.59c.813.814.69 2.257-.277 3.223L9.435 16.96l-3.942 1.442c-.495.182-.977-.054-1.075-.525a.928.928 0 0 1 .045-.51l1.47-3.976L18.066 1.257c.967-.966 2.41-1.09 3.223-.276zM8.904 2.19a1 1 0 1 1 0 2h-4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4a1 1 0 0 1 2 0v4a4 4 0 0 1-4 4h-12a4 4 0 0 1-4-4v-12a4 4 0 0 1 4-4z"
-                  />
-                </svg>
-              </div>
-            );
-          }
+          // if (
+          //   new Date(date).getFullYear() === new Date().getFullYear() &&
+          //   new Date(date).getMonth() === new Date().getMonth() &&
+          //   new Date(date).getDate() === new Date().getDate()
+          // ) {
+          //   return (
+          //     <div
+          //       className="write__icon__now"
+          //       onClick={(e) => {
+          //         onClickWriteBtn(e, { date });
+          //       }}
+          //     >
+          //       <svg
+          //         xmlns="http://www.w3.org/2000/svg"
+          //         width="1.6rem"
+          //         height="1.6rem"
+          //         viewBox="-0.5 -0.5 24 24"
+          //       >
+          //         <path
+          //           fill="#85b6ff"
+          //           d="m21.289.98l.59.59c.813.814.69 2.257-.277 3.223L9.435 16.96l-3.942 1.442c-.495.182-.977-.054-1.075-.525a.928.928 0 0 1 .045-.51l1.47-3.976L18.066 1.257c.967-.966 2.41-1.09 3.223-.276zM8.904 2.19a1 1 0 1 1 0 2h-4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4a1 1 0 0 1 2 0v4a4 4 0 0 1-4 4h-12a4 4 0 0 1-4-4v-12a4 4 0 0 1 4-4z"
+          //         />
+          //       </svg>
+          //     </div>
+          //   );
+          // }
 
           return (
             <Wrapper
@@ -246,7 +253,7 @@ const Container = styled.div`
     }
 
     .write__icon {
-        margin-left: 6.5rem;
+        margin-left: 6rem;
 		z-index: 100;
 
         &:hover {
@@ -285,10 +292,6 @@ const Container = styled.div`
 			margin-top: 0.5rem;
             color: ${(props) => props.theme.COLORS.LIGHT_RED}
         }
-
-		&::-webkit-scrollbar {
-  			display: none;
-		}
 	}
 
 	.react-calendar__navigation {
@@ -330,6 +333,7 @@ const Container = styled.div`
 	}
 
 	.react-calendar__tile {
+    position: relative;
 		height: 6.8rem;
 		border-bottom: 1px solid #eeeeee;
         display: flex;
@@ -368,6 +372,10 @@ const Wrapper = styled.div<{ $buttonDisplay: boolean }>`
   ${({ $buttonDisplay }) => `
     span {
       display: ${$buttonDisplay ? "flex" : "none"};
+    }
+
+    .now {
+      margin-left: 6.5rem;
     }
 
     &:hover span {
