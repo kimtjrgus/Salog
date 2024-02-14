@@ -78,6 +78,12 @@ const GlobalStyle = createGlobalStyle`
         }
     }
 
+     @media (max-width:959px) {
+        html {
+        font-size: 8px;
+        }
+    }
+
     h1,h2,h3,h4,h5,h6{
         font-family: 'Pretendard-SemiBold';
         font-size: 2.8rem;

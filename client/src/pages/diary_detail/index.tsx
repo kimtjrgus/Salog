@@ -36,6 +36,7 @@ const DiaryDetail = () => {
     img: "",
     tagList: [],
   });
+
   const [outgo, setOutgo] = useState<outgoType[]>([]);
   const [income, setIncome] = useState<incomeType[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -86,9 +87,9 @@ const DiaryDetail = () => {
     api
       .get(`/diary/${id}`)
       .then((res) => {
-        setDiary(res.data.data);
+        setDiary(res.data);
         api
-          .get(`/outgo?page=1&size=15&date=${res.data.data.date}`)
+          .get(`/outgo?page=1&size=15&date=${res.data.date}`)
           .then((res) => {
             setOutgo(res.data.data);
           })
@@ -96,7 +97,7 @@ const DiaryDetail = () => {
             console.log(error);
           });
         api
-          .get(`/income?page=1&size=15&date=${res.data.data.date}`)
+          .get(`/income?page=1&size=15&date=${res.data.date}`)
           .then((res) => {
             setIncome(res.data.data);
           })
@@ -255,7 +256,7 @@ const Container = styled.div`
 const DetailContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 70%;
+  width: 75rem;
 
   .go_back {
     width: 20%;
@@ -349,8 +350,9 @@ const Quill = styled(QuillContainer)`
 `;
 
 export const BookContainer = styled.div`
-  width: 30%;
-  height: 50vh;
+  width: 34.5rem;
+  height: 75vh;
+  margin: 0 auto;
   margin-top: 5rem;
   padding: 2rem;
 

@@ -136,6 +136,7 @@ const Container = styled.div`
     bottom: 3rem;
     background: #e5ebff;
     color: #849fff;
+    font-size: 1.3rem;
     border-radius: 8px;
     padding: 1rem 2rem;
 

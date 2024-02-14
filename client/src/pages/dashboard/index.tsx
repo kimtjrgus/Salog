@@ -47,8 +47,7 @@ export interface modalType {
 }
 
 const Dashboard = () => {
-  const member = useSelector((state: RootState) => state.persistedReducer.user);
-  console.log(member);
+  // const member = useSelector((state: RootState) => state.persistedReducer.user);
 
   const modal = useSelector((state: RootState) => state.persistedReducer.toast);
 

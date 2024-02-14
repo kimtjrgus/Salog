@@ -1183,6 +1183,10 @@ const DeleteModal = styled.div`
           background: ${(props) => props.theme.COLORS.LIGHT_BLUE};
           color: white;
         }
+
+        @media (max-width: 1329px) {
+          padding: 1rem 5rem;
+        }
       }
     }
   }
