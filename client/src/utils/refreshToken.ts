@@ -1,96 +1,3 @@
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-// import { getCookie, removeCookie, setCookie } from "./cookie";
-
-// export const api = axios.create({
-//   baseURL: process.env.REACT_APP_SERVER_URL,
-//   headers: { "Content-Type": "application/json" },
-// });
-
-// const RefreshToken = () => {
-//   const navigate = useNavigate();
-
-//   // 요청 전에 헤더에 accessToken을 추가
-//   api.interceptors.request.use((config) => {
-//     const accessToken = getCookie("accessToken");
-//     if (typeof accessToken === "undefined") {
-//       config.headers.Authorization = null;
-//       return config;
-//     }
-//     config.headers.Authorization = `${accessToken}`;
-//     //   config.withCredentials = true;
-//     return config;
-//   });
-
-//   // 에러 처리 및 accessToken 재발급
-//   api.interceptors.response.use(
-//     // 2xx 범위에 있는 응답 트리거
-//     (response) => response,
-//     async (error) => {
-//       // 2xx 범위 밖에있는 응답 트리거
-//       console.log(error);
-//       if (error.response && error.response.status === 401) {
-//         // 토큰 재발급 중인 경우 다른 요청은 중단
-
-//         const refreshToken = getCookie("refreshToken");
-//         const accessToken = localStorage.getItem("accessToken");
-//         const current = new Date();
-//         current.setMinutes(current.getMinutes() + 30);
-
-//         try {
-//           const response = await axios.post(
-//             `${process.env.REACT_APP_SERVER_URL}/refresh`,
-//             {
-//               accessToken,
-//               refreshToken,
-//             }
-//           );
-
-//           const newAccessToken = response.data.accessToken;
-//           const newRefreshToken = response.data.refreshToken;
-
-//           setCookie("accessToken", newAccessToken, {
-//             path: "/",
-//             expires: current,
-//           });
-//           setCookie("refreshToken", newRefreshToken, {
-//             path: "/",
-//             expires: current,
-//           });
-//           localStorage.setItem("accessToken", newAccessToken);
-
-//           // 이전 요청을 재시도
-//           const originalRequest = error.config;
-//           originalRequest.headers.accessToken = newAccessToken;
-//           originalRequest.headers.refreshToken = newRefreshToken;
-
-//           // originalRequest.headers.Authorization = newAccessToken;
-
-//           await api.request(originalRequest);
-//           //   .then(() => {
-//           //     window.location.reload();
-//           //   })
-//           //   .catch((error) => {
-//           //     console.log(error);
-//           //   });
-//           return;
-//         } catch (error) {
-//           // refreshToken 재발급에 실패한 경우 로그아웃 처리 등을 수행할 수 있습니다.
-//           removeCookie("refreshToken", { path: "/" });
-//           removeCookie("accessToken", { path: "/" });
-//           localStorage.clear();
-//           navigate("/login", { replace: true });
-//         }
-//       }
-
-//       return await Promise.reject(error);
-//     }
-//   );
-
-//   return <></>;
-// };
-
-// export default RefreshToken;
 import axios from 'axios';
 import { getCookie, removeCookie, setCookie } from './cookie';
 
@@ -135,8 +42,6 @@ api.interceptors.response.use(
 );
 
 let subscribers: any = [];
-console.log(subscribers);
-
 
 const resetTokenAndReattemptRequest = async (error: any) => {
 
@@ -213,4 +118,5 @@ const signOut = () => {
   removeCookie('accessToken');
   localStorage.clear();
   removeCookie('refreshToken');
+  window.location.href = ("/login");
 }

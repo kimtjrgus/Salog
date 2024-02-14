@@ -44,10 +44,11 @@ interface tagType {
 
 const Diary = () => {
   const [diaries, setDiaries] = useState<diaryType[]>([]);
-  console.log(diaries);
-
   const [tagLists, setTagLists] = useState<tagType[]>([]);
   const [searchVal, setSearchVal] = useState<string>("");
+  // 전체보기 숫자에 사용 될 상태
+  const [totalElement, setTotalElement] = useState<number>(0);
+
   // 무한 스크롤에 사용 될 페이지와 로딩 상태
   const [page, setPage] = useState(1);
   const [pageInfo, setPageInfo] = useState<pageType>({
@@ -133,14 +134,6 @@ const Diary = () => {
       .catch((error) => {
         console.log(error);
       });
-    api
-      .get("/diary/calendar?date=2024-02-00")
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
     // Top 버튼을 위한 스크롤 감지
     const handleShowButton = () => {
       if (window.scrollY > 280) {
@@ -198,6 +191,7 @@ const Diary = () => {
         } else {
           setDiaries(response.data.data);
           setPageInfo(response.data.pageInfo);
+          setTotalElement(response.data.pageInfo.totalElements);
         }
       }
       // 쿼리가 있을 때 && 쿼리에 ?title이 존재할 때 (제목 검색)
@@ -350,11 +344,11 @@ const Diary = () => {
               <hr />
               <NavStyle to="/diary" className={search === "" ? "active" : ""}>
                 <p>전체보기</p>&nbsp;
-                <span>{`(${pageInfo.totalElements})`}</span>
+                <span>{`(${totalElement})`}</span>
               </NavStyle>
               {categoryOrganize()}
             </CategoryContainer>
-            <CalendarComponent diaries={diaries} />
+            <CalendarComponent />
           </RemainContainer>
         </div>
         {showButton && (
