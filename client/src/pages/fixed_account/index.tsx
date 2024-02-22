@@ -74,6 +74,7 @@ const Fixed = () => {
   const schedule = useSelector(
     (state: RootState) => state.persistedReducer.schedule
   );
+  // const member = useSelector((state: RootState) => state.persistedReducer.user);
 
   const onClickUpdateList = (id: number, type: string) => {
     const active =
