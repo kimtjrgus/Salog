@@ -442,12 +442,14 @@ const MonthRadio = () => {
                 <div>사용 내역</div>
                 <div>금액</div>
               </div>
-              {wasteList.map((waste, idx) => (
-                <div className="waste__lists" key={idx}>
-                  <div>{waste.outgoName}</div>
-                  <div>{waste.money}</div>
-                </div>
-              ))}
+              <ul className="waste__ul">
+                {wasteList.map((waste, idx) => (
+                  <li className="waste__lists" key={idx}>
+                    <div>{waste.outgoName}</div>
+                    <div>{waste.money}</div>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </Waste>
@@ -993,6 +995,11 @@ const Waste = styled.div`
         border-right: 1px solid#c9c5c5;
       }
     }
+  }
+
+  .waste__ul {
+    height: 17rem;
+    overflow-y: scroll;
   }
 
   .waste__lists {

@@ -64,6 +64,7 @@ const WasteList = ({ waste, checkedList, checkHandler }: Props) => {
                 component={ReceiptLongOutlinedIcon}
                 sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
               />
+              {el.wasteList && <div className="waste"></div>}
             </li>
           );
         })
@@ -152,6 +153,14 @@ const Container = styled.ul`
     .money__blue {
       color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
     }
+  }
+
+  .waste {
+    margin-right: 0.1rem;
+    border-radius: 50%;
+    width: 0.6rem;
+    height: 0.6rem;
+    background: ${(props) => props.theme.COLORS.LIGHT_GREEN};
   }
 `;
 
