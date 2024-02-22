@@ -300,6 +300,7 @@ const Container = styled.div`
     }
 
     button {
+      font-size: 1.2rem;
       display: flex;
       gap: 0.5rem;
       padding: 0.8rem 1.2rem;

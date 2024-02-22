@@ -476,6 +476,7 @@ const Container = styled.div`
     }
 
     button {
+      font-size: 1.2rem;
       padding: 0.8rem 2rem;
       border-radius: 4px;
       color: white;
