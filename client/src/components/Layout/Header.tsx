@@ -3,13 +3,17 @@ import SvgIcon from "@mui/material/SvgIcon";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import NotificationsActiveRoundedIcon from "@mui/icons-material/NotificationsActiveRounded";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
+import NotificationsOffOutlinedIcon from "@mui/icons-material/NotificationsOffOutlined";
+import NotificationsOffRoundedIcon from "@mui/icons-material/NotificationsOffRounded";
 import DoNotDisturbRoundedIcon from "@mui/icons-material/DoNotDisturbRounded";
 import logo from "../../assets/Slogo.png";
 import { getCookie } from "src/utils/cookie";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { type RootState } from "src/store";
+import { api } from "src/utils/refreshToken";
+import { login } from "src/store/slices/userSlice";
 // import {
 //   setIncomeSchedule,
 //   setOutgoSchedule,
@@ -31,8 +35,19 @@ interface outgoType {
   outgoName: string;
 }
 
+interface toggleType {
+  homeAlarm: boolean;
+  emailAlarm: boolean;
+}
+
 export const Header = () => {
+  const member = useSelector((state: RootState) => state.persistedReducer.user);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOn, setIsOn] = useState<toggleType>({
+    homeAlarm: member.homeAlarm,
+    emailAlarm: member.emailAlarm,
+  });
+
   const [outgoIdArray, setOutgoIdArray] = useState<number[]>([]);
   const [incomeIdArray, setIncomeIdArray] = useState<number[]>([]);
   const [filteredOutgoIdArray, setFilteredOutgoIdArray] = useState<outgoType[]>(
@@ -47,7 +62,7 @@ export const Header = () => {
   );
 
   const navigate = useNavigate();
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const onClickLogo = () => {
     const cookie = getCookie("accessToken");
@@ -114,6 +129,27 @@ export const Header = () => {
     );
   }, [outgoIdArray, incomeIdArray]);
 
+  useEffect(() => {
+    const updateMember = async () => {
+      try {
+        // 회원정보 업데이트
+        await api.patch("/members/update", { ...isOn });
+
+        // 업데이트된 회원정보 가져오기
+        const res = await api.get("/members/get");
+
+        // 전역상태 변경
+        dispatch(login(res.data.data));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    updateMember().catch((error) => {
+      console.log(error);
+    });
+  }, [isOn]);
+
   return (
     <Container>
       <Logo onClick={onClickLogo}>
@@ -124,10 +160,12 @@ export const Header = () => {
         <SvgIcon
           component={
             !isOpen
-              ? filteredOutgoIdArray.length === 0 &&
-                filteredIncomeIdArray.length === 0
-                ? NotificationsNoneIcon
-                : NotificationsActiveRoundedIcon
+              ? !member.homeAlarm
+                ? NotificationsOffOutlinedIcon
+                : filteredOutgoIdArray.length === 0 &&
+                    filteredIncomeIdArray.length === 0
+                  ? NotificationsNoneIcon
+                  : NotificationsActiveRoundedIcon
               : NotificationsRoundedIcon
           }
           onClick={onClickAlarm}
@@ -142,8 +180,16 @@ export const Header = () => {
               }개`}</span>
               <button onClick={onClickDeleteBtn}>모든 알림 삭제</button>
             </div>
-            {filteredOutgoIdArray.length === 0 &&
-            filteredIncomeIdArray.length === 0 ? (
+            {!member.homeAlarm ? (
+              <NullContainer>
+                <SvgIcon
+                  component={NotificationsOffRoundedIcon}
+                  sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+                />
+                <p>알람이 켜져있지 않습니다.</p>
+              </NullContainer>
+            ) : filteredOutgoIdArray.length === 0 &&
+              filteredIncomeIdArray.length === 0 ? (
               <NullContainer>
                 <SvgIcon
                   component={DoNotDisturbRoundedIcon}
@@ -183,6 +229,44 @@ export const Header = () => {
                 </ul>
               </div>
             )}
+            <div className="alarm__bottom">
+              <div className="alarm__container">
+                <p>웹 알림 설정</p>
+                <ToggleContainer
+                  $isOn={isOn.homeAlarm}
+                  // 클릭하면 토글이 켜진 상태(isOn)를 boolean 타입으로 변경하는 메소드가 실행
+                  onClick={() => {
+                    setIsOn((prev) => {
+                      return { ...prev, homeAlarm: !prev.homeAlarm };
+                    });
+                  }}
+                >
+                  <div
+                    className={`toggle__circle ${
+                      isOn.homeAlarm ? "toggle__checked" : null
+                    }`}
+                  />
+                </ToggleContainer>
+              </div>
+              <div className="alarm__container">
+                <p>이메일 알림 설정</p>
+                <ToggleContainer
+                  $isOn={isOn.emailAlarm}
+                  // 클릭하면 토글이 켜진 상태(isOn)를 boolean 타입으로 변경하는 메소드가 실행
+                  onClick={() => {
+                    setIsOn((prev) => {
+                      return { ...prev, emailAlarm: !prev.emailAlarm };
+                    });
+                  }}
+                >
+                  <div
+                    className={`toggle__circle ${
+                      isOn.emailAlarm ? "toggle__checked" : null
+                    }`}
+                  />
+                </ToggleContainer>
+              </div>
+            </div>
           </AlarmModal>
         )}
       </Alarm>
@@ -356,6 +440,27 @@ const AlarmModal = styled.div`
       font-weight: 600;
     }
   }
+
+  .alarm__bottom {
+    border-top: 0.1rem solid rgb(233, 233, 238);
+    display: flex;
+    align-items: center;
+    height: 6rem;
+    padding: 0 2.5rem;
+
+    .alarm__container {
+      display: flex;
+      align-items: center;
+      margin-right: 2.5rem;
+
+      > p {
+        font-size: 1.2rem;
+        white-space: nowrap;
+        color: rgb(98, 98, 115);
+        margin-right: 1.5rem;
+      }
+    }
+  }
 `;
 
 const NullContainer = styled.div`
@@ -375,5 +480,31 @@ const NullContainer = styled.div`
   p {
     font-size: 1.5rem;
     color: gray;
+  }
+`;
+
+const ToggleContainer = styled.div<{ $isOn: boolean }>`
+  position: relative;
+  width: 4.6rem;
+  height: 2rem;
+  border-radius: 30px;
+  background-color: ${(props) =>
+    props.$isOn ? "rgb(0, 200, 102)" : "rgb(233, 233, 234)"};
+
+  > .toggle__circle {
+    position: absolute;
+    top: 0.1rem;
+    left: 0.1rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    background-color: rgb(255, 254, 255);
+    transition: 0.5s;
+  }
+
+  //.toggle--checked 클래스가 활성화 되었을 경우의 CSS를 구현
+  > .toggle__checked {
+    left: 2.7rem;
+    transition: 0.5s;
   }
 `;
