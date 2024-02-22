@@ -24,6 +24,7 @@ import Toast, { ToastType } from "src/components/Layout/Toast";
 import { type RootState } from "src/store";
 import { api } from "src/utils/refreshToken";
 import UpdateModal from "./UpdateModal";
+import PaginationComponent from "src/components/Layout/Paging";
 
 export interface outgoType {
   outgoId: number;
@@ -106,6 +107,34 @@ const History = () => {
   const [outgo, setOutgo] = useState<outgoType[]>([]);
   const [income, setIncome] = useState<incomeType[]>([]);
   const [waste, setWaste] = useState<wasteType[]>([]);
+  const [combined, setCombined] = useState<Array<incomeType | outgoType>>([]);
+
+  const [pageInfoObj, setPageInfoObj] = useState({
+    outgo: {
+      pageNumber: 0,
+      pageSize: 0,
+      totalElements: 0,
+      totalPages: 0,
+    },
+    income: {
+      pageNumber: 0,
+      pageSize: 0,
+      totalElements: 0,
+      totalPages: 0,
+    },
+    waste: {
+      pageNumber: 0,
+      pageSize: 0,
+      totalElements: 0,
+      totalPages: 0,
+    },
+    combined: {
+      pageNumber: 0,
+      pageSize: 0,
+      totalElements: 0,
+      totalPages: 0,
+    },
+  });
 
   const [sumOutgo, setSumOutgo] = useState<sumOutgoType>({
     monthlyTotal: 0,
@@ -140,6 +169,8 @@ const History = () => {
     waste: [],
   });
 
+  const [activePage, setActivePage] = useState(1);
+
   const [isChecked, setIsChecked] = useState(false);
   const modal = useSelector((state: RootState) => state.persistedReducer.toast);
 
@@ -147,8 +178,12 @@ const History = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // income과 outgo를 합쳐 최근 순으로 정렬
-  const combined: Array<incomeType | outgoType> = [...income, ...outgo];
+  const handlePageChange = (activePage: number) => {
+    setActivePage(activePage);
+  };
+
+  // // income과 outgo를 합쳐 최근 순으로 정렬
+  // const combined: Array<incomeType | outgoType> = [...income, ...outgo];
 
   const sortByDate = (array: any[]) => {
     const sortedArray = [...array];
@@ -174,13 +209,13 @@ const History = () => {
     }
   };
 
-  combined.sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return filtered.date
-      ? dateA.getTime() - dateB.getTime()
-      : dateB.getTime() - dateA.getTime();
-  });
+  // combined.sort((a, b) => {
+  //   const dateA = new Date(a.date);
+  //   const dateB = new Date(b.date);
+  //   return filtered.date
+  //     ? dateA.getTime() - dateB.getTime()
+  //     : dateB.getTime() - dateA.getTime();
+  // });
 
   const checkedItemHandler = (
     id: number,
@@ -500,23 +535,61 @@ const History = () => {
     const fetchData = async () => {
       try {
         const requests = [
-          api.get(`/outgo?page=1&size=30&date=${customDate}`),
-          api.get(`/income?page=1&size=30&date=${customDate}`),
-          api.get(`/outgo/wasteList?page=1&size=30&date=${customDate}`),
-          // api.get(`/outgo/monthly?date=${customDate}`),
-          // api.get(`/income/monthly?date=${customDate}`),
-          // api.get(`/outgo/wasteList/monthly?date=${customDate}`),
+          api.get(`/outgo?page=${activePage}&size=10&date=${customDate}`),
+          api.get(`/income?page=${activePage}&size=10&date=${customDate}`),
+          api.get(
+            `/outgo/wasteList?page=${activePage}&size=10&date=${customDate}`
+          ),
         ];
 
         const responses = await axios.all(requests);
 
         // 개별 요청의 응답을 처리하여 상태를 업데이트합니다.
         setOutgo(responses[0].data.data);
+        setPageInfoObj((prevPageInfoObj) => ({
+          ...prevPageInfoObj,
+          outgo: responses[0].data.pageInfo,
+        }));
         setIncome(responses[1].data.data);
+        setPageInfoObj((prevPageInfoObj) => ({
+          ...prevPageInfoObj,
+          income: responses[1].data.pageInfo,
+        }));
         setWaste(responses[2].data.data);
-        // setSumOutgo(responses[3].data);
-        // setSumIncome(responses[4].data);
-        // setSumWasteList(responses[5].data);
+        setPageInfoObj((prevPageInfoObj) => ({
+          ...prevPageInfoObj,
+          waste: responses[2].data.pageInfo,
+        }));
+
+        const combinedData = [
+          ...responses[0].data.data,
+          ...responses[1].data.data,
+        ];
+
+        combinedData.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return filtered.date
+            ? dateA.getTime() - dateB.getTime()
+            : dateB.getTime() - dateA.getTime();
+        });
+
+        console.log(combinedData);
+
+        // combined 데이터를 페이지별로 자르기 위해 페이징 처리합니다.
+        const startIndex = (activePage - 1) * 10;
+        const endIndex = startIndex + 10;
+        const combinedDataPerPage = combinedData.slice(startIndex, endIndex);
+        setCombined(combinedDataPerPage);
+        setPageInfoObj((prevPageInfoObj) => ({
+          ...prevPageInfoObj,
+          combined: {
+            pageNumber: 1,
+            pageSize: 10,
+            totalElements: combinedData.length,
+            totalPages: Math.ceil(combinedData.length / 10),
+          },
+        }));
       } catch (error) {
         console.log(error);
       }
@@ -524,7 +597,7 @@ const History = () => {
     fetchData().catch((error) => {
       console.log(error);
     });
-  }, [getMoment]);
+  }, [getMoment, activePage]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -569,6 +642,7 @@ const History = () => {
       date: false,
       tag: false,
     });
+    setActivePage(1);
   }, [location.pathname, getMoment]);
 
   useEffect(() => {
@@ -647,7 +721,10 @@ const History = () => {
         <MainLists>
           <div className="lists__header">
             <NavStyle to="/history" $isActive={"/history"}>
-              <p>{`전체 (${income.length + outgo.length})`}</p>
+              <p>{`전체 (${
+                pageInfoObj.income.totalElements +
+                pageInfoObj.outgo.totalElements
+              })`}</p>
               <p className="sum__red">
                 {(
                   sumIncome.monthlyTotal - sumOutgo.monthlyTotal
@@ -656,19 +733,19 @@ const History = () => {
               </p>
             </NavStyle>
             <NavStyle to="/income" $isActive={"/income"}>
-              <p>{`수입 (${income.length})`}</p>
+              <p>{`수입 (${pageInfoObj.income.totalElements})`}</p>
               <p className="sum__blue">
                 {sumIncome.monthlyTotal.toLocaleString()} 원
               </p>
             </NavStyle>
             <NavStyle to="/outgo" $isActive={"/outgo"}>
-              <p>{`지출 (${outgo.length})`}</p>
+              <p>{`지출 (${pageInfoObj.outgo.totalElements})`}</p>
               <p className="sum__red">
                 {sumOutgo.monthlyTotal.toLocaleString()} 원
               </p>
             </NavStyle>
             <NavStyle to="/waste" $isActive={"/waste"}>
-              <p>{`낭비 리스트 (${waste.length})`}</p>
+              <p>{`낭비 리스트 (${pageInfoObj.waste.totalElements})`}</p>
               <p className="sum__green">
                 {sumWasteList.monthlyTotal.toLocaleString()} 원
               </p>
@@ -829,6 +906,19 @@ const History = () => {
               checkHandler={checkHandler}
             />
           )}
+          <PaginationComponent
+            totalItemsCount={
+              location.pathname === "/outgo"
+                ? pageInfoObj.outgo.totalElements
+                : location.pathname === "/income"
+                  ? pageInfoObj.income.totalElements
+                  : location.pathname === "/waste"
+                    ? pageInfoObj.waste.totalElements
+                    : pageInfoObj.combined.totalElements
+            }
+            activePage={activePage}
+            handlePageChange={handlePageChange}
+          />
         </MainLists>
       </Container>
       {isOpen.writeModal && (
@@ -938,6 +1028,7 @@ const SubHeader = styled.div`
   }
 
   .write__btn {
+    font-size: 1.2rem;
     display: flex;
     gap: 5px;
     padding: 0.8rem 1rem;
