@@ -18,13 +18,24 @@ import IncomeList from "./IncomeList";
 import WasteList from "./WasteList";
 import OutgoList from "./OutgoList";
 import LedgerWrite from "./LedgerWrite";
-import { useDispatch, useSelector } from "react-redux";
-import { showToast, hideToast } from "src/store/slices/toastSlice";
-import Toast, { ToastType } from "src/components/Layout/Toast";
-import { type RootState } from "src/store";
+import { useDispatch } from "react-redux";
+import { showToast } from "src/store/slices/toastSlice";
 import { api } from "src/utils/refreshToken";
 import UpdateModal from "./UpdateModal";
 import PaginationComponent from "src/components/Layout/Paging";
+
+export interface ledgerType {
+  outgoId: number;
+  incomeId: number;
+  date: string;
+  ledgerName: string;
+  money: number;
+  memo: string;
+  ledgerTag: tagType;
+  wasteList: boolean;
+  payment: string;
+  receiptImg: string;
+}
 
 export interface outgoType {
   outgoId: number;
@@ -104,10 +115,10 @@ interface filterType {
 const History = () => {
   const [getMoment, setMoment] = useState(moment());
 
+  const [ledger, setLedger] = useState<ledgerType[]>([]);
   const [outgo, setOutgo] = useState<outgoType[]>([]);
   const [income, setIncome] = useState<incomeType[]>([]);
   const [waste, setWaste] = useState<wasteType[]>([]);
-  const [combined, setCombined] = useState<Array<incomeType | outgoType>>([]);
 
   const [pageInfoObj, setPageInfoObj] = useState({
     outgo: {
@@ -172,7 +183,6 @@ const History = () => {
   const [activePage, setActivePage] = useState(1);
 
   const [isChecked, setIsChecked] = useState(false);
-  const modal = useSelector((state: RootState) => state.persistedReducer.toast);
 
   const location = useLocation();
   const dispatch = useDispatch();
@@ -181,9 +191,6 @@ const History = () => {
   const handlePageChange = (activePage: number) => {
     setActivePage(activePage);
   };
-
-  // // income과 outgo를 합쳐 최근 순으로 정렬
-  // const combined: Array<incomeType | outgoType> = [...income, ...outgo];
 
   const sortByDate = (array: any[]) => {
     const sortedArray = [...array];
@@ -207,16 +214,11 @@ const History = () => {
     if (location.pathname === "/waste") {
       setWaste(sortedArray);
     }
+    if (location.pathname === "/history") {
+      setLedger(sortedArray);
+    }
   };
-
-  // combined.sort((a, b) => {
-  //   const dateA = new Date(a.date);
-  //   const dateB = new Date(b.date);
-  //   return filtered.date
-  //     ? dateA.getTime() - dateB.getTime()
-  //     : dateB.getTime() - dateA.getTime();
-  // });
-
+  
   const checkedItemHandler = (
     id: number,
     isChecked: boolean,
@@ -258,15 +260,15 @@ const History = () => {
     const sumOfMoney = { outgo: 0, income: 0, waste: 0 };
     checkedList.outgo.forEach((id) => {
       const idx = outgo.findIndex((el) => el.outgoId === id);
-      sumOfMoney.outgo += outgo[idx].money;
+      if (idx !== -1) sumOfMoney.outgo += outgo[idx].money;
     });
     checkedList.income.forEach((id) => {
       const idx = income.findIndex((el) => el.incomeId === id);
-      sumOfMoney.income += income[idx].money;
+      if (idx !== -1) sumOfMoney.income += income[idx].money;
     });
     checkedList.waste.forEach((id) => {
       const idx = waste.findIndex((el) => el.outgoId === id);
-      sumOfMoney.waste += waste[idx]?.money;
+      if (idx !== -1) sumOfMoney.waste += waste[idx]?.money;
     });
 
     if (location.pathname !== "/waste")
@@ -540,6 +542,9 @@ const History = () => {
           api.get(
             `/outgo/wasteList?page=${activePage}&size=10&date=${customDate}`
           ),
+          api.get(
+            `/calendar/ledger?page=${activePage}&size=10&date=${customDate}`
+          ),
         ];
 
         const responses = await axios.all(requests);
@@ -560,36 +565,39 @@ const History = () => {
           ...prevPageInfoObj,
           waste: responses[2].data.pageInfo,
         }));
-
-        const combinedData = [
-          ...responses[0].data.data,
-          ...responses[1].data.data,
-        ];
-
-        combinedData.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return filtered.date
-            ? dateA.getTime() - dateB.getTime()
-            : dateB.getTime() - dateA.getTime();
-        });
-
-        console.log(combinedData);
-
-        // combined 데이터를 페이지별로 자르기 위해 페이징 처리합니다.
-        const startIndex = (activePage - 1) * 10;
-        const endIndex = startIndex + 10;
-        const combinedDataPerPage = combinedData.slice(startIndex, endIndex);
-        setCombined(combinedDataPerPage);
+        setLedger(responses[3].data.data);
         setPageInfoObj((prevPageInfoObj) => ({
           ...prevPageInfoObj,
-          combined: {
-            pageNumber: 1,
-            pageSize: 10,
-            totalElements: combinedData.length,
-            totalPages: Math.ceil(combinedData.length / 10),
-          },
+          combined: responses[3].data.pageInfo,
         }));
+
+        // const combinedData = [
+        //   ...responses[0].data.data,
+        //   ...responses[1].data.data,
+        // ];
+
+        // combinedData.sort((a, b) => {
+        //   const dateA = new Date(a.date);
+        //   const dateB = new Date(b.date);
+        //   return filtered.date
+        //     ? dateA.getTime() - dateB.getTime()
+        //     : dateB.getTime() - dateA.getTime();
+        // });
+
+        // combined 데이터를 페이지별로 자르기 위해 페이징 처리합니다.
+        // const startIndex = (activePage - 1) * 10;
+        // const endIndex = startIndex + 10;
+        // const combinedDataPerPage = combinedData.slice(startIndex, endIndex);
+        // setCombined(combinedDataPerPage);
+        // setPageInfoObj((prevPageInfoObj) => ({
+        //   ...prevPageInfoObj,
+        //   combined: {
+        //     pageNumber: 1,
+        //     pageSize: 10,
+        //     totalElements: combinedData.length,
+        //     totalPages: Math.ceil(combinedData.length / 10),
+        //   },
+        // }));
       } catch (error) {
         console.log(error);
       }
@@ -644,23 +652,6 @@ const History = () => {
     });
     setActivePage(1);
   }, [location.pathname, getMoment]);
-
-  useEffect(() => {
-    // 전역상태를 이용한 토스트 창 띄우기
-    setTimeout(() => {
-      if (modal.visible) {
-        modal.type === "success"
-          ? Toast(ToastType.success, modal.message)
-          : Toast(ToastType.error, modal.message);
-        dispatch(hideToast());
-      }
-    }, 100);
-    setCheckedList({
-      income: [],
-      outgo: [],
-      waste: [],
-    });
-  }, [modal, dispatch]);
 
   return (
     <>
@@ -852,6 +843,7 @@ const History = () => {
                   if (location.pathname === "/income") sortByDate(income);
                   if (location.pathname === "/outgo") sortByDate(outgo);
                   if (location.pathname === "/waste") sortByDate(waste);
+                  if (location.pathname === "/history") sortByDate(ledger);
                 }}
               >
                 날짜
@@ -880,7 +872,7 @@ const History = () => {
           {/* 경로에 따라 다른 컴포넌트를 보여줘야함  */}
           {location.pathname === "/history" && (
             <HistoryList
-              sortedArray={combined}
+              sortedArray={ledger}
               checkedList={checkedList}
               checkHandler={checkHandler}
             />
@@ -917,6 +909,7 @@ const History = () => {
                     : pageInfoObj.combined.totalElements
             }
             activePage={activePage}
+            itemsPerPage={10}
             handlePageChange={handlePageChange}
           />
         </MainLists>
