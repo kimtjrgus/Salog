@@ -1,18 +1,22 @@
 package com.codemouse.salog.ledger.calendar.service;
 
-import com.codemouse.salog.auth.jwt.JwtTokenizer;
+import com.codemouse.salog.dto.MultiResponseDto;
 import com.codemouse.salog.ledger.calendar.dto.CalendarDto;
-import com.codemouse.salog.ledger.income.repository.IncomeRepository;
+import com.codemouse.salog.ledger.income.dto.IncomeDto;
 import com.codemouse.salog.ledger.income.service.IncomeService;
-import com.codemouse.salog.ledger.outgo.repository.OutgoRepository;
+import com.codemouse.salog.ledger.outgo.dto.OutgoDto;
 import com.codemouse.salog.ledger.outgo.service.OutgoService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -41,5 +45,58 @@ public class CalendarService {
         }
 
         return responses;
+    }
+
+    public MultiResponseDto<CalendarDto.LedgerResponse> getIntegratedLedger(String token, int page, int size, String date, String ledgerTag){
+        List<IncomeDto.Response> incomeList = incomeService.getIncomes(token, page, size, ledgerTag, date).getData();
+        List<OutgoDto.Response> outgoList = outgoService.findOutgoPagesAsList(token, page, size, date, ledgerTag, null);
+
+        List<CalendarDto.LedgerResponse> ledgerResponses = new ArrayList<>();
+
+        for (IncomeDto.Response income : incomeList) {
+            ledgerResponses.add(
+                    new CalendarDto.LedgerResponse(
+                            income.getIncomeId(),
+                            null, // outgoId는 null
+                            income.getDate(),
+                            income.getMoney(),
+                            income.getIncomeName(),
+                            null,
+                            income.getMemo(),
+                            income.getIncomeTag(),
+                            null,
+                            null
+                    ));
+        }
+
+        for (OutgoDto.Response outgo : outgoList) {
+            ledgerResponses.add(
+                    new CalendarDto.LedgerResponse(
+                            null, // incomeId는 null
+                            outgo.getOutgoId(),
+                            outgo.getDate(),
+                            outgo.getMoney(),
+                            outgo.getOutgoName(),
+                            outgo.getPayment(),
+                            outgo.getMemo(),
+                            outgo.getOutgoTag(),
+                            outgo.isWasteList(),
+                            outgo.getReceiptImg()
+                    ));
+        }
+
+        // 날짜별 내림차순 재정렬
+        ledgerResponses.sort(Comparator.comparing(CalendarDto.LedgerResponse::getDate).reversed());
+
+        // 페이지 생성
+        int startIdx = (page - 1) * size;
+        int endIdx = Math.min(startIdx + size, ledgerResponses.size());
+        List<CalendarDto.LedgerResponse> pageItems = ledgerResponses.subList(startIdx, endIdx);
+
+        // 페이징 정보 생성
+        Pageable pageable = PageRequest.of(page - 1, size);
+        PageImpl<CalendarDto.LedgerResponse> pageResult = new PageImpl<>(pageItems, pageable, ledgerResponses.size());
+
+        return new MultiResponseDto<>(pageItems, pageResult);
     }
 }
