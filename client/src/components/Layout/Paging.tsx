@@ -4,18 +4,20 @@ import { styled } from "styled-components";
 interface paginatorProps {
   totalItemsCount: number;
   activePage: number;
+  itemsPerPage: number;
   handlePageChange: (pageNumber: number) => void;
 }
 const PaginationComponent = ({
   totalItemsCount,
   activePage,
+  itemsPerPage,
   handlePageChange,
 }: paginatorProps) => {
   return (
     <PaginationWrapper>
       <Pagination
         activePage={activePage}
-        itemsCountPerPage={10}
+        itemsCountPerPage={itemsPerPage}
         totalItemsCount={totalItemsCount || 1}
         pageRangeDisplayed={5}
         prevPageText="‹"
