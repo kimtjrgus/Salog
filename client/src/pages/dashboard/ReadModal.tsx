@@ -7,31 +7,24 @@ import { useEffect, useState } from "react";
 import { type modalType } from ".";
 import { useNavigate } from "react-router-dom";
 import { api } from "src/utils/refreshToken";
+import PaginationComponent from "src/components/Layout/Paging";
 
 interface Props {
   isOpen: modalType;
   setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
 }
 
-interface outgoType {
+interface ledgerType {
   outgoId: number;
+  incomeId: number;
   date: string;
-  outgoName: string;
+  ledgerName: string;
   money: number;
   memo: string;
-  outgoTag: tagType;
+  ledgerTag: tagType;
   wasteList: boolean;
   payment: string;
-  reciptImg: string;
-}
-
-interface incomeType {
-  incomeId: number;
-  incomeTag: tagType;
-  date: string;
-  money: number;
-  incomeName: string;
-  memo: string;
+  receiptImg: string;
 }
 
 interface tagType {
@@ -40,23 +33,29 @@ interface tagType {
 }
 
 const ReadModal = ({ isOpen, setIsOpen }: Props) => {
-  const [outgo, setOutgo] = useState<outgoType[]>([]);
-  const [income, setIncome] = useState<incomeType[]>([]);
+  // const [outgo, setOutgo] = useState<outgoType[]>([]);
+  // const [income, setIncome] = useState<incomeType[]>([]);
+  const [ledger, setLedger] = useState<ledgerType[]>([]);
+  const [activePage, setActivePage] = useState(1);
+  const [pageInfoObj, setPageInfoObj] = useState({
+    pageNumber: 0,
+    pageSize: 0,
+    totalElements: 0,
+    totalPages: 0,
+  });
+  console.log(pageInfoObj, ledger);
 
   const navigate = useNavigate();
 
+  const handlePageChange = (activePage: number) => {
+    setActivePage(activePage);
+  };
+
   const sumOfTotal = () => {
     let total = 0;
-    if (outgo.length !== 0) {
-      outgo.forEach((el) => {
-        total -= el.money;
-      });
-    }
-    if (income.length !== 0) {
-      income.forEach((el) => {
-        total += el.money;
-      });
-    }
+    ledger.forEach((el) => {
+      el.incomeId === null ? (total -= el.money) : (total += el.money);
+    });
     return total;
   };
 
@@ -83,23 +82,15 @@ const ReadModal = ({ isOpen, setIsOpen }: Props) => {
 
   useEffect(() => {
     api
-      .get(`/outgo?page=1&size=10&date=${isOpen.day}`)
+      .get(`/calendar/ledger?page=${activePage}&size=5&date=${isOpen.day}`)
       .then((res) => {
-        setOutgo(res.data.data);
+        setLedger(res.data.data);
+        setPageInfoObj(res.data.pageInfo);
       })
       .catch((error) => {
         console.log(error);
       });
-
-    api
-      .get(`/income?page=1&size=10&date=${isOpen.day}`)
-      .then((res) => {
-        setIncome(res.data.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [isOpen.day]);
+  }, [isOpen.day, activePage]);
 
   return (
     <Background>
@@ -137,7 +128,7 @@ const ReadModal = ({ isOpen, setIsOpen }: Props) => {
           <p>금액</p>
           <p>메모</p>
         </div>
-        {outgo.length === 0 && income.length === 0 ? (
+        {ledger.length === 0 ? (
           <NullContainer>
             <SvgIcon
               component={DoNotDisturbRoundedIcon}
@@ -146,35 +137,38 @@ const ReadModal = ({ isOpen, setIsOpen }: Props) => {
             <p>작성된 목록이 없습니다.</p>
           </NullContainer>
         ) : (
-          <>
-            {outgo.map((el) => {
-              return (
-                <div className="list" key={el.outgoId}>
+          <ul className="lists">
+            {ledger.map((el) => {
+              return el.incomeId === null ? (
+                <li className="list" key={el.outgoId}>
                   <ColorRedDiv>지출</ColorRedDiv>
                   <p className="date ft-size">{dateAsDots(el.date)}</p>
-                  <p className="tag ft-size">{el.outgoTag.tagName}</p>
-                  <p className="name ft-size">{el.outgoName}</p>
+                  <p className="tag ft-size">{el.ledgerTag.tagName}</p>
+                  <p className="name ft-size">{el.ledgerName}</p>
                   <p className="method ft-size">{el.payment}</p>
                   <p className="outgo_money ft-size">{`${el.money.toLocaleString()}원`}</p>
                   <p className="memo ft-size">{el.memo}</p>
-                </div>
-              );
-            })}
-            {income.map((el) => {
-              return (
-                <div className="list" key={el.incomeId}>
+                </li>
+              ) : (
+                <li className="list" key={el.incomeId}>
                   <ColorBlueDiv>수입</ColorBlueDiv>
                   <p className="date ft-size">{dateAsDots(el.date)}</p>
-                  <p className="tag ft-size">{el.incomeTag.tagName}</p>
-                  <p className="name ft-size">{el.incomeName}</p>
+                  <p className="tag ft-size">{el.ledgerTag.tagName}</p>
+                  <p className="name ft-size">{el.ledgerName}</p>
                   <p className="method ft-size">{"x"}</p>
                   <p className="income_money ft-size">{`${el.money.toLocaleString()}원`}</p>
                   <p className="memo ft-size">{el.memo}</p>
-                </div>
+                </li>
               );
             })}
-          </>
+          </ul>
         )}
+        <PaginationComponent
+          totalItemsCount={pageInfoObj.totalElements}
+          activePage={activePage}
+          itemsPerPage={5}
+          handlePageChange={handlePageChange}
+        />
       </Container>
     </Background>
   );
@@ -287,6 +281,10 @@ const Container = styled.div`
         width: 6.8rem;
       }
     }
+  }
+
+  .lists {
+    height: 17rem;
   }
 
   .list {
