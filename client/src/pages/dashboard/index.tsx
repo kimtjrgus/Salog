@@ -5,13 +5,9 @@ import { useEffect, useState } from "react";
 import DashboardCalendar from "./Calendar";
 import Schedule from "./Schedule";
 import WriteModal from "./WriteModal";
-import { useSelector, useDispatch } from "react-redux";
-import { type RootState } from "src/store";
 import ReadModal from "./ReadModal";
 import { api } from "src/utils/refreshToken";
 import moment from "moment";
-import { hideToast } from "src/store/slices/toastSlice";
-import Toast, { ToastType } from "src/components/Layout/Toast";
 
 export interface outgoType {
   monthlyTotal: number;
@@ -48,10 +44,6 @@ export interface modalType {
 
 const Dashboard = () => {
   // const member = useSelector((state: RootState) => state.persistedReducer.user);
-
-  const modal = useSelector((state: RootState) => state.persistedReducer.toast);
-
-  const dispatch = useDispatch();
 
   // member에 태그가 추가되면 화면 제작
   const [monthlyOutgo, setMonthlyOutgo] = useState<outgoType>({
@@ -135,33 +127,7 @@ const Dashboard = () => {
       .catch((error) => {
         console.error(error);
       });
-    // const fetchData = async () => {
-    // 	try {
-    // 		const [outgoResponse, incomeResponse] = await Promise.all([
-    // 			api.get("/monthlyOutgo"),
-    // 			api.get("/monthlyIncome"),
-    // 		]);
-
-    // 		setMonthlyOutgo(outgoResponse.data[0]);
-    // 		setMonthlyIncome(incomeResponse.data[0]);
-    // 	} catch (error) {
-    // 		console.log(error);
-    // 	}
-    // };
-    // fetchData();
   }, []);
-
-  useEffect(() => {
-    // 전역상태를 이용한 토스트 창 띄우기
-    setTimeout(() => {
-      if (modal.visible) {
-        modal.type === "success"
-          ? Toast(ToastType.success, modal.message)
-          : Toast(ToastType.error, modal.message);
-        dispatch(hideToast());
-      }
-    }, 100);
-  }, [modal, dispatch]);
 
   return (
     <>

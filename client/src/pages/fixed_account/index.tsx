@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
-import Toast, { ToastType } from "src/components/Layout/Toast";
-import { hideToast, showToast } from "src/store/slices/toastSlice";
+import { showToast } from "src/store/slices/toastSlice";
 import {
   setIncomeSchedule,
   setOutgoSchedule,
@@ -70,7 +69,6 @@ const Fixed = () => {
   });
 
   const dispatch = useDispatch();
-  const modal = useSelector((state: RootState) => state.persistedReducer.toast);
   const schedule = useSelector(
     (state: RootState) => state.persistedReducer.schedule
   );
@@ -459,24 +457,37 @@ const Fixed = () => {
   );
 
   useEffect(() => {
-    const date = moment().format("YYYY-MM");
-    const customDate = `${date}-00`;
-    api
-      .get(`/fixedOutgo/get?page=1&size=10&date=${customDate}`)
-      .then((res) => {
-        setFixedOutgo(res.data.data);
-      })
-      .catch((error) => {
+    const fetchData = async () => {
+      try {
+        const date = moment().format("YYYY-MM");
+        const customDate = `${date}-00`;
+        const res1 = await api.get(
+          `/fixedOutgo/get?page=1&size=10&date=${customDate}`
+        );
+        setFixedOutgo(res1.data.data);
+        const res2 = await api.get(
+          `/fixedIncome/get?page=1&size=10&date=${customDate}`
+        );
+        setFixedIncome(res2.data.data);
+
+        const nextDate = moment().add(1, "months").format("YYYY-MM");
+        const nextCustomDate = `${nextDate}-00`;
+        const res3 = await api.get(
+          `/fixedOutgo/get?page=1&size=10&date=${nextCustomDate}`
+        );
+        setFixedOutgo((prev) => [...prev, ...res3.data.data]);
+        const res4 = await api.get(
+          `/fixedIncome/get?page=1&size=10&date=${nextCustomDate}`
+        );
+        setFixedIncome((prev) => [...prev, ...res4.data.data]);
+      } catch (error) {
         console.error(error);
-      });
-    api
-      .get(`/fixedIncome/get?page=1&size=10&date=${customDate}`)
-      .then((res) => {
-        setFixedIncome(res.data.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      }
+    };
+
+    fetchData().catch((error) => {
+      console.log(error);
+    });
   }, []);
 
   useEffect(() => {
@@ -506,16 +517,6 @@ const Fixed = () => {
       setIncomeActiveItemId(null);
     }
   }, [location.pathname]);
-
-  useEffect(() => {
-    // 전역상태를 이용한 토스트 창 띄우기
-    setTimeout(() => {
-      if (modal.visible) {
-        Toast(ToastType.success, modal.message);
-        dispatch(hideToast());
-      }
-    }, 100);
-  }, [modal, dispatch]);
 
   return (
     <>
@@ -1181,13 +1182,22 @@ const List = styled.div<{ $date: string }>`
     justify-content: center;
     align-items: center;
     padding: 2rem 2.5rem;
-    background: ${(props) =>
-      new Date(props.$date).getDate() - new Date().getDate() < 0 ||
-      new Date(props.$date).getDate() - new Date().getDate() >= 7
-        ? props.theme.COLORS.LIGHT_GREEN
-        : new Date(props.$date).getDate() - new Date().getDate() < 3
-          ? props.theme.COLORS.LIGHT_RED
-          : props.theme.COLORS.LIGHT_YELLOW};
+    background: ${(props) => {
+      const currentDate = new Date();
+      const propDate = new Date(props.$date);
+      const diffDays = Math.ceil(
+        (propDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      if (diffDays < 0 || diffDays >= 7) {
+        return props.theme.COLORS.LIGHT_GREEN;
+      } else if (diffDays < 3) {
+        return props.theme.COLORS.LIGHT_RED;
+      } else {
+        return props.theme.COLORS.LIGHT_YELLOW;
+      }
+    }};
+
     border-radius: 8px;
     color: #fff;
     font-size: 1.2rem;

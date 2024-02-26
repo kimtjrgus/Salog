@@ -19,6 +19,7 @@ import {
   setIncomeSchedule,
   setOutgoSchedule,
 } from "src/store/slices/scheduleSlice";
+import useDidMountEffect from "src/hooks/useDidMountEffect";
 
 interface userType {
   email: string;
@@ -82,44 +83,7 @@ const Login = () => {
           .get("/members/get")
           .then((res) => {
             dispatch(login(res.data.data));
-            console.log(member);
-
             // 3일 미만 남은 금융일정 전역상태로 추가
-            if (member.homeAlarm) {
-              const date = moment().format("YYYY-MM");
-              const customDate = `${date}-00`;
-              api
-                .get(`/fixedOutgo/get?page=1&size=10&date=${customDate}`)
-                .then((res) => {
-                  const filteredOutgo = res.data.data.filter((el: outgoType) =>
-                    circulateSchedule(el.date)
-                  );
-                  // const doubleFilteredOutgo = filteredOutgo.filter(
-                  //   (el: outgoType) => !outgoIdArray.includes(el.fixedOutgoId)
-                  // );
-                  dispatch(setOutgoSchedule([...filteredOutgo]));
-                })
-                .catch((error) => {
-                  console.error(error);
-                  // 적절한 에러 처리 방식 선택
-                });
-
-              api
-                .get(`/fixedIncome/get?page=1&size=10&date=${customDate}`)
-                .then((res) => {
-                  const filteredIncome = res.data.data.filter(
-                    (el: incomeType) => circulateSchedule(el.date)
-                  );
-                  // const doubleFilteredIncome = filteredIncome.filter(
-                  //   (el: incomeType) => !incomeIdArray.includes(el.fixedIncomeId)
-                  // );
-                  dispatch(setIncomeSchedule([...filteredIncome]));
-                })
-                .catch((error) => {
-                  console.error(error);
-                  // 적절한 에러 처리 방식 선택
-                });
-            }
             navigate("/dashboard");
           })
           .catch((error) => {
@@ -136,6 +100,45 @@ const Login = () => {
           setError({ ...error, password: "비밀번호가 일치하지 않습니다." });
       });
   };
+
+  // user 전역 상태가 변경되면 실행
+  useDidMountEffect(() => {
+    if (member.homeAlarm) {
+      const date = moment().format("YYYY-MM");
+      const customDate = `${date}-00`;
+      api
+        .get(`/fixedOutgo/get?page=1&size=10&date=${customDate}`)
+        .then((res) => {
+          const filteredOutgo = res.data.data.filter((el: outgoType) =>
+            circulateSchedule(el.date)
+          );
+          // const doubleFilteredOutgo = filteredOutgo.filter(
+          //   (el: outgoType) => !outgoIdArray.includes(el.fixedOutgoId)
+          // );
+          dispatch(setOutgoSchedule([...filteredOutgo]));
+        })
+        .catch((error) => {
+          console.error(error);
+          // 적절한 에러 처리 방식 선택
+        });
+
+      api
+        .get(`/fixedIncome/get?page=1&size=10&date=${customDate}`)
+        .then((res) => {
+          const filteredIncome = res.data.data.filter((el: incomeType) =>
+            circulateSchedule(el.date)
+          );
+          // const doubleFilteredIncome = filteredIncome.filter(
+          //   (el: incomeType) => !incomeIdArray.includes(el.fixedIncomeId)
+          // );
+          dispatch(setIncomeSchedule([...filteredIncome]));
+        })
+        .catch((error) => {
+          console.error(error);
+          // 적절한 에러 처리 방식 선택
+        });
+    }
+  }, [member]);
 
   return (
     <Container>
