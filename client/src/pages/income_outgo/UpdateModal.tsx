@@ -139,11 +139,12 @@ const UpdateModal = ({
     []
   );
 
-  const onClickSubmit = () => {
-    values.map((value) => {
-      value.division === "outgo"
-        ? api
-            .patch(`/outgo/update/${value.id}`, {
+  const onClickSubmit = async () => {
+    try {
+      const updates = await Promise.all(
+        values.map(async (value) => {
+          if (value.division === "outgo") {
+            const res = await api.patch(`/outgo/update/${value.id}`, {
               date: value.date,
               outgoName: value.name,
               money: Number(value.money),
@@ -152,65 +153,71 @@ const UpdateModal = ({
               wasteList: value.wasteList,
               payment: value.payment,
               receiptImg: "",
-            })
-            .then((res) => {
-              setOutgo((prev: outgoType[]) => {
-                const updatedOutgo = [...prev];
-                const index = updatedOutgo.findIndex(
-                  (el) => el.outgoId === value.id
-                );
-                if (index !== -1) {
-                  updatedOutgo[index] = res.data;
-                }
-                return updatedOutgo;
-              });
-              if (res.data.wasteList === true) {
-                setWaste((prev: wasteType[]) => {
-                  const updatedWaste = [...prev];
-                  const index = updatedWaste.findIndex(
-                    (el) => el.outgoId === value.id
-                  );
-                  if (index !== -1) {
-                    updatedWaste[index] = res.data;
-                  }
-                  return updatedWaste;
-                });
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            })
-        : api
-            .patch(`/income/update/${value.id}`, {
+            });
+            return { division: "outgo", id: value.id, data: res.data };
+          } else {
+            const res = await api.patch(`/income/update/${value.id}`, {
               date: value.date,
               incomeName: value.name,
               money: Number(value.money),
               memo: value.memo,
               incomeTag: value.tag,
               receiptImg: "",
-            })
-            .then((res) => {
-              setIncome((prev: incomeType[]) => {
-                const updatedIncome = [...prev];
-                const index = updatedIncome.findIndex(
-                  (el) => el.incomeId === value.id
-                );
-                if (index !== -1) {
-                  updatedIncome[index] = res.data;
-                }
-                return updatedIncome;
-              });
-            })
-            .catch((error) => {
-              console.log(error);
             });
-      return null;
-    });
-    setIsOpen((prev) => {
-      const updated = { ...prev };
-      return { ...updated, updateModal: false };
-    });
-    dispatch(showToast({ message: "수정이 완료되었습니다", type: "success" }));
+            return { division: "income", id: value.id, data: res.data };
+          }
+        })
+      );
+
+      for (const update of updates) {
+        if (update.division === "outgo") {
+          setOutgo((prev: outgoType[]) => {
+            const updatedOutgo = [...prev];
+            const index = updatedOutgo.findIndex(
+              (el) => el.outgoId === update.id
+            );
+            if (index !== -1) {
+              updatedOutgo[index] = update.data;
+            }
+            return updatedOutgo;
+          });
+
+          if (update.data.wasteList === true) {
+            setWaste((prev: wasteType[]) => {
+              const updatedWaste = [...prev];
+              const index = updatedWaste.findIndex(
+                (el) => el.outgoId === update.id
+              );
+              if (index !== -1) {
+                updatedWaste[index] = update.data;
+              }
+              return updatedWaste;
+            });
+          }
+        } else {
+          setIncome((prev: incomeType[]) => {
+            const updatedIncome = [...prev];
+            const index = updatedIncome.findIndex(
+              (el) => el.incomeId === update.id
+            );
+            if (index !== -1) {
+              updatedIncome[index] = update.data;
+            }
+            return updatedIncome;
+          });
+        }
+      }
+
+      setIsOpen((prev) => {
+        const updated = { ...prev };
+        return { ...updated, updateModal: false };
+      });
+      dispatch(
+        showToast({ message: "수정이 완료되었습니다", type: "success" })
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

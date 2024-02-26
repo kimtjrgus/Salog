@@ -148,11 +148,12 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
     []
   );
 
-  const onClickSubmit = () => {
-    values.map((value) => {
-      value.division === "outgo"
-        ? api
-            .post("/outgo/post", {
+  const onClickSubmit = async () => {
+    try {
+      await Promise.all(
+        values.map(async (value) => {
+          if (value.division === "outgo") {
+            const res = await api.post("/outgo/post", {
               date: value.date,
               outgoName: value.name,
               money: Number(value.money),
@@ -161,56 +162,54 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
               wasteList: false,
               payment: value.payment,
               receiptImg: "",
-            })
-            .then((res) => {
-              console.log(res.data);
-              // 작성한 데이터의 날짜와 현재 열려있는 페이지의 날짜가 같다면 저장(상태 최신화를 위해서 작성한 코드)
-              if (
-                new Date(res.data.date).getFullYear() ===
-                  new Date(getMoment.format("YYYY-MM-DD")).getFullYear() &&
-                new Date(res.data.date).getMonth() + 1 ===
-                  new Date(getMoment.format("YYYY-MM-DD")).getMonth() + 1
-              ) {
-                setOutgo((prev: outgoType[]) => {
-                  return [...prev, res.data];
-                });
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            })
-        : api
-            .post("/income/post", {
+            });
+
+            console.log(res.data);
+            if (
+              new Date(res.data.date).getFullYear() ===
+                new Date(getMoment.format("YYYY-MM-DD")).getFullYear() &&
+              new Date(res.data.date).getMonth() + 1 ===
+                new Date(getMoment.format("YYYY-MM-DD")).getMonth() + 1
+            ) {
+              setOutgo((prev: outgoType[]) => {
+                return [...prev, res.data];
+              });
+            }
+          } else {
+            const res = await api.post("/income/post", {
               date: value.date,
               incomeName: value.name,
               money: Number(value.money),
               memo: value.memo,
               incomeTag: value.tag,
               receiptImg: "",
-            })
-            .then((res) => {
-              console.log(res.data);
-              if (
-                new Date(res.data.date).getFullYear() ===
-                  new Date(getMoment.format("YYYY-MM-DD")).getFullYear() &&
-                new Date(res.data.date).getMonth() + 1 ===
-                  new Date(getMoment.format("YYYY-MM-DD")).getMonth() + 1
-              ) {
-                setIncome((prev: incomeType[]) => {
-                  return [...prev, res.data];
-                });
-              }
-            })
-            .catch((error) => {
-              console.log(error);
             });
-      return null;
-    });
-    setIsOpen((prev) => {
-      const updated = { ...prev };
-      return { ...updated, writeModal: false };
-    });
-    dispatch(showToast({ message: "작성이 완료되었습니다", type: "success" }));
+
+            console.log(res.data);
+            if (
+              new Date(res.data.date).getFullYear() ===
+                new Date(getMoment.format("YYYY-MM-DD")).getFullYear() &&
+              new Date(res.data.date).getMonth() + 1 ===
+                new Date(getMoment.format("YYYY-MM-DD")).getMonth() + 1
+            ) {
+              setIncome((prev: incomeType[]) => {
+                return [...prev, res.data];
+              });
+            }
+          }
+        })
+      );
+
+      setIsOpen((prev) => {
+        const updated = { ...prev };
+        return { ...updated, writeModal: false };
+      });
+      dispatch(
+        showToast({ message: "작성이 완료되었습니다", type: "success" })
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
