@@ -18,12 +18,24 @@ import IncomeList from "./IncomeList";
 import WasteList from "./WasteList";
 import OutgoList from "./OutgoList";
 import LedgerWrite from "./LedgerWrite";
-import { useDispatch, useSelector } from "react-redux";
-import { showToast, hideToast } from "src/store/slices/toastSlice";
-import Toast, { ToastType } from "src/components/Layout/Toast";
-import { type RootState } from "src/store";
+import { useDispatch } from "react-redux";
+import { showToast } from "src/store/slices/toastSlice";
 import { api } from "src/utils/refreshToken";
 import UpdateModal from "./UpdateModal";
+import PaginationComponent from "src/components/Layout/Paging";
+
+export interface ledgerType {
+  outgoId: number;
+  incomeId: number;
+  date: string;
+  ledgerName: string;
+  money: number;
+  memo: string;
+  ledgerTag: tagType;
+  wasteList: boolean;
+  payment: string;
+  receiptImg: string;
+}
 
 export interface outgoType {
   outgoId: number;
@@ -103,9 +115,37 @@ interface filterType {
 const History = () => {
   const [getMoment, setMoment] = useState(moment());
 
+  const [ledger, setLedger] = useState<ledgerType[]>([]);
   const [outgo, setOutgo] = useState<outgoType[]>([]);
   const [income, setIncome] = useState<incomeType[]>([]);
   const [waste, setWaste] = useState<wasteType[]>([]);
+
+  const [pageInfoObj, setPageInfoObj] = useState({
+    outgo: {
+      pageNumber: 0,
+      pageSize: 0,
+      totalElements: 0,
+      totalPages: 0,
+    },
+    income: {
+      pageNumber: 0,
+      pageSize: 0,
+      totalElements: 0,
+      totalPages: 0,
+    },
+    waste: {
+      pageNumber: 0,
+      pageSize: 0,
+      totalElements: 0,
+      totalPages: 0,
+    },
+    combined: {
+      pageNumber: 0,
+      pageSize: 0,
+      totalElements: 0,
+      totalPages: 0,
+    },
+  });
 
   const [sumOutgo, setSumOutgo] = useState<sumOutgoType>({
     monthlyTotal: 0,
@@ -140,15 +180,17 @@ const History = () => {
     waste: [],
   });
 
+  const [activePage, setActivePage] = useState(1);
+
   const [isChecked, setIsChecked] = useState(false);
-  const modal = useSelector((state: RootState) => state.persistedReducer.toast);
 
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // income과 outgo를 합쳐 최근 순으로 정렬
-  const combined: Array<incomeType | outgoType> = [...income, ...outgo];
+  const handlePageChange = (activePage: number) => {
+    setActivePage(activePage);
+  };
 
   const sortByDate = (array: any[]) => {
     const sortedArray = [...array];
@@ -172,16 +214,11 @@ const History = () => {
     if (location.pathname === "/waste") {
       setWaste(sortedArray);
     }
+    if (location.pathname === "/history") {
+      setLedger(sortedArray);
+    }
   };
-
-  combined.sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return filtered.date
-      ? dateA.getTime() - dateB.getTime()
-      : dateB.getTime() - dateA.getTime();
-  });
-
+  
   const checkedItemHandler = (
     id: number,
     isChecked: boolean,
@@ -223,15 +260,15 @@ const History = () => {
     const sumOfMoney = { outgo: 0, income: 0, waste: 0 };
     checkedList.outgo.forEach((id) => {
       const idx = outgo.findIndex((el) => el.outgoId === id);
-      sumOfMoney.outgo += outgo[idx].money;
+      if (idx !== -1) sumOfMoney.outgo += outgo[idx].money;
     });
     checkedList.income.forEach((id) => {
       const idx = income.findIndex((el) => el.incomeId === id);
-      sumOfMoney.income += income[idx].money;
+      if (idx !== -1) sumOfMoney.income += income[idx].money;
     });
     checkedList.waste.forEach((id) => {
       const idx = waste.findIndex((el) => el.outgoId === id);
-      sumOfMoney.waste += waste[idx]?.money;
+      if (idx !== -1) sumOfMoney.waste += waste[idx]?.money;
     });
 
     if (location.pathname !== "/waste")
@@ -500,23 +537,67 @@ const History = () => {
     const fetchData = async () => {
       try {
         const requests = [
-          api.get(`/outgo?page=1&size=30&date=${customDate}`),
-          api.get(`/income?page=1&size=30&date=${customDate}`),
-          api.get(`/outgo/wasteList?page=1&size=30&date=${customDate}`),
-          // api.get(`/outgo/monthly?date=${customDate}`),
-          // api.get(`/income/monthly?date=${customDate}`),
-          // api.get(`/outgo/wasteList/monthly?date=${customDate}`),
+          api.get(`/outgo?page=${activePage}&size=10&date=${customDate}`),
+          api.get(`/income?page=${activePage}&size=10&date=${customDate}`),
+          api.get(
+            `/outgo/wasteList?page=${activePage}&size=10&date=${customDate}`
+          ),
+          api.get(
+            `/calendar/ledger?page=${activePage}&size=10&date=${customDate}`
+          ),
         ];
 
         const responses = await axios.all(requests);
 
         // 개별 요청의 응답을 처리하여 상태를 업데이트합니다.
         setOutgo(responses[0].data.data);
+        setPageInfoObj((prevPageInfoObj) => ({
+          ...prevPageInfoObj,
+          outgo: responses[0].data.pageInfo,
+        }));
         setIncome(responses[1].data.data);
+        setPageInfoObj((prevPageInfoObj) => ({
+          ...prevPageInfoObj,
+          income: responses[1].data.pageInfo,
+        }));
         setWaste(responses[2].data.data);
-        // setSumOutgo(responses[3].data);
-        // setSumIncome(responses[4].data);
-        // setSumWasteList(responses[5].data);
+        setPageInfoObj((prevPageInfoObj) => ({
+          ...prevPageInfoObj,
+          waste: responses[2].data.pageInfo,
+        }));
+        setLedger(responses[3].data.data);
+        setPageInfoObj((prevPageInfoObj) => ({
+          ...prevPageInfoObj,
+          combined: responses[3].data.pageInfo,
+        }));
+
+        // const combinedData = [
+        //   ...responses[0].data.data,
+        //   ...responses[1].data.data,
+        // ];
+
+        // combinedData.sort((a, b) => {
+        //   const dateA = new Date(a.date);
+        //   const dateB = new Date(b.date);
+        //   return filtered.date
+        //     ? dateA.getTime() - dateB.getTime()
+        //     : dateB.getTime() - dateA.getTime();
+        // });
+
+        // combined 데이터를 페이지별로 자르기 위해 페이징 처리합니다.
+        // const startIndex = (activePage - 1) * 10;
+        // const endIndex = startIndex + 10;
+        // const combinedDataPerPage = combinedData.slice(startIndex, endIndex);
+        // setCombined(combinedDataPerPage);
+        // setPageInfoObj((prevPageInfoObj) => ({
+        //   ...prevPageInfoObj,
+        //   combined: {
+        //     pageNumber: 1,
+        //     pageSize: 10,
+        //     totalElements: combinedData.length,
+        //     totalPages: Math.ceil(combinedData.length / 10),
+        //   },
+        // }));
       } catch (error) {
         console.log(error);
       }
@@ -524,7 +605,7 @@ const History = () => {
     fetchData().catch((error) => {
       console.log(error);
     });
-  }, [getMoment]);
+  }, [getMoment, activePage]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -569,24 +650,8 @@ const History = () => {
       date: false,
       tag: false,
     });
+    setActivePage(1);
   }, [location.pathname, getMoment]);
-
-  useEffect(() => {
-    // 전역상태를 이용한 토스트 창 띄우기
-    setTimeout(() => {
-      if (modal.visible) {
-        modal.type === "success"
-          ? Toast(ToastType.success, modal.message)
-          : Toast(ToastType.error, modal.message);
-        dispatch(hideToast());
-      }
-    }, 100);
-    setCheckedList({
-      income: [],
-      outgo: [],
-      waste: [],
-    });
-  }, [modal, dispatch]);
 
   return (
     <>
@@ -647,7 +712,10 @@ const History = () => {
         <MainLists>
           <div className="lists__header">
             <NavStyle to="/history" $isActive={"/history"}>
-              <p>{`전체 (${income.length + outgo.length})`}</p>
+              <p>{`전체 (${
+                pageInfoObj.income.totalElements +
+                pageInfoObj.outgo.totalElements
+              })`}</p>
               <p className="sum__red">
                 {(
                   sumIncome.monthlyTotal - sumOutgo.monthlyTotal
@@ -656,19 +724,19 @@ const History = () => {
               </p>
             </NavStyle>
             <NavStyle to="/income" $isActive={"/income"}>
-              <p>{`수입 (${income.length})`}</p>
+              <p>{`수입 (${pageInfoObj.income.totalElements})`}</p>
               <p className="sum__blue">
                 {sumIncome.monthlyTotal.toLocaleString()} 원
               </p>
             </NavStyle>
             <NavStyle to="/outgo" $isActive={"/outgo"}>
-              <p>{`지출 (${outgo.length})`}</p>
+              <p>{`지출 (${pageInfoObj.outgo.totalElements})`}</p>
               <p className="sum__red">
                 {sumOutgo.monthlyTotal.toLocaleString()} 원
               </p>
             </NavStyle>
             <NavStyle to="/waste" $isActive={"/waste"}>
-              <p>{`낭비 리스트 (${waste.length})`}</p>
+              <p>{`낭비 리스트 (${pageInfoObj.waste.totalElements})`}</p>
               <p className="sum__green">
                 {sumWasteList.monthlyTotal.toLocaleString()} 원
               </p>
@@ -775,6 +843,7 @@ const History = () => {
                   if (location.pathname === "/income") sortByDate(income);
                   if (location.pathname === "/outgo") sortByDate(outgo);
                   if (location.pathname === "/waste") sortByDate(waste);
+                  if (location.pathname === "/history") sortByDate(ledger);
                 }}
               >
                 날짜
@@ -803,7 +872,7 @@ const History = () => {
           {/* 경로에 따라 다른 컴포넌트를 보여줘야함  */}
           {location.pathname === "/history" && (
             <HistoryList
-              sortedArray={combined}
+              sortedArray={ledger}
               checkedList={checkedList}
               checkHandler={checkHandler}
             />
@@ -829,6 +898,20 @@ const History = () => {
               checkHandler={checkHandler}
             />
           )}
+          <PaginationComponent
+            totalItemsCount={
+              location.pathname === "/outgo"
+                ? pageInfoObj.outgo.totalElements
+                : location.pathname === "/income"
+                  ? pageInfoObj.income.totalElements
+                  : location.pathname === "/waste"
+                    ? pageInfoObj.waste.totalElements
+                    : pageInfoObj.combined.totalElements
+            }
+            activePage={activePage}
+            itemsPerPage={10}
+            handlePageChange={handlePageChange}
+          />
         </MainLists>
       </Container>
       {isOpen.writeModal && (
@@ -938,6 +1021,7 @@ const SubHeader = styled.div`
   }
 
   .write__btn {
+    font-size: 1.2rem;
     display: flex;
     gap: 5px;
     padding: 0.8rem 1rem;

@@ -5,10 +5,6 @@ import { useEffect, useState } from "react";
 import { api } from "src/utils/refreshToken";
 import moment from "moment";
 import Modal from "./Modal";
-import { useDispatch, useSelector } from "react-redux";
-import { hideToast } from "src/store/slices/toastSlice";
-import Toast, { ToastType } from "src/components/Layout/Toast";
-import { type RootState } from "src/store";
 
 export interface budgetType {
   budget: number;
@@ -49,10 +45,6 @@ const Budget = () => {
   });
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
-  const modal = useSelector((state: RootState) => state.persistedReducer.toast);
-
-  const dispatch = useDispatch();
 
   const remainingDay = () => {
     // 현재 날짜를 가져옵니다.
@@ -121,18 +113,6 @@ const Budget = () => {
         console.error(error);
       });
   }, []);
-
-  useEffect(() => {
-    // 전역상태를 이용한 토스트 창 띄우기
-    setTimeout(() => {
-      if (modal.visible) {
-        modal.type === "success"
-          ? Toast(ToastType.success, modal.message)
-          : Toast(ToastType.error, modal.message);
-        dispatch(hideToast());
-      }
-    }, 100);
-  }, [modal, dispatch]);
 
   return (
     <>
@@ -300,6 +280,7 @@ const Container = styled.div`
     }
 
     button {
+      font-size: 1.2rem;
       display: flex;
       gap: 0.5rem;
       padding: 0.8rem 1.2rem;

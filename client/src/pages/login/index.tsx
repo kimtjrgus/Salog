@@ -19,6 +19,7 @@ import {
   setIncomeSchedule,
   setOutgoSchedule,
 } from "src/store/slices/scheduleSlice";
+import useDidMountEffect from "src/hooks/useDidMountEffect";
 
 interface userType {
   email: string;
@@ -43,12 +44,10 @@ const Login = () => {
   const [values, setValues] = useState<userType>({ email: "", password: "" });
   const [error, setError] = useState<userType>({ email: "", password: "" });
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const member = useSelector((state: RootState) => state.persistedReducer.user);
+
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
-  const schedule = useSelector(
-    (state: RootState) => state.persistedReducer.schedule
-  );
 
   // 이메일, 비밀번호가 변경될 때 상태를 저장하는 함수
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,66 +83,62 @@ const Login = () => {
           .get("/members/get")
           .then((res) => {
             dispatch(login(res.data.data));
+            // 3일 미만 남은 금융일정 전역상태로 추가
             navigate("/dashboard");
           })
           .catch((error) => {
             console.log(error);
           });
-
-        // 3일 미만 남은 금융일정 전역상태로 추가
-        const date = moment().format("YYYY-MM");
-        const customDate = `${date}-00`;
-        // const outgoIdArray = JSON.parse(
-        //   localStorage.getItem("outgoSchedule") ?? "[]"
-        // );
-        // const incomeIdArray = JSON.parse(
-        //   localStorage.getItem("incomeSchedule") ?? "[]"
-        // );
-
-        api
-          .get(`/fixedOutgo/get?page=1&size=10&date=${customDate}`)
-          .then((res) => {
-            const filteredOutgo = res.data.data.filter((el: outgoType) =>
-              circulateSchedule(el.date)
-            );
-            // const doubleFilteredOutgo = filteredOutgo.filter(
-            //   (el: outgoType) => !outgoIdArray.includes(el.fixedOutgoId)
-            // );
-            dispatch(
-              setOutgoSchedule([...schedule.outgoSchedule, ...filteredOutgo])
-            );
-          })
-          .catch((error) => {
-            console.error(error);
-            // 적절한 에러 처리 방식 선택
-          });
-
-        api
-          .get(`/fixedIncome/get?page=1&size=10&date=${customDate}`)
-          .then((res) => {
-            const filteredIncome = res.data.data.filter((el: incomeType) =>
-              circulateSchedule(el.date)
-            );
-            // const doubleFilteredIncome = filteredIncome.filter(
-            //   (el: incomeType) => !incomeIdArray.includes(el.fixedIncomeId)
-            // );
-            dispatch(
-              setIncomeSchedule([...schedule.incomeSchedule, ...filteredIncome])
-            );
-          })
-          .catch((error) => {
-            console.error(error);
-            // 적절한 에러 처리 방식 선택
-          });
       })
       .catch((error) => {
         // 404 : 회원이 존재하지 않음 , 400 : 비밀번호가 일치하지 않음
+        console.log(error);
+
         if (error.response.data.status === 404)
           setError({ ...error, email: "존재하지 않는 계정입니다." });
         if (error.response.data.status === 400)
           setError({ ...error, password: "비밀번호가 일치하지 않습니다." });
       });
   };
+
+  // user 전역 상태가 변경되면 실행
+  useDidMountEffect(() => {
+    if (member.homeAlarm) {
+      const date = moment().format("YYYY-MM");
+      const customDate = `${date}-00`;
+      api
+        .get(`/fixedOutgo/get?page=1&size=10&date=${customDate}`)
+        .then((res) => {
+          const filteredOutgo = res.data.data.filter((el: outgoType) =>
+            circulateSchedule(el.date)
+          );
+          // const doubleFilteredOutgo = filteredOutgo.filter(
+          //   (el: outgoType) => !outgoIdArray.includes(el.fixedOutgoId)
+          // );
+          dispatch(setOutgoSchedule([...filteredOutgo]));
+        })
+        .catch((error) => {
+          console.error(error);
+          // 적절한 에러 처리 방식 선택
+        });
+
+      api
+        .get(`/fixedIncome/get?page=1&size=10&date=${customDate}`)
+        .then((res) => {
+          const filteredIncome = res.data.data.filter((el: incomeType) =>
+            circulateSchedule(el.date)
+          );
+          // const doubleFilteredIncome = filteredIncome.filter(
+          //   (el: incomeType) => !incomeIdArray.includes(el.fixedIncomeId)
+          // );
+          dispatch(setIncomeSchedule([...filteredIncome]));
+        })
+        .catch((error) => {
+          console.error(error);
+          // 적절한 에러 처리 방식 선택
+        });
+    }
+  }, [member]);
 
   return (
     <Container>

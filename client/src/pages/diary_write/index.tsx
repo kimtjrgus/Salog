@@ -129,8 +129,12 @@ const DiaryWrite = () => {
       Toast(ToastType.error, "제목과 내용을 입력해주세요");
     } else if (values.title.length === 0) {
       Toast(ToastType.error, "제목을 입력해주세요");
+    } else if (values.title.length > 30) {
+      Toast(ToastType.error, "제목은 30자 이하로 입력해주세요");
     } else if (values.body.replace(/(<([^>]+)>)/gi, "").length < 10) {
       Toast(ToastType.error, "내용을 10자 이상 입력해주세요");
+    } else if (values.body.replace(/(<([^>]+)>)/gi, "").length > 4000) {
+      Toast(ToastType.error, "내용은 4000자 이하로 입력해주세요");
     } else {
       api
         .post(`/diary/post`, {
