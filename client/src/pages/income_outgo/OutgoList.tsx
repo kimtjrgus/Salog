@@ -78,7 +78,7 @@ export default OutgoList;
 const Container = styled.ul`
   display: flex;
   flex-direction: column;
-  max-height: 40.3rem;
+  max-height: 41.3rem;
   overflow: overlay;
 
   &::-webkit-scrollbar {

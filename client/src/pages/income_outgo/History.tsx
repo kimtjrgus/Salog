@@ -2,11 +2,11 @@ import styled from "styled-components";
 import { SvgIcon } from "@mui/material";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import DoNotDisturbRoundedIcon from "@mui/icons-material/DoNotDisturbRounded";
-import { type incomeType, type outgoType, type checkedType } from ".";
+import { type checkedType, type ledgerType } from ".";
 import { v4 as uuidv4 } from "uuid";
 
 interface Props {
-  sortedArray: Array<incomeType | outgoType>;
+  sortedArray: ledgerType[];
   checkedList: checkedType;
   checkHandler: (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -45,7 +45,7 @@ const HistoryList = ({ sortedArray, checkedList, checkHandler }: Props) => {
         </NullContainer>
       ) : (
         sortedArray.map((el) => {
-          if (el && "incomeTag" in el) {
+          if (el?.incomeId !== null) {
             // el이 incomeType인 경우
             return (
               <li className="ledger__list" key={uuidv4()}>
@@ -58,8 +58,8 @@ const HistoryList = ({ sortedArray, checkedList, checkHandler }: Props) => {
                 />
                 <ColorBlueDiv>수입</ColorBlueDiv>
                 <p>{dateAsDots(el.date)}</p>
-                <p>{el.incomeTag.tagName}</p>
-                <p>{el.incomeName}</p>
+                <p>{el.ledgerTag.tagName}</p>
+                <p>{el.ledgerName}</p>
                 <p>{"x"}</p>
                 <p className="money__blue">{el.money.toLocaleString()}원</p>
                 <p>{el.memo}</p>
@@ -82,8 +82,8 @@ const HistoryList = ({ sortedArray, checkedList, checkHandler }: Props) => {
                 />
                 <ColorRedDiv>지출</ColorRedDiv>
                 <p>{dateAsDots(el.date)}</p>
-                <p>{el.outgoTag.tagName}</p>
-                <p>{el.outgoName}</p>
+                <p>{el.ledgerTag.tagName}</p>
+                <p>{el.ledgerName}</p>
                 <p>{el.payment}</p>
                 <p className="money__red">{el.money.toLocaleString()}원</p>
                 <p>{el.memo}</p>
@@ -104,7 +104,7 @@ const HistoryList = ({ sortedArray, checkedList, checkHandler }: Props) => {
 export default HistoryList;
 
 const Container = styled.ul`
-  max-height: 40.3rem;
+  max-height: 41.3rem;
   overflow: overlay;
 
   &::-webkit-scrollbar {
