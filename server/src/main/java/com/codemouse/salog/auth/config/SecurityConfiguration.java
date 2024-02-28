@@ -45,6 +45,10 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
                 .formLogin().disable()
                 .httpBasic().disable()
+                .oauth2Login()  // OAuth2 로그인 설정
+                    .defaultSuccessUrl("http://www.salog.kro.kr/dashboard")  // 인증 성공 후 리다이렉트 될 URL
+                    .failureUrl("http://www.salog.kro.kr/")  // 인증 실패 후 리다이렉트 될 URL
+                .and()
                 .exceptionHandling()
                 .authenticationEntryPoint(new MemberAuthenticationEntryPoint())
                 .accessDeniedHandler(new MemberAccessDeniedHandler())

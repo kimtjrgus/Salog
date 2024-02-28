@@ -48,12 +48,11 @@ public class MemberService {
 
     //Oauth 회원 핸들링
     public Map<String, String> oauthUserHandler(String email) {
-        Optional<Member> optionalMember = memberRepository.findByEmail(email);
 
         Member oauthMember;
 
-        if (optionalMember.isPresent()) {
-            oauthMember = optionalMember.get();
+        if (verifiedEmail(email)) {
+            oauthMember = memberRepository.findByEmail(email).get();
         } else {
             Member member = new Member();
             member.setEmail(email);
