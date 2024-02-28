@@ -65,6 +65,8 @@ public class MemberService {
 
         isQuit(findMember);
 
+        socialCheck(findMember);
+
         String curPassword = passwords.getCurPassword();
         String newPassword = passwords.getNewPassword();
 
@@ -86,6 +88,8 @@ public class MemberService {
 
         if (findMember.isPresent()) {
             Member member = findMember.get();
+
+            socialCheck(member);
 
             String encryptedPassword = passwordEncoder.encode(newPassword);
             member.setPassword(encryptedPassword);
@@ -163,6 +167,13 @@ public class MemberService {
     public void verifiedRequest(String token, long serviceMemberId) {
         if (jwtTokenizer.getMemberId(token) != serviceMemberId) {
             throw new BusinessLogicException(ExceptionCode.MEMBER_MISMATCHED);
+        }
+    }
+
+    // 소셜 가입한 회원인지 체크
+    public void socialCheck(Member member) {
+        if (member.getPassword() == null) {
+            throw new BusinessLogicException(ExceptionCode.SOCIAL_MEMBER);
         }
     }
 }
