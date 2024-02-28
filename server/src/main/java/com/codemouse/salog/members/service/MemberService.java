@@ -18,8 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.AuthenticationFailedException;
 import javax.mail.MessagingException;
 import javax.mail.SendFailedException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Transactional
 @Service
@@ -47,6 +46,50 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    //Oauth 회원 핸들링
+    public Map<String, String> oauthUserHandler(String email) {
+
+        Member oauthMember;
+
+        if (verifiedEmail(email)) {
+            oauthMember = memberRepository.findByEmail(email).get();
+        } else {
+            Member member = new Member();
+            member.setEmail(email);
+            member.setPassword(null);
+            member.setHomeAlarm(false);
+            member.setEmailAlarm(false);
+
+            // 권한
+            List<String> roles = authorityUtils.createRoles(member.getEmail());
+            member.setRoles(roles);
+
+            oauthMember = memberRepository.save(member);
+        }
+
+        // jwt 생성
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("username", oauthMember.getEmail());
+        claims.put("roles", oauthMember.getRoles());
+        claims.put("memberId", oauthMember.getMemberId());
+
+        String subject = oauthMember.getEmail();
+
+        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
+
+        Date accessTokenExpiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
+        String accessToken = jwtTokenizer.generateAccessToken(claims, subject, accessTokenExpiration, base64EncodedSecretKey);
+
+        Date refreshTokenExpiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
+        String refreshToken = jwtTokenizer.generateRefreshToken(subject, refreshTokenExpiration, base64EncodedSecretKey);
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("accessToken", accessToken);
+        tokens.put("refreshToken", refreshToken);
+
+        return tokens;
+    }
+
     public void updateMember(String token, MemberDto.Patch patchDto) {
         Member member = memberMapper.memberPatchDtoToMember(patchDto);
         Member findMember = findVerifiedMember(jwtTokenizer.getMemberId(token));
@@ -64,6 +107,8 @@ public class MemberService {
         Member findMember = findVerifiedMember(jwtTokenizer.getMemberId(token));
 
         isQuit(findMember);
+
+        socialCheck(findMember);
 
         String curPassword = passwords.getCurPassword();
         String newPassword = passwords.getNewPassword();
@@ -86,6 +131,8 @@ public class MemberService {
 
         if (findMember.isPresent()) {
             Member member = findMember.get();
+
+            socialCheck(member);
 
             String encryptedPassword = passwordEncoder.encode(newPassword);
             member.setPassword(encryptedPassword);
@@ -163,6 +210,13 @@ public class MemberService {
     public void verifiedRequest(String token, long serviceMemberId) {
         if (jwtTokenizer.getMemberId(token) != serviceMemberId) {
             throw new BusinessLogicException(ExceptionCode.MEMBER_MISMATCHED);
+        }
+    }
+
+    // 소셜 가입한 회원인지 체크
+    public void socialCheck(Member member) {
+        if (member.getPassword() == null) {
+            throw new BusinessLogicException(ExceptionCode.SOCIAL_MEMBER);
         }
     }
 }
