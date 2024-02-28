@@ -39,8 +39,8 @@ public class DiaryTagService {
 
     // Diary Delete
     public void deleteDiaryTag(String token, Long diaryTagId) {
-        Member member = memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
-        DiaryTag diaryTag = findVerifiedDiaryTag(diaryTagId);
+        memberService.findVerifiedMember(jwtTokenizer.getMemberId(token));
+        findVerifiedDiaryTag(diaryTagId);
 
         diaryTagRepository.deleteById(diaryTagId);
     }

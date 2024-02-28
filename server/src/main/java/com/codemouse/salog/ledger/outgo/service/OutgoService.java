@@ -278,4 +278,12 @@ public class OutgoService {
 
         return outgoPage;
     }
+    
+    // 상단의 페이지생성 메서드오버로딩
+    public List<OutgoDto.Response> findOutgoPagesAsList(String token, int page, int size, String date, String outgoTag, Boolean isWasteList){
+        Page<Outgo> outgoPage = findOutgoPages(token, page, size, date, outgoTag, isWasteList);
+        return outgoPage.getContent().stream()
+                .map(outgoMapper::OutgoToOutgoResponseDto)
+                .collect(Collectors.toList());
+    }
 }
