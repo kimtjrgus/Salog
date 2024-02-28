@@ -35,7 +35,7 @@ public class MemberController {
     }
 
     // Oauth - google
-    @GetMapping("/oauth2/callback/google")
+    @GetMapping("/login/oauth2/code/google")
     public ResponseEntity<?> googleOauth2Callback(@RegisteredOAuth2AuthorizedClient("google")OAuth2AuthorizedClient auth2AuthorizedClient) {
         String accessToken = auth2AuthorizedClient.getAccessToken().getTokenValue();
 
