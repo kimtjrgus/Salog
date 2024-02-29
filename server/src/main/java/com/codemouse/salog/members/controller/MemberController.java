@@ -34,39 +34,6 @@ public class MemberController {
         memberService.createMember(requestBody);
     }
 
-    // Oauth - google
-    @GetMapping("/login/oauth2/code/google")
-    public ResponseEntity<?> googleOauth2Callback(@RegisteredOAuth2AuthorizedClient("google")OAuth2AuthorizedClient auth2AuthorizedClient) {
-        String accessToken = auth2AuthorizedClient.getAccessToken().getTokenValue();
-
-        String userEmail = getUserInfo(accessToken);
-
-        Map<String, String> tokens = memberService.oauthUserHandler(userEmail);
-
-        return ResponseEntity.ok(tokens);
-    }
-
-    // 구글 인증 서버에 액세스 토큰을 보내고 유저 정보를 받아옴
-    // 서비스 로직? member 서비스? auth 서비스?
-    private String getUserInfo(String accessToken) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-
-        HttpEntity<String> entity = new HttpEntity<>("body", headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(
-                "https://www.googleapis.com/oauth2/v2/userinfo",
-                HttpMethod.GET,
-                entity,
-                Map.class
-        );
-
-        Map<String, Object> userInfo = response.getBody();
-        return (String) userInfo.get("email");
-    }
-
     @PatchMapping("/update")
     @ResponseStatus(HttpStatus.OK)
     public void updateMember(@RequestHeader(name = "Authorization") String token,
