@@ -36,6 +36,15 @@ spring:
           auth: true
           starttls:
             enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH_GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${OAUTH_GOOGLE_REDIRECT_URI}
+            scope: email
 email:
   sender:
     man: ${EMAIL}
