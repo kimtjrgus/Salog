@@ -18,6 +18,8 @@ public enum ExceptionCode {
     LOGOUT(400, "LOGOUT 재로그인 필요"),
     TOKEN_EXPIRED(400, "TOKEN_EXPIRED 토큰 만료"),
     TOKEN_INVALID(400, "TOKEN_INVALID 유효하지 않은 토큰"),
+    //Oauth
+    SOCIAL_MEMBER(400, "SOCIAL_MEMBER 소셜 가입한 회원"),
 
     // 일기
     MEMBER_MISMATCHED(400, "MEMBER_MISMATCHED MemberId가 일치하지 않음"),
