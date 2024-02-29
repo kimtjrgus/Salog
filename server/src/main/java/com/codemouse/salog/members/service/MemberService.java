@@ -46,50 +46,6 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    //Oauth 회원 핸들링
-    public Map<String, String> oauthUserHandler(String email) {
-
-        Member oauthMember;
-
-        if (verifiedEmail(email)) {
-            oauthMember = memberRepository.findByEmail(email).get();
-        } else {
-            Member member = new Member();
-            member.setEmail(email);
-            member.setPassword(null);
-            member.setHomeAlarm(false);
-            member.setEmailAlarm(false);
-
-            // 권한
-            List<String> roles = authorityUtils.createRoles(member.getEmail());
-            member.setRoles(roles);
-
-            oauthMember = memberRepository.save(member);
-        }
-
-        // jwt 생성
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("username", oauthMember.getEmail());
-        claims.put("roles", oauthMember.getRoles());
-        claims.put("memberId", oauthMember.getMemberId());
-
-        String subject = oauthMember.getEmail();
-
-        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-
-        Date accessTokenExpiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
-        String accessToken = jwtTokenizer.generateAccessToken(claims, subject, accessTokenExpiration, base64EncodedSecretKey);
-
-        Date refreshTokenExpiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
-        String refreshToken = jwtTokenizer.generateRefreshToken(subject, refreshTokenExpiration, base64EncodedSecretKey);
-
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        tokens.put("refreshToken", refreshToken);
-
-        return tokens;
-    }
-
     public void updateMember(String token, MemberDto.Patch patchDto) {
         Member member = memberMapper.memberPatchDtoToMember(patchDto);
         Member findMember = findVerifiedMember(jwtTokenizer.getMemberId(token));
