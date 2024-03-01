@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-public class TokenController {
+public class SecurityController {
     private final JwtTokenizer jwtTokenizer;
     private final TokenBlackListService tokenBlackListService;
 

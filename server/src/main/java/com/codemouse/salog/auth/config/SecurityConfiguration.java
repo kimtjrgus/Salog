@@ -111,7 +111,8 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                         .antMatchers(HttpMethod.GET, "/ledgerTags").hasRole("USER")
                         .antMatchers(HttpMethod.GET, "/diaryTags").hasRole("USER")
 
-                );
+                )
+                .oauth2Login();  // OAuth2 로그인 설정
         return http.build();
     }
 

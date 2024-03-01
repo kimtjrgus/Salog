@@ -5,19 +5,19 @@ import com.codemouse.salog.dto.SingleResponseDto;
 import com.codemouse.salog.helper.EmailSenderResponse;
 import com.codemouse.salog.members.dto.EmailRequestDto;
 import com.codemouse.salog.members.dto.MemberDto;
-import com.codemouse.salog.members.entity.Member;
-import com.codemouse.salog.members.mapper.MemberMapper;
 import com.codemouse.salog.members.service.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/members")
