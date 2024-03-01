@@ -52,6 +52,7 @@ jobs:
           key: ${{ secrets.KEY }}
           script: |
             docker rm -f $(docker ps -aq)
+            cp /home/ec2-user/keystore.p12 /app/
             docker pull ${{ secrets.DOCKER_REPO }}/salog
             docker run -e SPRING_PROFILES_ACTIVE=deploy -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} -e EMAIL=${{ secrets.EMAIL }} -e EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} -e AWS_RDS_URL=${{ secrets.AWS_RDS_URL }} -e AWS_RDS_PASSWORD=${{ secrets.AWS_RDS_PASSWORD }} -e OAUTH_GOOGLE_CLIENT_ID=${{secrets.OAUTH_GOOGLE_CLIENT_ID}} -e OAUTH_GOOGLE_CLIENT_SECRET=${{secrets.OAUTH_GOOGLE_CLIENT_SECRET}} -e OAUTH_GOOGLE_REDIRECT_URI=${{secrets.OAUTH_GOOGLE_REDIRECT_URI}} -e KEY_STORE_PASSWORD=${{secrets.KEY_STORE_PASSWORD}} -d -p 443:8080 ${{ secrets.DOCKER_REPO }}/salog
             docker image prune -f
