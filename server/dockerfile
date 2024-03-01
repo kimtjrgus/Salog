@@ -1,5 +1,5 @@
 # Package stage
 FROM openjdk:11-jre-slim
 COPY ./server/build/libs/salog-0.0.1-SNAPSHOT.jar /app/salog.jar
-EXPOSE 80
+EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app/salog.jar"]
