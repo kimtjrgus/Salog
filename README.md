@@ -9,14 +9,16 @@
   ### 프로젝트 기간 : 2023.11.17 ~ ing
 
   ### 배포 링크 : <a href="http://www.salog.kro.kr" target="_blank">Salog</a>
-<br />
 
+  <br>
   
 ## 👥 팀원 구성
   |<img src="https://github.com/codestates-seb/seb43_main_004/assets/120611048/fd4b071f-c773-4a17-b27f-ec9656290fa5" width="130px" />|<img src="https://github.com/codestates-seb/seb43_main_004/assets/120611048/1c7f47bc-6dba-4d67-b189-5ac3148256fd" width="130px" />|<img src="https://github.com/codestates-seb/seb43_main_004/assets/120611048/c194e140-fb6b-4bec-8b60-5b8398258e86" width="130px" />
 |:---:|:---:|:---:|
 |[이용석](https://github.com/021Skyfall)|[김석현](https://github.com/kimtjrgus)|[선유준](https://github.com/YujunSun0)
 |BE (팀장)|BE|FE|
+
+<br>
 
 ## 🔧 기술 스택
 
@@ -47,6 +49,8 @@
     ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
     ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
     ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+
+    <br>
 
 ## 🖥️ 페이지 별 기능 
 
@@ -283,6 +287,8 @@
   - develop 브랜치는 개발 단계에서 git-flow의 master 역할을 하는 브랜치입니다.
   - Feat 브랜치는 기능 단위로 독립적인 개발 환경을 위하여 사용하고 merge 후 각 브랜치를 삭제해주었습니다.
  
+<br>
+ 
 ## 프로젝트 후기
 
 ### 이용석
@@ -315,7 +321,9 @@
 많은 것을 배울 수 있었던 프로젝트였습니다. 
 프론트엔드를 혼자 담당하게 되어 기획한 모든 기능들을 구현 해내기 위해 노력하였으며, 점차 완성되어 가는 웹을 보며 뿌듯함을 느꼈습니다.
 
-특히, 이번엔 Redux-toolkit을 사용하면서 리덕스 상태를 지속적으로 저장 및 복원하기 위한 Redux-persist를 사용하면서 전역상태를 사용해보는 경험을 해본 점이 좋았습니다.
+기능적 부분으로는 Redux-toolkit을 사용하면서 리덕스 상태를 지속적으로 저장 및 복원하기 위한 Redux-persist를 사용하면서 전역상태를 사용해보는 경험을 해본 점이 좋았습니다.
+추가로, 텍스트 에디터를 사용하여 이미지를 올릴 때 base64 형식으로 인코딩되어 저장되는 것을 firebase storage를 사용하여 url로 변환하여 사용하는 과정으로 최적화도 이뤄냈고, 가독성 문제도
+해결한 뿌듯한 성과를 이뤄내며 성장할 수 있었습니다.
 
 아쉬운 점으로는 React의 상태를 관리하면서 서버와 통신 할 때 최신화하는 것을 위해 React-Query를 사용해보고 싶었지만, 기능을 구현하는 것에 초점을 두어 학습하지 못한 점이 아쉬웠습니다.
 
