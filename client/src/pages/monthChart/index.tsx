@@ -474,7 +474,7 @@ const Container = styled.div`
     position: absolute;
     bottom: 0rem;
     width: 100%;
-    height: 10px;
+    height: 1rem;
     display: flex;
     justify-content: space-between;
     padding-right: 10px;
@@ -602,7 +602,7 @@ const LastTwoBarList = styled.li<{ height: string }>`
   div {
     animation: fade-in1 1s ease-in-out forwards;
     border-radius: 4px;
-    width: 28px;
+    width: 2.8rem;
     height: ${(props) => props.height}%;
     background: #bfbbbb;
     margin-bottom: 1rem;
@@ -641,7 +641,7 @@ const LastBarList = styled.li<{ height: string }>`
   div {
     animation: fade-in2 1s ease-in-out forwards;
     border-radius: 4px;
-    width: 28px;
+    width: 2.8rem;
     height: ${(props) => props.height}%;
     background: #bfbbbb;
     margin-bottom: 1rem;
@@ -679,7 +679,7 @@ const BarList = styled.li<{ height: string }>`
 
   div {
     border-radius: 4px;
-    width: 28px;
+    width: 2.8rem;
     animation: fade-in3 1s ease-in-out forwards;
     background: ${(props) => props.theme.COLORS.LIGHT_RED};
     height: ${(props) => props.height}%;
@@ -718,7 +718,7 @@ const FirstWeekBarList = styled.li<{ height: string }>`
 
   div {
     border-radius: 4px;
-    width: 28px;
+    width: 2.8rem;
     height: ${(props) => props.height}%;
     animation: fade-in4 1s ease-in-out forwards;
     background: ${(props) => props.theme.COLORS.LIGHT_GREEN};
@@ -757,7 +757,7 @@ const SecondWeekBarList = styled.li<{ height: string }>`
 
   div {
     border-radius: 4px;
-    width: 28px;
+    width: 2.8rem;
     animation: fade-in5 1s ease-in-out forwards;
     background: ${(props) => props.theme.COLORS.LIGHT_GREEN};
     margin-bottom: 1rem;
@@ -795,7 +795,7 @@ const ThirdWeekBarList = styled.li<{ height: string }>`
 
   div {
     border-radius: 4px;
-    width: 28px;
+    width: 2.8rem;
     animation: fade-in6 1s ease-in-out forwards;
     background: ${(props) => props.theme.COLORS.LIGHT_GREEN};
     margin-bottom: 1rem;
@@ -833,7 +833,7 @@ const FourthWeekBarList = styled.li<{ height: string }>`
 
   div {
     border-radius: 4px;
-    width: 28px;
+    width: 2.8rem;
     animation: fade-in7 1s ease-in-out forwards;
     background: ${(props) => props.theme.COLORS.LIGHT_GREEN};
     margin-bottom: 1rem;
@@ -871,7 +871,7 @@ const FifthWeekBarList = styled.li<{ height: string }>`
 
   div {
     border-radius: 4px;
-    width: 28px;
+    width: 2.8rem;
     animation: fade-in8 1s ease-in-out forwards;
     background: ${(props) =>
       isNaN(Number(props.height)) ? "#bfbbbb" : props.theme.COLORS.LIGHT_GREEN};

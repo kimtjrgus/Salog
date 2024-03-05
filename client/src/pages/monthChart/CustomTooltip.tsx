@@ -21,7 +21,7 @@ export default CustomTooltip;
 const Container = styled.div`
   width: fit-content;
   font-size: 1.6rem;
-  height: 28px;
+  height: 2.8rem;
   padding: 8px;
   background-color: #fff;
   opacity: 0.85;
