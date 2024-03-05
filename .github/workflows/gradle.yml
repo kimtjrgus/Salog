@@ -33,7 +33,7 @@ jobs:
         run: |
           cd ./server/
           chmod +x ./gradlew
-          ./gradlew clean build -x test -Dspring.profiles.active=deploy -DAWS_RDS_URL=${{ secrets.AWS_RDS_URL }} -DAWS_RDS_PASSWORD=${{ secrets.AWS_RDS_PASSWORD }} -DJWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} -DEMAIL=${{ secrets.EMAIL }} -DEMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} -DOAUTH_GOOGLE_CLIENT_ID=${{secrets.OAUTH_GOOGLE_CLIENT_ID}} -DOAUTH_GOOGLE_CLIENT_SECRET=${{secrets.OAUTH_GOOGLE_CLIENT_SECRET}} -DOAUTH_GOOGLE_REDIRECT_URI=${{secrets.OAUTH_GOOGLE_REDIRECT_URI}} -DKEY_STORE_PASSWORD=${{secrets.KEY_STORE_PASSWORD}}
+          ./gradlew clean build -x test -Dspring.profiles.active=deploy -DAWS_RDS_URL=${{ secrets.AWS_RDS_URL }} -DAWS_RDS_PASSWORD=${{ secrets.AWS_RDS_PASSWORD }} -DJWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} -DEMAIL=${{ secrets.EMAIL }} -DEMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} -DOAUTH_GOOGLE_CLIENT_ID=${{secrets.OAUTH_GOOGLE_CLIENT_ID}} -DOAUTH_GOOGLE_CLIENT_SECRET=${{secrets.OAUTH_GOOGLE_CLIENT_SECRET}} -DOAUTH_GOOGLE_REDIRECT_URI=${{secrets.OAUTH_GOOGLE_REDIRECT_URI}} -DNAVER_OCR_SECRET=${{secrets.NAVER_OCR_SECRET}} -DNAVER_OCR_URL=${{secrets.NAVER_OCR_URL}} -DKEY_STORE_PASSWORD=${{secrets.KEY_STORE_PASSWORD}}
 
       - name: Log in to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
@@ -53,5 +53,5 @@ jobs:
           script: |
             docker rm -f $(docker ps -aq)
             docker pull ${{ secrets.DOCKER_REPO }}/salog
-            docker run -e SPRING_PROFILES_ACTIVE=deploy -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} -e EMAIL=${{ secrets.EMAIL }} -e EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} -e AWS_RDS_URL=${{ secrets.AWS_RDS_URL }} -e AWS_RDS_PASSWORD=${{ secrets.AWS_RDS_PASSWORD }} -e OAUTH_GOOGLE_CLIENT_ID=${{secrets.OAUTH_GOOGLE_CLIENT_ID}} -e OAUTH_GOOGLE_CLIENT_SECRET=${{secrets.OAUTH_GOOGLE_CLIENT_SECRET}} -e OAUTH_GOOGLE_REDIRECT_URI=${{secrets.OAUTH_GOOGLE_REDIRECT_URI}} -e KEY_STORE_PASSWORD=${{secrets.KEY_STORE_PASSWORD}} -v /home/ec2-user/keystore.p12:/app/keystore.p12 -d -p 443:8080 ${{ secrets.DOCKER_REPO }}/salog
+            docker run -e SPRING_PROFILES_ACTIVE=deploy -e JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} -e EMAIL=${{ secrets.EMAIL }} -e EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} -e AWS_RDS_URL=${{ secrets.AWS_RDS_URL }} -e AWS_RDS_PASSWORD=${{ secrets.AWS_RDS_PASSWORD }} -e OAUTH_GOOGLE_CLIENT_ID=${{secrets.OAUTH_GOOGLE_CLIENT_ID}} -e OAUTH_GOOGLE_CLIENT_SECRET=${{secrets.OAUTH_GOOGLE_CLIENT_SECRET}} -e OAUTH_GOOGLE_REDIRECT_URI=${{secrets.OAUTH_GOOGLE_REDIRECT_URI}} -e NAVER_OCR_SECRET=${{secrets.NAVER_OCR_SECRET}} -e NAVER_OCR_URL=${{secrets.NAVER_OCR_URL}} -e KEY_STORE_PASSWORD=${{secrets.KEY_STORE_PASSWORD}} -v /home/ec2-user/keystore.p12:/app/keystore.p12 -d -p 443:8080 ${{ secrets.DOCKER_REPO }}/salog
             docker image prune -f
