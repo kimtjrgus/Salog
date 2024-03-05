@@ -16,7 +16,7 @@ public class CustomCorsConfiguration implements CorsConfigurationSource {
         configuration.addAllowedOrigin("http://localhost:3000"); // 프론트 용
         configuration.addAllowedOrigin("http://www.salog.kro.kr.s3-website.ap-northeast-2.amazonaws.com"); // 프론트 S3
 //        configuration.addAllowedOrigin("https://d37e9ewzht4md2.cloudfront.net"); // 클라우드 프론트 사용 시 활성화 필요
-        configuration.addAllowedOrigin("http://www.salog.kro.kr"); // 도메인
+        configuration.addAllowedOrigin("https://www.salog.kro.kr"); // 도메인
         configuration.addAllowedMethod(HttpMethod.GET.name());
         configuration.addAllowedMethod(HttpMethod.POST.name());
         configuration.addAllowedMethod(HttpMethod.PUT.name());
