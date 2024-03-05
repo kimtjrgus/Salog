@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.io.IOException;
 
 @RestController
 @Slf4j
@@ -29,6 +30,13 @@ public class OutgoController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @PostMapping("/uploadImage")
+    public ResponseEntity<?> uploadReceiptImage(@RequestHeader(name = "Authorization") String token,
+                                                @Valid @RequestBody OutgoDto.PostImage requestBody) throws IOException {
+        OutgoDto.ImageOcrResponse response = service.convertImageToOutgo(token, requestBody);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @PatchMapping("/update/{outgo-id}")
     public ResponseEntity<?> updateOutgo (@RequestHeader(name = "Authorization") String token,
