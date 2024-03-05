@@ -5,6 +5,8 @@ import com.codemouse.salog.auth.utils.TokenBlackListService;
 import com.codemouse.salog.dto.MultiResponseDto;
 import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
+import com.codemouse.salog.helper.naverOcr.ClovaOcrApiService;
+import com.codemouse.salog.helper.naverOcr.ClovaOcrDto;
 import com.codemouse.salog.ledger.outgo.dto.OutgoDto;
 import com.codemouse.salog.ledger.outgo.entity.Outgo;
 import com.codemouse.salog.ledger.outgo.mapper.OutgoMapper;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -42,6 +45,7 @@ public class OutgoService {
     private final JwtTokenizer jwtTokenizer;
     private final TokenBlackListService tokenBlackListService;
     private final MemberService memberService;
+    private final ClovaOcrApiService clovaOcrApiService;
 
 
     // POST
@@ -285,5 +289,26 @@ public class OutgoService {
         return outgoPage.getContent().stream()
                 .map(outgoMapper::OutgoToOutgoResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    // 영수증 인식 후 자동작성
+    public OutgoDto.ImageOcrResponse convertImageToOutgo(String token, OutgoDto.PostImage outgoDto) throws IOException {
+        tokenBlackListService.isBlackListed(token);
+
+        String receiptImageUrl = outgoDto.getReceiptImageUrl();
+        String base64Image = clovaOcrApiService.convertImageToBase64(receiptImageUrl);
+        ClovaOcrDto callOcrDto = clovaOcrApiService.callOcrApi(base64Image);
+
+        // ocrDto와 outgoDto를 매칭해줌
+        log.info(callOcrDto.getDate(),
+                callOcrDto.getTotalPrice(),
+                callOcrDto.getStoreInfo());
+
+        return new OutgoDto.ImageOcrResponse(
+                callOcrDto.getDate(), // date
+                callOcrDto.getTotalPrice(), // money
+                callOcrDto.getStoreInfo(), // outgoName
+                receiptImageUrl
+        );
     }
 }
