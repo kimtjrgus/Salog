@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SvgIcon } from "@mui/material";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
@@ -20,6 +20,8 @@ import {
   setOutgoSchedule,
 } from "src/store/slices/scheduleSlice";
 import useDidMountEffect from "src/hooks/useDidMountEffect";
+import { hideToast } from "src/store/slices/toastSlice";
+import Toast, { ToastType } from "src/components/Layout/Toast";
 
 interface userType {
   email: string;
@@ -45,6 +47,7 @@ const Login = () => {
   const [error, setError] = useState<userType>({ email: "", password: "" });
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const member = useSelector((state: RootState) => state.persistedReducer.user);
+  const modal = useSelector((state: RootState) => state.persistedReducer.toast);
 
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
@@ -82,7 +85,10 @@ const Login = () => {
         api
           .get("/members/get")
           .then((res) => {
-            dispatch(login(res.data.data));
+            const updatedRes = { ...res.data.data, userEmail: values.email };
+            console.log(updatedRes);
+
+            dispatch(login(updatedRes));
             // 3일 미만 남은 금융일정 전역상태로 추가
             navigate("/dashboard");
           })
@@ -99,6 +105,12 @@ const Login = () => {
         if (error.response.data.status === 400)
           setError({ ...error, password: "비밀번호가 일치하지 않습니다." });
       });
+  };
+
+  const onClickGoogleBtn = () => {
+    // window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&scope=email&client_id=${process.env.REACT_APP_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_GOOGLE_REDIRECT_URL}`;
+    window.location.href =
+      "https://server.salog.kro.kr/oauth2/authorization/google";
   };
 
   // user 전역 상태가 변경되면 실행
@@ -139,6 +151,18 @@ const Login = () => {
         });
     }
   }, [member]);
+
+  // 전역상태를 이용한 토스트 창 띄우기
+
+  useEffect(() => {
+    setTimeout(() => {
+      // 타입 단언입니다. 이를 통해 modal.type이 ToastType의 키 중 하나임을 명시적으로 알려주는 것
+      if (modal.visible && Object.keys(ToastType).includes(modal.type)) {
+        Toast(ToastType[modal.type as keyof typeof ToastType], modal.message);
+        dispatch(hideToast());
+      }
+    }, 100);
+  }, [modal, dispatch]);
 
   return (
     <Container>
@@ -209,7 +233,7 @@ const Login = () => {
           <OauthBtn>
             <Kakao />
           </OauthBtn>
-          <OauthBtn>
+          <OauthBtn onClick={onClickGoogleBtn}>
             <Google />
           </OauthBtn>
           <OauthBtn>
