@@ -3,9 +3,15 @@ import { styled } from "styled-components";
 import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { debounce } from "src/utils/timeFunc";
-import { type outgoType, type incomeType, type modalType } from ".";
+import {
+  type ledgerType,
+  type outgoType,
+  type incomeType,
+  type modalType,
+  type PageInfoObj,
+} from ".";
 import { useDispatch } from "react-redux";
 import { showToast } from "src/store/slices/toastSlice";
 import { api } from "src/utils/refreshToken";
@@ -13,8 +19,10 @@ import type moment from "moment";
 
 interface Props {
   setIsOpen: React.Dispatch<React.SetStateAction<modalType>>;
+  setLedger: React.Dispatch<React.SetStateAction<ledgerType[]>>;
   setIncome: React.Dispatch<React.SetStateAction<incomeType[]>>;
   setOutgo: React.Dispatch<React.SetStateAction<outgoType[]>>;
+  setPageInfoObj: React.Dispatch<React.SetStateAction<PageInfoObj>>;
   getMoment: moment.Moment;
 }
 
@@ -43,7 +51,14 @@ interface valuesType {
   memo: string;
 }
 
-const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
+const LedgerWrite = ({
+  setIsOpen,
+  setLedger,
+  setIncome,
+  setOutgo,
+  setPageInfoObj,
+  getMoment,
+}: Props) => {
   const [values, setValues] = useState<valuesType[]>([
     {
       id: 1,
@@ -164,7 +179,6 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
               receiptImg: "",
             });
 
-            console.log(res.data);
             if (
               new Date(res.data.date).getFullYear() ===
                 new Date(getMoment.format("YYYY-MM-DD")).getFullYear() &&
@@ -174,6 +188,14 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
               setOutgo((prev: outgoType[]) => {
                 return [...prev, res.data];
               });
+              setPageInfoObj((prevPageInfoObj) => ({
+                ...prevPageInfoObj,
+                outgo: {
+                  ...prevPageInfoObj.outgo,
+                  totalElements: prevPageInfoObj.outgo.totalElements + 1,
+                },
+              }));
+
             }
           } else {
             const res = await api.post("/income/post", {
@@ -185,7 +207,6 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
               receiptImg: "",
             });
 
-            console.log(res.data);
             if (
               new Date(res.data.date).getFullYear() ===
                 new Date(getMoment.format("YYYY-MM-DD")).getFullYear() &&
@@ -195,10 +216,30 @@ const LedgerWrite = ({ setIsOpen, setIncome, setOutgo, getMoment }: Props) => {
               setIncome((prev: incomeType[]) => {
                 return [...prev, res.data];
               });
+               setPageInfoObj((prevPageInfoObj) => ({
+                 ...prevPageInfoObj,
+                 income: {
+                   ...prevPageInfoObj.income,
+                   totalElements: prevPageInfoObj.income.totalElements + 1,
+                 },
+               }));
             }
           }
         })
       );
+
+      const date = getMoment.format("YYYY-MM");
+      const customDate = `${date}-00`;
+
+      const res = await api.get(
+        `/calendar/ledger?page=1&size=10&date=${customDate}`
+      );
+
+      setLedger(res.data.data);
+      setPageInfoObj((prevPageInfoObj) => ({
+        ...prevPageInfoObj,
+        combined: res.data.pageInfo,
+      }));
 
       setIsOpen((prev) => {
         const updated = { ...prev };
