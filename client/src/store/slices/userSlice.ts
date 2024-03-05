@@ -7,6 +7,7 @@ const userSlice = createSlice({
 		emailAlarm: false,
 		homeAlarm: false,
 		createdAt: "",
+		userEmail: "",
 		incomeTags: [],
 		outgoTags: [],
 	},
@@ -16,6 +17,7 @@ const userSlice = createSlice({
 			state.emailAlarm = action.payload.emailAlarm;
 			state.homeAlarm = action.payload.homeAlarm;
 			state.createdAt = action.payload.createdAt;
+			state.userEmail = action.payload.userEmail;
 			state.incomeTags = action.payload.incomeTags;
 			state.outgoTags = action.payload.outgoTags;
 		},
