@@ -1,6 +1,7 @@
 package com.codemouse.salog.ledger.calendar.service;
 
 import com.codemouse.salog.dto.MultiResponseDto;
+import com.codemouse.salog.dto.PageInfo;
 import com.codemouse.salog.ledger.calendar.dto.CalendarDto;
 import com.codemouse.salog.ledger.income.dto.IncomeDto;
 import com.codemouse.salog.ledger.income.service.IncomeService;
@@ -8,15 +9,11 @@ import com.codemouse.salog.ledger.outgo.dto.OutgoDto;
 import com.codemouse.salog.ledger.outgo.service.OutgoService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -48,8 +45,8 @@ public class CalendarService {
     }
 
     public MultiResponseDto<CalendarDto.LedgerResponse> getIntegratedLedger(String token, int page, int size, String date, String ledgerTag){
-        List<IncomeDto.Response> incomeList = incomeService.getIncomes(token, page, size, ledgerTag, date).getData();
-        List<OutgoDto.Response> outgoList = outgoService.findOutgoPagesAsList(token, page, size, date, ledgerTag, null);
+        List<IncomeDto.Response> incomeList = incomeService.getIncomes(token, 1, Integer.MAX_VALUE, ledgerTag, date).getData();
+        List<OutgoDto.Response> outgoList = outgoService.findOutgoPagesAsList(token, 1, Integer.MAX_VALUE, date, ledgerTag, null);
 
         List<CalendarDto.LedgerResponse> ledgerResponses = new ArrayList<>();
 
@@ -85,18 +82,21 @@ public class CalendarService {
                     ));
         }
 
-        // 날짜별 내림차순 재정렬
-        ledgerResponses.sort(Comparator.comparing(CalendarDto.LedgerResponse::getDate).reversed());
+        ledgerResponses.sort((o1, o2) -> o2.getDate().compareTo(o1.getDate()));
 
-        // 페이지 생성
-        int startIdx = (page - 1) * size;
-        int endIdx = Math.min(startIdx + size, ledgerResponses.size());
-        List<CalendarDto.LedgerResponse> pageItems = ledgerResponses.subList(startIdx, endIdx);
+        // 페이지 처리
+        int fromIndex = (page - 1) * size;
+        int toIndex = Math.min(fromIndex + size, ledgerResponses.size());
+        long totalElements = ledgerResponses.size();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        PageInfo pageInfo = new PageInfo(page, size, totalElements, totalPages);
 
-        // 페이징 정보 생성
-        Pageable pageable = PageRequest.of(page - 1, size);
-        PageImpl<CalendarDto.LedgerResponse> pageResult = new PageImpl<>(pageItems, pageable, ledgerResponses.size());
+        List<CalendarDto.LedgerResponse> pagedData = new ArrayList<>();
+        if(ledgerResponses != null && fromIndex <= toIndex) {
+            pagedData = ledgerResponses.subList(fromIndex, toIndex);
+            // subList가 fromIndex <= toIndex 해당 조건안에서 동작하기 위함.
+        }
 
-        return new MultiResponseDto<>(pageItems, pageResult);
+        return new MultiResponseDto<>(pagedData, pageInfo);
     }
 }
