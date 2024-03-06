@@ -46,6 +46,7 @@ public class MemberDto {
     @Setter
     public static class Response {
         private long memberId;
+        private String email;
         private boolean emailAlarm;
         private boolean homeAlarm;
         private LocalDateTime createdAt;
