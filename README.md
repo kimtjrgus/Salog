@@ -2,7 +2,6 @@
 
 <div align="center">
 <img width="1082" alt="main" src="https://github.com/kimtjrgus/salog/assets/120611048/f4391ed8-e8ad-41db-9e4e-ac3f8878e385">
-</div>
 
   ![Component 70](https://github.com/kimtjrgus/salog/assets/120611048/52114883-7a5f-43b0-8a3a-a26072be37a3)
 
@@ -10,13 +9,19 @@
 
   ### &nbsp;배&nbsp;&nbsp;포&nbsp;&nbsp;링&nbsp;&nbsp;크&nbsp; : <a href="http://www.salog.kro.kr" target="_blank">Salog</a>
 
+</div>
+
   <br />
   
 ## 👥 팀원 구성
+<div align="center">
+  
   |<img src="https://github.com/codestates-seb/seb43_main_004/assets/120611048/fd4b071f-c773-4a17-b27f-ec9656290fa5" width="130px" />|<img src="https://github.com/codestates-seb/seb43_main_004/assets/120611048/1c7f47bc-6dba-4d67-b189-5ac3148256fd" width="130px" />|<img src="https://github.com/codestates-seb/seb43_main_004/assets/120611048/c194e140-fb6b-4bec-8b60-5b8398258e86" width="130px" />
 |:---:|:---:|:---:|
 |[이용석](https://github.com/021Skyfall)|[김석현](https://github.com/kimtjrgus)|[선유준](https://github.com/YujunSun0)
 |BE (팀장)|BE|FE|
+
+</div>
 
 <br />
 
