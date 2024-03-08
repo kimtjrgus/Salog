@@ -8,9 +8,9 @@
 
   ### 프로젝트 기간 : 2023.11.17 ~ ing
 
-  ### 배포 링크 : <a href="http://www.salog.kro.kr" target="_blank">Salog</a>
+  ### &nbsp;배&nbsp;&nbsp;포&nbsp;&nbsp;링&nbsp;&nbsp;크&nbsp; : <a href="http://www.salog.kro.kr" target="_blank">Salog</a>
 
-  <br>
+  <br />
   
 ## 👥 팀원 구성
   |<img src="https://github.com/codestates-seb/seb43_main_004/assets/120611048/fd4b071f-c773-4a17-b27f-ec9656290fa5" width="130px" />|<img src="https://github.com/codestates-seb/seb43_main_004/assets/120611048/1c7f47bc-6dba-4d67-b189-5ac3148256fd" width="130px" />|<img src="https://github.com/codestates-seb/seb43_main_004/assets/120611048/c194e140-fb6b-4bec-8b60-5b8398258e86" width="130px" />
@@ -18,7 +18,7 @@
 |[이용석](https://github.com/021Skyfall)|[김석현](https://github.com/kimtjrgus)|[선유준](https://github.com/YujunSun0)
 |BE (팀장)|BE|FE|
 
-<br>
+<br />
 
 ## 🔧 기술 스택
 
@@ -50,7 +50,13 @@
     ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
     ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 
-    <br>
+<br />
+
+## 💾 아키텍쳐 다이어그램
+
+![_Main-1 (7)](https://github.com/kimtjrgus/Salog/assets/120611048/300386c0-c927-48b5-b327-a55a60825886)
+
+<br />
 
 ## 🖥️ 페이지 별 기능 
 
@@ -60,7 +66,7 @@
 
 | 초기화면 |
 |----------|
-|![2024-03-023 37 14-ezgif com-video-to-gif-converter](https://github.com/kimtjrgus/salog/assets/120611048/b623fcf4-24ba-46b5-a755-bb665b288802)|
+|![2024-03-083 49 55-ezgif com-video-to-gif-converter](https://github.com/kimtjrgus/Salog/assets/120611048/9845e1ed-a2ae-4e90-bec9-42eab7c0e0fd)|
 
 <br>
 
