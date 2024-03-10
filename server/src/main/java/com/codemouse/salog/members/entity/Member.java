@@ -32,9 +32,9 @@ public class Member extends Auditable {
     @Column(nullable = false)
     private boolean homeAlarm;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
-    private Status status = Status.MEMBER_ACTIVE;
+//    @Enumerated(value = EnumType.STRING)
+//    @Column(nullable = false)
+//    private Status status = Status.MEMBER_ACTIVE;
 
     // JWT - 역할 부여
     @ElementCollection(fetch = FetchType.EAGER)
@@ -44,15 +44,15 @@ public class Member extends Auditable {
     private List<LedgerTag> ledgerTags;
 
 
-    public enum Status {
-        MEMBER_ACTIVE("활동중"),
-        MEMBER_QUIT("탈퇴 상태");
-
-        @Getter
-        private final String status;
-
-        Status(String status){
-            this.status = status;
-        }
-    }
+//    public enum Status {
+//        MEMBER_ACTIVE("활동중"),
+//        MEMBER_QUIT("탈퇴 상태");
+//
+//        @Getter
+//        private final String status;
+//
+//        Status(String status){
+//            this.status = status;
+//        }
+//    }
 }
