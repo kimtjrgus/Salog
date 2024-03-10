@@ -62,8 +62,6 @@ public class MemberService {
     public void updatePassword(String token, MemberDto.PatchPassword passwords) {
         Member findMember = findVerifiedMember(jwtTokenizer.getMemberId(token));
 
-        isQuit(findMember);
-
         socialCheck(findMember);
 
         String curPassword = passwords.getCurPassword();
@@ -102,18 +100,13 @@ public class MemberService {
     public MemberDto.Response findMember(String token) {
         Member findMember = findVerifiedMember(jwtTokenizer.getMemberId(token));
 
-        isQuit(findMember);
-
         return memberMapper.memberToMemberResponseDto(findMember);
     }
 
     public void deleteMember(String token) {
         Member findMember = findVerifiedMember(jwtTokenizer.getMemberId(token));
 
-        isQuit(findMember);
-
-        findMember.setStatus(Member.Status.MEMBER_QUIT);
-        memberRepository.save(findMember);
+        memberRepository.delete(findMember);
     }
 
     // 존재하는 회원인지 체크
@@ -136,10 +129,10 @@ public class MemberService {
     }
 
     // 탈퇴여부 체크
-    private static void isQuit(Member findMember) {
-        if(findMember.getStatus().equals(Member.Status.MEMBER_QUIT))
-            throw new BusinessLogicException(ExceptionCode.MEMBER_ALREADY_DELETED);
-    }
+//    private static void isQuit(Member findMember) {
+//        if(findMember.getStatus().equals(Member.Status.MEMBER_QUIT))
+//            throw new BusinessLogicException(ExceptionCode.MEMBER_ALREADY_DELETED);
+//    }
 
     // 이메일 발송, 에러 핸들링
     public String sendEmail(String email) throws MessagingException {

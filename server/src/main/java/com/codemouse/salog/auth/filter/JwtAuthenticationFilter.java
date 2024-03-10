@@ -39,16 +39,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Optional<Member> member = memberRepository.findByEmail(loginDto.getEmail());
 
         // 회원 탈퇴시 로그인 거절
-        if (member.isPresent() && member.get().getStatus().equals(Member.Status.MEMBER_QUIT)) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-            log.error("회원 탈퇴한 계정입니다. " + (ExceptionCode.MEMBER_UNAUTHORIZED).getMessage());
-            return null;
-        } else{
+//        if (member.isPresent() && member.get().getStatus().equals(Member.Status.MEMBER_QUIT)) {
+//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+//            log.error("회원 탈퇴한 계정입니다. " + (ExceptionCode.MEMBER_UNAUTHORIZED).getMessage());
+//            return null;
+//        } else{
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 
             return authenticationManager.authenticate(authenticationToken);
-        }
+//        }
     }
 
     @Override

@@ -53,7 +53,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                 .apply(new CustomFilterConfigurer())
                 .and()
 
-                // TODO: 2023-12-04 엔드포인트 수정 필요, 추후 구현 엔드포인트 추가시 수정 필요 
                 .authorizeHttpRequests(authorize -> authorize
                         .antMatchers(HttpMethod.POST, "/members/signup").permitAll()
                         .antMatchers(HttpMethod.POST, "/members/signup/sendmail").permitAll()
