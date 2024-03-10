@@ -19,7 +19,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect # mysql8버전
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true      # SQL 쿼리 출력
     properties:
       hibernate:
