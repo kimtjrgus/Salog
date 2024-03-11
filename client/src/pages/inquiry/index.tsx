@@ -4,17 +4,17 @@ import { styled } from "styled-components";
 import { type RootState } from "src/store";
 import { useDispatch, useSelector } from "react-redux";
 import { showToast } from "src/store/slices/toastSlice";
+import Spinner from "../../assets/Rolling2-1s-21px.gif";
 
 const Inquiry = () => {
   const member = useSelector((state: RootState) => state.persistedReducer.user);
 
   const [values, setValues] = useState({
-    user_email: member?.userEmail,
+    user_email: member?.email,
     ask_title: "",
     ask_message: "",
   });
-
-  console.log(values);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const form = useRef<HTMLFormElement>(null);
   const dispatch = useDispatch();
@@ -23,13 +23,13 @@ const Inquiry = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-
     setValues({ ...values, [name]: value });
   };
 
   const sendEmail = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setIsLoading(true);
     if (form.current) {
       emailjs
         .send(
@@ -39,6 +39,7 @@ const Inquiry = () => {
           `${process.env.REACT_APP_PUBLIC_KEY}`
         )
         .then(() => {
+          setIsLoading(false);
           form.current?.reset();
           setValues((prev) => {
             return { ...prev, ask_title: "", ask_message: "" };
@@ -83,7 +84,9 @@ const Inquiry = () => {
         value={values.ask_message}
         onChange={onChangeValues}
       />
-      <input type="submit" value="전송" />
+      <button type="submit">
+        {isLoading ? <img src={Spinner} alt="로딩" /> : "전송"}
+      </button>
     </FormContainer>
   );
 };
@@ -113,20 +116,17 @@ const FormContainer = styled.form`
     border: 1px solid #b3b3b3;
     border-radius: 6px;
     height: 3.5rem;
+  }
 
-    &:last-child {
-      border: none;
-      background: ${(props) => props.theme.COLORS.LIGHT_BLUE};
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-    }
+  > button {
+    height: 3.5rem;
+    border: none;
+    background: ${(props) => props.theme.COLORS.LIGHT_BLUE};
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
 
     &.disabled {
-      opacity: 0.4;
-    }
-
-    &.readOnly {
       opacity: 0.4;
     }
   }
