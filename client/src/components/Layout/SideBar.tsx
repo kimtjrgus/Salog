@@ -12,9 +12,9 @@ import ExitToAppRoundedIcon from "@mui/icons-material/ExitToAppRounded";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import { useState } from "react";
-import { removeCookie } from "src/utils/cookie";
 import { useDispatch } from "react-redux";
 import { logout } from "src/store/slices/userSlice";
+import { userLogout } from "src/utils/validCheck";
 
 export const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,8 +26,7 @@ export const SideBar = () => {
   };
 
   const onClickCloseBtn = () => {
-    removeCookie("accessToken", { path: "/" });
-    removeCookie("refreshToken", { path: "/" });
+    userLogout();
     dispatch(logout());
     navigate("/login", { replace: true });
   };

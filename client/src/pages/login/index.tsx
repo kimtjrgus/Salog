@@ -85,10 +85,7 @@ const Login = () => {
         api
           .get("/members/get")
           .then((res) => {
-            const updatedRes = { ...res.data.data, userEmail: values.email };
-            console.log(updatedRes);
-
-            dispatch(login(updatedRes));
+            dispatch(login(res.data.data));
             // 3일 미만 남은 금융일정 전역상태로 추가
             navigate("/dashboard");
           })
