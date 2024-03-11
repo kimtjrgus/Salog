@@ -112,6 +112,20 @@ interface filterType {
   tag: boolean;
 }
 
+interface PageInfo {
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface PageInfoObj {
+  outgo: PageInfo;
+  income: PageInfo;
+  waste: PageInfo;
+  combined: PageInfo;
+}
+
 const History = () => {
   const [getMoment, setMoment] = useState(moment());
 
@@ -120,7 +134,7 @@ const History = () => {
   const [income, setIncome] = useState<incomeType[]>([]);
   const [waste, setWaste] = useState<wasteType[]>([]);
 
-  const [pageInfoObj, setPageInfoObj] = useState({
+  const [pageInfoObj, setPageInfoObj] = useState<PageInfoObj>({
     outgo: {
       pageNumber: 0,
       pageSize: 0,
@@ -218,7 +232,7 @@ const History = () => {
       setLedger(sortedArray);
     }
   };
-  
+
   const checkedItemHandler = (
     id: number,
     isChecked: boolean,
@@ -396,6 +410,19 @@ const History = () => {
             });
           });
         }
+
+        const date = getMoment.format("YYYY-MM");
+        const customDate = `${date}-00`;
+
+        api
+          .get(`/calendar/ledger?page=1&size=10&date=${customDate}`)
+          .then((res) => {
+            setLedger(res.data.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+
         // 클라이언트에서 데이터 제거
         const updatedCheckedList = { ...checkedList };
 
@@ -449,9 +476,32 @@ const History = () => {
       }
     });
 
+    if (results.some((res) => res)) {
+      const successfulResultsCount = results.filter(
+        (res) => res !== null
+      ).length;
+      setPageInfoObj((prevPageInfoObj) => ({
+        ...prevPageInfoObj,
+        waste: {
+          ...prevPageInfoObj.waste,
+          totalElements:
+            prevPageInfoObj.waste.totalElements + successfulResultsCount,
+        },
+      }));
+    }
+
     // 데이터 업데이트
     setOutgo(updatedOutgo);
     setWaste(updatedWaste);
+
+    const date = getMoment.format("YYYY-MM");
+    const customDate = `${date}-00`;
+
+    const res = await api.get(
+      `/calendar/ledger?page=1&size=10&date=${customDate}`
+    );
+
+    setLedger(res.data.data);
 
     if (results.some((res) => res)) {
       dispatch(
@@ -498,8 +548,31 @@ const History = () => {
         console.log(updatedOutgo);
       });
 
+      if (responses.some((res) => res)) {
+        const successfulResultsCount = responses.filter(
+          (res) => res !== null
+        ).length;
+        setPageInfoObj((prevPageInfoObj) => ({
+          ...prevPageInfoObj,
+          waste: {
+            ...prevPageInfoObj.waste,
+            totalElements:
+              prevPageInfoObj.waste.totalElements - successfulResultsCount,
+          },
+        }));
+      }
+
       setOutgo(updatedOutgo);
       setWaste(updatedWaste);
+
+      const date = getMoment.format("YYYY-MM");
+      const customDate = `${date}-00`;
+
+      const res = await api.get(
+        `/calendar/ledger?page=1&size=10&date=${customDate}`
+      );
+
+      setLedger(res.data.data);
 
       setIsAllChecked(false);
       setCheckedList({
@@ -570,34 +643,6 @@ const History = () => {
           ...prevPageInfoObj,
           combined: responses[3].data.pageInfo,
         }));
-
-        // const combinedData = [
-        //   ...responses[0].data.data,
-        //   ...responses[1].data.data,
-        // ];
-
-        // combinedData.sort((a, b) => {
-        //   const dateA = new Date(a.date);
-        //   const dateB = new Date(b.date);
-        //   return filtered.date
-        //     ? dateA.getTime() - dateB.getTime()
-        //     : dateB.getTime() - dateA.getTime();
-        // });
-
-        // combined 데이터를 페이지별로 자르기 위해 페이징 처리합니다.
-        // const startIndex = (activePage - 1) * 10;
-        // const endIndex = startIndex + 10;
-        // const combinedDataPerPage = combinedData.slice(startIndex, endIndex);
-        // setCombined(combinedDataPerPage);
-        // setPageInfoObj((prevPageInfoObj) => ({
-        //   ...prevPageInfoObj,
-        //   combined: {
-        //     pageNumber: 1,
-        //     pageSize: 10,
-        //     totalElements: combinedData.length,
-        //     totalPages: Math.ceil(combinedData.length / 10),
-        //   },
-        // }));
       } catch (error) {
         console.log(error);
       }
@@ -712,10 +757,7 @@ const History = () => {
         <MainLists>
           <div className="lists__header">
             <NavStyle to="/history" $isActive={"/history"}>
-              <p>{`전체 (${
-                pageInfoObj.income.totalElements +
-                pageInfoObj.outgo.totalElements
-              })`}</p>
+              <p>{`전체 (${pageInfoObj.combined?.totalElements})`}</p>
               <p className="sum__red">
                 {(
                   sumIncome.monthlyTotal - sumOutgo.monthlyTotal
@@ -724,19 +766,19 @@ const History = () => {
               </p>
             </NavStyle>
             <NavStyle to="/income" $isActive={"/income"}>
-              <p>{`수입 (${pageInfoObj.income.totalElements})`}</p>
+              <p>{`수입 (${pageInfoObj.income?.totalElements})`}</p>
               <p className="sum__blue">
                 {sumIncome.monthlyTotal.toLocaleString()} 원
               </p>
             </NavStyle>
             <NavStyle to="/outgo" $isActive={"/outgo"}>
-              <p>{`지출 (${pageInfoObj.outgo.totalElements})`}</p>
+              <p>{`지출 (${pageInfoObj.outgo?.totalElements})`}</p>
               <p className="sum__red">
                 {sumOutgo.monthlyTotal.toLocaleString()} 원
               </p>
             </NavStyle>
             <NavStyle to="/waste" $isActive={"/waste"}>
-              <p>{`낭비 리스트 (${pageInfoObj.waste.totalElements})`}</p>
+              <p>{`낭비 리스트 (${pageInfoObj.waste?.totalElements})`}</p>
               <p className="sum__green">
                 {sumWasteList.monthlyTotal.toLocaleString()} 원
               </p>
@@ -901,12 +943,12 @@ const History = () => {
           <PaginationComponent
             totalItemsCount={
               location.pathname === "/outgo"
-                ? pageInfoObj.outgo.totalElements
+                ? pageInfoObj.outgo?.totalElements
                 : location.pathname === "/income"
-                  ? pageInfoObj.income.totalElements
+                  ? pageInfoObj.income?.totalElements
                   : location.pathname === "/waste"
-                    ? pageInfoObj.waste.totalElements
-                    : pageInfoObj.combined.totalElements
+                    ? pageInfoObj.waste?.totalElements
+                    : pageInfoObj.combined?.totalElements
             }
             activePage={activePage}
             itemsPerPage={10}
@@ -917,8 +959,10 @@ const History = () => {
       {isOpen.writeModal && (
         <LedgerWrite
           setIsOpen={setIsOpen}
+          setLedger={setLedger}
           setIncome={setIncome}
           setOutgo={setOutgo}
+          setPageInfoObj={setPageInfoObj}
           getMoment={getMoment}
         />
       )}
@@ -931,6 +975,8 @@ const History = () => {
           setIncome={setIncome}
           setOutgo={setOutgo}
           setWaste={setWaste}
+          setLedger={setLedger}
+          getMoment={getMoment}
         />
       )}
       {isOpen.deleteModal && (
@@ -1119,7 +1165,7 @@ const MainLists = styled.div`
         width: 8rem;
         padding-right: 1rem;
         padding-top: 0.5rem;
-        height: 24px;
+        height: 2.4rem;
         border-right: 0.5px solid white;
       }
     }
@@ -1127,7 +1173,7 @@ const MainLists = styled.div`
     .plus__waste {
       cursor: pointer;
       display: flex;
-      height: 24px;
+      height: 2.4rem;
       align-items: center;
       gap: 4px;
       border-right: 0.5px solid white;
@@ -1140,7 +1186,7 @@ const MainLists = styled.div`
     .delete__list {
       cursor: pointer;
       display: flex;
-      height: 24px;
+      height: 2.4rem;
       align-items: center;
       gap: 4px;
       border-right: 0.5px solid white;
@@ -1241,7 +1287,7 @@ const DeleteModal = styled.div`
     padding: 2.5rem;
 
     h4 {
-      font-size: 2.2rem;
+      font-size: 2rem;
       color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
       margin-bottom: 1.5rem;
     }
@@ -1282,7 +1328,7 @@ const WastePlus = styled.div<{ cursor: string }>`
   opacity: ${(props) => (props.cursor === "true" ? "1" : "0.4")};
   pointer-events: ${(props) => (props.cursor === "true" ? "auto" : "none")};
   display: flex;
-  height: 24px;
+  height: 2.4rem;
   align-items: center;
   gap: 4px;
   border-right: 0.5px solid white;

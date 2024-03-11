@@ -12,6 +12,9 @@ import axios from "axios";
 import { setCookie } from "src/utils/cookie";
 import Toast, { ToastType } from "src/components/Layout/Toast";
 import Modal from "src/components/Layout/Modal";
+import Spinner from "../../assets/Rolling-1s-21px.gif";
+import { useDispatch } from "react-redux";
+import { showToast } from "src/store/slices/toastSlice";
 
 export interface inputType {
   [key: string]: any;
@@ -77,8 +80,10 @@ const SignUp = () => {
     seconds: 0,
   }); // 인증번호 발송 시 상태 (서버 기능 구현 전까지는 클릭하면 true로)
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const onChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -97,8 +102,7 @@ const SignUp = () => {
     }
   };
 
-  const onBlurInputs = (e: React.FocusEvent<HTMLInputElement>) => {
-    console.log(e);
+  const onBlurInputs = () => {
 
     const msg = { password: "", passwordCheck: "" };
     const { password, passwordCheck } = values;
@@ -132,11 +136,13 @@ const SignUp = () => {
         email: values.email,
       })
       .then(() => {
+        setIsLoading(true);
         axios
           .post(`${process.env.REACT_APP_SERVER_URL}/members/signup/sendmail`, {
             email: values.email,
           })
           .then((res) => {
+            setIsLoading(false);
             // 발송 되면 모달 띄우기
             setErrorMsg({
               ...errorMsg,
@@ -228,11 +234,14 @@ const SignUp = () => {
       .post(`${process.env.REACT_APP_SERVER_URL}/members/signup`, {
         email: values.email,
         password: values.password,
-        webAlarm: alarm.webAlarm,
+        homeAlarm: alarm.webAlarm,
         emailAlarm: alarm.emailAlarm,
       })
       .then((res) => {
         setCookie("accessToken", res.data.accessToken, { path: "/" });
+        dispatch(
+          showToast({ message: "회원가입이 완료되었습니다", type: "success" })
+        );
         navigate("/login");
       })
       .catch((error) => {
@@ -291,7 +300,7 @@ const SignUp = () => {
               disabled={isDisabled || isAuth}
               onClick={onClickAuthBtn}
             >
-              인증
+              {isLoading ? <img src={Spinner} alt={"로딩"}></img> : "인증"}
             </CerBtnBlue>
           </InputContainer>
           <WarningTitle>{errorMsg.email}</WarningTitle>

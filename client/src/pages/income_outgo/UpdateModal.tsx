@@ -5,6 +5,7 @@ import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined
 import { useCallback, useEffect, useState } from "react";
 import { debounce } from "src/utils/timeFunc";
 import {
+  type ledgerType,
   type outgoType,
   type incomeType,
   type modalType,
@@ -23,6 +24,8 @@ interface Props {
   setIncome: React.Dispatch<React.SetStateAction<incomeType[]>>;
   setOutgo: React.Dispatch<React.SetStateAction<outgoType[]>>;
   setWaste: React.Dispatch<React.SetStateAction<wasteType[]>>;
+  setLedger: React.Dispatch<React.SetStateAction<ledgerType[]>>;
+  getMoment: moment.Moment;
 }
 
 // type valuesType = Record<string, Record<string, string>>;
@@ -58,11 +61,12 @@ const UpdateModal = ({
   setIncome,
   setOutgo,
   setWaste,
+  setLedger,
+  getMoment,
 }: Props) => {
   const [values, setValues] = useState<valuesType[]>([]);
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
   const dispatch = useDispatch();
-  console.log(values);
 
   // const onChangeMoney = (e: React.ChangeEvent<HTMLInputElement>) => {
   // 	const inputValue = e.target.value;
@@ -207,6 +211,15 @@ const UpdateModal = ({
           });
         }
       }
+
+      const date = getMoment.format("YYYY-MM");
+      const customDate = `${date}-00`;
+
+      const res = await api.get(
+        `/calendar/ledger?page=1&size=10&date=${customDate}`
+      );
+
+      setLedger(res.data.data);
 
       setIsOpen((prev) => {
         const updated = { ...prev };

@@ -875,7 +875,7 @@ const Container = styled.div`
   height: 100%;
 
   h3 {
-    font-size: 2.2rem;
+    font-size: 2rem;
     color: #464656;
     margin-bottom: 1rem;
   }

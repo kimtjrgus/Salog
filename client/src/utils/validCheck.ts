@@ -1,3 +1,5 @@
+import { removeCookie } from './cookie';
+
 export const checkEmail = (email: string): boolean => {
 	const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 	return emailRegex.test(email);
@@ -9,3 +11,9 @@ export const checkPassword = (password: string): boolean => {
 		/^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/;
 	return pwdRegex.test(password);
 };
+
+export const userLogout = () => {
+  removeCookie('accessToken', { path: '/' })
+  removeCookie('refreshToken', { path: '/' })
+  localStorage.removeItem('accessToken')
+}

@@ -222,8 +222,9 @@ export const Header = () => {
   // 전역상태를 이용한 토스트 창 띄우기
   useEffect(() => {
     setTimeout(() => {
-      if (modal.visible) {
-        Toast(ToastType.success, modal.message);
+      // 타입 단언입니다. 이를 통해 modal.type이 ToastType의 키 중 하나임을 명시적으로 알려주는 것
+      if (modal.visible && Object.keys(ToastType).includes(modal.type)) {
+        Toast(ToastType[modal.type as keyof typeof ToastType], modal.message);
         dispatch(hideToast());
       }
     }, 100);

@@ -214,8 +214,8 @@ const NullContainer = styled.div`
 
 const NullPie = styled.div`
   margin-left: 2rem;
-  width: 180px;
-  height: 180px;
+  width: 18rem;
+  height: 18rem;
   border: 8px solid #d6d6d6;
   border-radius: 50%;
 `;

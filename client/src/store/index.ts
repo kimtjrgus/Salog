@@ -22,7 +22,7 @@ const reducers = combineReducers({
 const persistConfig = {
 	key: "root",
 	storage,
-	whiteList: ["user,ledger, toast", "schedule"],
+	whiteList: ["schedule"],
 };
 
 const persistedReducer = persistReducer(persistConfig, reducers);

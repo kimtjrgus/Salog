@@ -18,6 +18,9 @@ import Budget from "./pages/budget";
 import MonthRadio from "./pages/monthChart";
 import PasswordFind from "./pages/password";
 import Landing from "./pages/landing";
+import GoogleOAuth2RedirectPage from "./pages/login/Google";
+import Inquiry from "./pages/inquiry";
+import Setting from "./pages/account_setting";
 
 function App() {
   return (
@@ -39,11 +42,14 @@ function App() {
           <Route path={"/fixed__account/update"} element={<Fixed />} />
           <Route path={"/budget"} element={<Budget />} />
           <Route path={"/monthRadio"} element={<MonthRadio />} />
+          <Route path={"/inquiry"} element={<Inquiry />} />
+          <Route path={"/setting"} element={<Setting />} />
         </Route>
         {/* 로그인 하지 않은 유저만 접근 가능 */}
         <Route element={<PublicRoute />}>
           <Route path={"/"} element={<Landing />} />
           <Route path={"/login"} element={<Login />} />
+          <Route path={"/oauthGoogle"} element={<GoogleOAuth2RedirectPage />} />
           <Route path={"/signup"} element={<SignUp />} />
           <Route path={"/findPassword"} element={<PasswordFind />} />
         </Route>
