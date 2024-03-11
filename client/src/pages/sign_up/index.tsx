@@ -102,8 +102,7 @@ const SignUp = () => {
     }
   };
 
-  const onBlurInputs = (e: React.FocusEvent<HTMLInputElement>) => {
-    console.log(e);
+  const onBlurInputs = () => {
 
     const msg = { password: "", passwordCheck: "" };
     const { password, passwordCheck } = values;

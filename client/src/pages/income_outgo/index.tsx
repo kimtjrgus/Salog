@@ -1287,7 +1287,7 @@ const DeleteModal = styled.div`
     padding: 2.5rem;
 
     h4 {
-      font-size: 2.2rem;
+      font-size: 2rem;
       color: ${(props) => props.theme.COLORS.LIGHT_BLUE};
       margin-bottom: 1.5rem;
     }
