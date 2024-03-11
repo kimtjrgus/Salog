@@ -20,6 +20,7 @@ import PasswordFind from "./pages/password";
 import Landing from "./pages/landing";
 import GoogleOAuth2RedirectPage from "./pages/login/Google";
 import Inquiry from "./pages/inquiry";
+import Setting from "./pages/account_setting";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route path={"/budget"} element={<Budget />} />
           <Route path={"/monthRadio"} element={<MonthRadio />} />
           <Route path={"/inquiry"} element={<Inquiry />} />
+          <Route path={"/setting"} element={<Setting />} />
         </Route>
         {/* 로그인 하지 않은 유저만 접근 가능 */}
         <Route element={<PublicRoute />}>
