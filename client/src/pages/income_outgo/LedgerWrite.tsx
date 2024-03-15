@@ -144,12 +144,6 @@ const LedgerWrite = ({
           });
       }
     );
-
-    // const reader = new FileReader();
-    // reader.onload = () => {
-    //   setUploadedInfo({ name, size, type, imageUrl: String(reader.result) });
-    // };
-    // reader.readAsDataURL(file);
   };
 
   const handleDropImage = (
@@ -163,8 +157,11 @@ const LedgerWrite = ({
   };
 
   const handleUpload = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(target);
+
     if (target.files && target.files.length > 0) {
       const file = target.files[0];
+      target.value = "";
       setFileInfo(file); // 코드 추가
     }
   };
@@ -217,49 +214,46 @@ const LedgerWrite = ({
   };
 
   // 업로드 이후 내용 확인 모달에서 확인 버튼을 눌렀을 때 실행되는 함수
- const onClickCheckBtn = () => {
-   const initialValues = {
-     division: "outgo",
-     date: receipt.date,
-     tag: "",
-     name: receipt.outgoName,
-     payment: "카드",
-     money: receipt.money.toString(),
-     memo: "",
-   };
+  const onClickCheckBtn = () => {
+    const initialValues = {
+      division: "outgo",
+      date: receipt.date,
+      tag: "",
+      name: receipt.outgoName,
+      payment: "카드",
+      money: receipt.money.toString(),
+      memo: "",
+    };
 
-   const newRow = {
-     id: values.length !== 0 ? values[values.length - 1].id + 1 : 1,
-     ...initialValues,
-   };
+    const newRow = {
+      id: values.length !== 0 ? values[values.length - 1].id + 1 : 1,
+      ...initialValues,
+    };
 
-   // 마지막 행의 속성들을 순회하여 전부 빈 값이면 덮어쓰기
-   setValues((prevValues) => {
-     // 마지막 요소가 모든 속성이 빈 문자열인지 확인 (id 제외)
-     const isLastItemEmpty =
-       prevValues.length !== 0 &&
-       Object.entries(prevValues[prevValues.length - 1]).every(
-         ([key, value]) => {
-           return key === "id" ? true : value === "";
-         }
-       );
+    // 마지막 행의 속성들을 순회하여 전부 빈 값이면 덮어쓰기
+    setValues((prevValues) => {
+      // 마지막 요소가 모든 속성이 빈 문자열인지 확인 (id 제외)
+      const isLastItemEmpty =
+        prevValues.length !== 0 &&
+        Object.entries(prevValues[prevValues.length - 1]).every(
+          ([key, value]) => {
+            return key === "id" ? true : value === "";
+          }
+        );
 
-     if (isLastItemEmpty) {
-       // 마지막 요소를 newRow로 대체
-       return [...prevValues.slice(0, prevValues.length - 1), newRow];
-     } else {
-       // newRow를 배열에 추가
-       return [...prevValues, newRow];
-     }
-   });
+      if (isLastItemEmpty) {
+        // 마지막 요소를 newRow로 대체
+        return [...prevValues.slice(0, prevValues.length - 1), newRow];
+      } else {
+        // newRow를 배열에 추가
+        return [...prevValues, newRow];
+      }
+    });
 
-   setIsOpen((prev) => {
-     return { ...prev, uploadModal: false, uploadCheckModal: false };
-   });
- };
-
-
-  console.log(values);
+    setIsOpen((prev) => {
+      return { ...prev, uploadModal: false, uploadCheckModal: false };
+    });
+  };
 
   const onClickPlusBtn = () => {
     const initialValues: valueType = {
@@ -724,7 +718,7 @@ const LedgerWrite = ({
         </UploadContainer>
       )}
       {isOpen.uploadCheckModal && (
-        <ReceiptModal receipt={receipt}>
+        <ReceiptModal receipt={receipt} setReceipt={setReceipt}>
           <button
             onClick={() => {
               setIsOpen((prev) => {

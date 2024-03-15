@@ -39,6 +39,7 @@ export interface tagType {
 export interface modalType {
   dayTile: boolean;
   writeIcon: boolean;
+  receiptCheck: boolean;
   day: string;
 }
 
@@ -68,6 +69,7 @@ const Dashboard = () => {
   const [isOpen, setIsOpen] = useState<modalType>({
     dayTile: false,
     writeIcon: false,
+    receiptCheck: false,
     day: "",
   });
 

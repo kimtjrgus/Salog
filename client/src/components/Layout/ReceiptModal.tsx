@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { styled } from "styled-components";
 
 export interface receiptType {
@@ -10,17 +10,11 @@ export interface receiptType {
 
 interface ReceiptModalProps {
   receipt: receiptType;
+  setReceipt: React.Dispatch<React.SetStateAction<receiptType>>;
   children: React.ReactNode;
 }
 
-const ReceiptModal = ({ receipt, children }: ReceiptModalProps) => {
-  const [values, setValues] = useState<receiptType>({
-    outgoName: receipt.outgoName,
-    date: receipt.date,
-    money: receipt.money,
-    receiptImg: receipt.receiptImg,
-  });
-
+const ReceiptModal = ({ receipt, setReceipt, children }: ReceiptModalProps) => {
   const onChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     let processedValue = value;
@@ -28,51 +22,73 @@ const ReceiptModal = ({ receipt, children }: ReceiptModalProps) => {
       // '원'과 컴마를 제거하고 숫자로 변환
       processedValue = value.replace(/원|,/g, "");
     }
-    setValues((prev) => {
+    setReceipt((prev) => {
       return { ...prev, [name]: processedValue };
     });
   };
 
+  // 객체 프로퍼티들의 순서를 변경해주기 위한 useEffect문
+  useEffect(() => {
+    setReceipt({
+      date: receipt.date,
+      outgoName: receipt.outgoName,
+      money: receipt.money,
+      receiptImg: receipt.receiptImg,
+    });
+  }, []);
+
   return (
-    <Container>
-      <div className="container__left">
-        <img src={receipt.receiptImg} alt="영수증 이미지" />
-      </div>
-      <ul className="container__right">
-        <h4>입력 내용 확인</h4>
-        <p>잘못 인식된 내용은 수정할 수 있습니다.</p>
-        {Object.entries(values)
-          .filter(([key, _]) => key !== "receiptImg")
-          .map(([key, value], idx) => {
-            return (
-              <li className="list" key={idx}>
-                <p>
-                  {key === "outgoName"
-                    ? "거래처"
-                    : key === "date"
-                      ? "거래일시"
-                      : "총 금액"}
-                </p>
-                <input
-                  name={key}
-                  type={key === "date" ? "date" : "text"}
-                  value={
-                    key === "money"
-                      ? `${Number(value).toLocaleString()}원`
-                      : value
-                  }
-                  onChange={onChangeValue}
-                />
-              </li>
-            );
-          })}
-        <div className="buttons">{children}</div>
-      </ul>
-    </Container>
+    <Background>
+      <Container>
+        <div className="container__left">
+          <img src={receipt.receiptImg} alt="영수증 이미지" />
+        </div>
+        <ul className="container__right">
+          <h4>입력 내용 확인</h4>
+          <p>잘못 인식된 내용은 수정할 수 있습니다.</p>
+          {Object.entries(receipt)
+            .filter(([key, _]) => key !== "receiptImg")
+            .map(([key, value], idx) => {
+              return (
+                <li className="list" key={idx}>
+                  <p>
+                    {key === "outgoName"
+                      ? "거래처"
+                      : key === "date"
+                        ? "거래일시"
+                        : "총 금액"}
+                  </p>
+                  <input
+                    name={key}
+                    type={key === "date" ? "date" : "text"}
+                    value={
+                      key === "money"
+                        ? `${Number(value).toLocaleString()}원`
+                        : value
+                    }
+                    onChange={onChangeValue}
+                  />
+                </li>
+              );
+            })}
+          <div className="buttons">{children}</div>
+        </ul>
+      </Container>
+    </Background>
   );
 };
 
 export default ReceiptModal;
+
+const Background = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 150;
+  position: fixed;
+  top: 0;
+  left: 0;
+`;
 
 const Container = styled.div`
   position: fixed;
