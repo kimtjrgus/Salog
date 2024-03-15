@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { SvgIcon } from "@mui/material";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
-import { ReactComponent as Kakao } from "../../assets/Kakao.svg";
+// import { ReactComponent as Kakao } from "../../assets/Kakao.svg";
 import { ReactComponent as Google } from "../../assets/Google.svg";
-import { ReactComponent as Naver } from "../../assets/Naver.svg";
+// import { ReactComponent as Naver } from "../../assets/Naver.svg";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setCookie } from "src/utils/cookie";
@@ -227,15 +227,15 @@ const Login = () => {
           <hr />
         </TitleWithLine>
         <OauthBtnContainer>
-          <OauthBtn>
+          {/* <OauthBtn>
             <Kakao />
-          </OauthBtn>
+          </OauthBtn> */}
           <OauthBtn onClick={onClickGoogleBtn}>
             <Google />
           </OauthBtn>
-          <OauthBtn>
+          {/* <OauthBtn>
             <Naver />
-          </OauthBtn>
+          </OauthBtn> */}
         </OauthBtnContainer>
       </LoginContainer>
     </Container>
