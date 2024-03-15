@@ -43,7 +43,6 @@ const ReadModal = ({ isOpen, setIsOpen }: Props) => {
     totalElements: 0,
     totalPages: 0,
   });
-  console.log(pageInfoObj, ledger);
 
   const navigate = useNavigate();
 
