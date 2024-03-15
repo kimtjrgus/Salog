@@ -105,6 +105,8 @@ export interface modalType {
   writeModal: boolean;
   deleteModal: boolean;
   updateModal: boolean;
+  uploadModal: boolean;
+  uploadCheckModal: boolean;
 }
 
 interface filterType {
@@ -178,6 +180,8 @@ const History = () => {
     writeModal: false,
     deleteModal: false,
     updateModal: false,
+    uploadModal: false,
+    uploadCheckModal: false
   });
 
   const [filtered, setFiltered] = useState<filterType>({
@@ -958,6 +962,7 @@ const History = () => {
       </Container>
       {isOpen.writeModal && (
         <LedgerWrite
+          isOpen={isOpen}
           setIsOpen={setIsOpen}
           setLedger={setLedger}
           setIncome={setIncome}

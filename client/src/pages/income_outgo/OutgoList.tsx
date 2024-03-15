@@ -3,6 +3,8 @@ import { SvgIcon } from "@mui/material";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import DoNotDisturbRoundedIcon from "@mui/icons-material/DoNotDisturbRounded";
 import { type outgoType, type checkedType } from ".";
+import { useState } from "react";
+import ReceiptCheckModal from "./ReceiptCheckModal";
 
 interface Props {
   outgo: outgoType[];
@@ -15,6 +17,9 @@ interface Props {
 }
 
 const OutgoList = ({ outgo, checkedList, checkHandler }: Props) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string>("");
+
   const dateAsDots = (element: string) => {
     const originalDate = element;
     const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
@@ -32,44 +37,63 @@ const OutgoList = ({ outgo, checkedList, checkHandler }: Props) => {
     return convertedDate;
   };
 
+  const onClickReceipt = (imageUrl: string) => {
+    setImageUrl(imageUrl);
+    setIsOpen(true);
+  };
+
   return (
-    <Container className="ledger__lists">
-      {outgo.length === 0 ? (
-        <NullContainer>
-          <SvgIcon
-            component={DoNotDisturbRoundedIcon}
-            sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-          />
-          <p>작성된 목록이 없습니다.</p>
-        </NullContainer>
-      ) : (
-        outgo.map((el) => {
-          return (
-            <li className="ledger__list" key={el.outgoId}>
-              <input
-                type="checkbox"
-                checked={checkedList.outgo.includes(el.outgoId)}
-                onChange={(e) => {
-                  checkHandler(e, el.outgoId, "outgo");
-                }}
-              />
-              <ColorRedDiv>지출</ColorRedDiv>
-              <p>{dateAsDots(el.date)}</p>
-              <p>{el.outgoTag.tagName}</p>
-              <p>{el.outgoName}</p>
-              <p>{el.payment}</p>
-              <p className="money__red">{el.money.toLocaleString()}원</p>
-              <p>{el.memo}</p>
-              <SvgIcon
-                component={ReceiptLongOutlinedIcon}
-                sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-              />
-              {el.wasteList && <div className="waste"></div>}
-            </li>
-          );
-        })
+    <>
+      <Container className="ledger__lists">
+        {outgo.length === 0 ? (
+          <NullContainer>
+            <SvgIcon
+              component={DoNotDisturbRoundedIcon}
+              sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+            />
+            <p>작성된 목록이 없습니다.</p>
+          </NullContainer>
+        ) : (
+          outgo.map((el) => {
+            return (
+              <li className="ledger__list" key={el.outgoId}>
+                <input
+                  type="checkbox"
+                  checked={checkedList.outgo.includes(el.outgoId)}
+                  onChange={(e) => {
+                    checkHandler(e, el.outgoId, "outgo");
+                  }}
+                />
+                <ColorRedDiv>지출</ColorRedDiv>
+                <p>{dateAsDots(el.date)}</p>
+                <p>{el.outgoTag.tagName}</p>
+                <p>{el.outgoName}</p>
+                <p>{el.payment}</p>
+                <p className="money__red">{el.money.toLocaleString()}원</p>
+                <p>{el.memo}</p>
+                <Receipt
+                  $exist={!!el.receiptImg}
+                  onClick={() => {
+                    if (el.receiptImg !== "") {
+                      onClickReceipt(el.receiptImg);
+                    }
+                  }}
+                >
+                  <SvgIcon
+                    component={ReceiptLongOutlinedIcon}
+                    sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+                  />
+                </Receipt>
+                {el.wasteList && <div className="waste"></div>}
+              </li>
+            );
+          })
+        )}
+      </Container>
+      {isOpen && (
+        <ReceiptCheckModal imageUrl={imageUrl} setIsOpen={setIsOpen} />
       )}
-    </Container>
+    </>
   );
 };
 
@@ -193,5 +217,14 @@ const NullContainer = styled.div`
   p {
     font-size: 1.5rem;
     color: gray;
+  }
+`;
+
+const Receipt = styled.div<{ $exist: boolean }>`
+  > svg {
+    cursor: ${(props) => (props.$exist ? "pointer" : "not-allowed")};
+    font-size: 1.8rem;
+    margin-left: 0.5rem;
+    opacity: ${(props) => (props.$exist ? "1" : "0.4")};
   }
 `;

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { SvgIcon } from "@mui/material";
-import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+// import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import DoNotDisturbRoundedIcon from "@mui/icons-material/DoNotDisturbRounded";
 import { type incomeType, type checkedType } from ".";
 
@@ -60,10 +60,10 @@ const IncomeList = ({ income, checkedList, checkHandler }: Props) => {
               <p>{"x"}</p>
               <p className="money__blue">{el.money.toLocaleString()}원</p>
               <p>{el.memo}</p>
-              <SvgIcon
+              {/* <SvgIcon
                 component={ReceiptLongOutlinedIcon}
                 sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-              />
+              /> */}
             </li>
           );
         })

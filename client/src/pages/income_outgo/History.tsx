@@ -4,6 +4,8 @@ import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import DoNotDisturbRoundedIcon from "@mui/icons-material/DoNotDisturbRounded";
 import { type checkedType, type ledgerType } from ".";
 import { v4 as uuidv4 } from "uuid";
+import { useState } from "react";
+import ReceiptCheckModal from "./ReceiptCheckModal";
 
 interface Props {
   sortedArray: ledgerType[];
@@ -16,6 +18,9 @@ interface Props {
 }
 
 const HistoryList = ({ sortedArray, checkedList, checkHandler }: Props) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string>("");
+
   const dateAsDots = (element: string) => {
     const originalDate = element;
     const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
@@ -33,71 +38,90 @@ const HistoryList = ({ sortedArray, checkedList, checkHandler }: Props) => {
     return convertedDate;
   };
 
+  const onClickReceipt = (imageUrl: string) => {
+    setImageUrl(imageUrl);
+    setIsOpen(true);
+  };
+
   return (
-    <Container className="ledger__lists">
-      {sortedArray.length === 0 ? (
-        <NullContainer>
-          <SvgIcon
-            component={DoNotDisturbRoundedIcon}
-            sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-          />
-          <p>작성된 목록이 없습니다.</p>
-        </NullContainer>
-      ) : (
-        sortedArray.map((el) => {
-          if (el?.incomeId !== null) {
-            // el이 incomeType인 경우
-            return (
-              <li className="ledger__list" key={uuidv4()}>
-                <input
-                  type="checkbox"
-                  checked={checkedList.income.includes(el.incomeId)}
-                  onChange={(e) => {
-                    checkHandler(e, el.incomeId, "income");
-                  }}
-                />
-                <ColorBlueDiv>수입</ColorBlueDiv>
-                <p>{dateAsDots(el.date)}</p>
-                <p>{el.ledgerTag.tagName}</p>
-                <p>{el.ledgerName}</p>
-                <p>{"x"}</p>
-                <p className="money__blue">{el.money.toLocaleString()}원</p>
-                <p>{el.memo}</p>
-                <SvgIcon
+    <>
+      <Container className="ledger__lists">
+        {sortedArray.length === 0 ? (
+          <NullContainer>
+            <SvgIcon
+              component={DoNotDisturbRoundedIcon}
+              sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+            />
+            <p>작성된 목록이 없습니다.</p>
+          </NullContainer>
+        ) : (
+          sortedArray.map((el) => {
+            if (el?.incomeId !== null) {
+              // el이 incomeType인 경우
+              return (
+                <li className="ledger__list" key={uuidv4()}>
+                  <input
+                    type="checkbox"
+                    checked={checkedList.income.includes(el.incomeId)}
+                    onChange={(e) => {
+                      checkHandler(e, el.incomeId, "income");
+                    }}
+                  />
+                  <ColorBlueDiv>수입</ColorBlueDiv>
+                  <p>{dateAsDots(el.date)}</p>
+                  <p>{el.ledgerTag.tagName}</p>
+                  <p>{el.ledgerName}</p>
+                  <p>{"x"}</p>
+                  <p className="money__blue">{el.money.toLocaleString()}원</p>
+                  <p>{el.memo}</p>
+                  {/* <SvgIcon
                   component={ReceiptLongOutlinedIcon}
                   sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-                />
-              </li>
-            );
-          } else {
-            // el이 outgoType인 경우
-            return (
-              <li className="ledger__list" key={uuidv4()}>
-                <input
-                  type="checkbox"
-                  checked={checkedList.outgo.includes(el.outgoId)}
-                  onChange={(e) => {
-                    checkHandler(e, el.outgoId, "outgo");
-                  }}
-                />
-                <ColorRedDiv>지출</ColorRedDiv>
-                <p>{dateAsDots(el.date)}</p>
-                <p>{el.ledgerTag.tagName}</p>
-                <p>{el.ledgerName}</p>
-                <p>{el.payment}</p>
-                <p className="money__red">{el.money.toLocaleString()}원</p>
-                <p>{el.memo}</p>
-                <SvgIcon
-                  component={ReceiptLongOutlinedIcon}
-                  sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
-                />
-                {el.wasteList && <div className="waste"></div>}
-              </li>
-            );
-          }
-        })
+                /> */}
+                </li>
+              );
+            } else {
+              // el이 outgoType인 경우
+              return (
+                <li className="ledger__list" key={uuidv4()}>
+                  <input
+                    type="checkbox"
+                    checked={checkedList.outgo.includes(el.outgoId)}
+                    onChange={(e) => {
+                      checkHandler(e, el.outgoId, "outgo");
+                    }}
+                  />
+                  <ColorRedDiv>지출</ColorRedDiv>
+                  <p>{dateAsDots(el.date)}</p>
+                  <p>{el.ledgerTag.tagName}</p>
+                  <p>{el.ledgerName}</p>
+                  <p>{el.payment}</p>
+                  <p className="money__red">{el.money.toLocaleString()}원</p>
+                  <p>{el.memo}</p>
+                  <Receipt
+                    $exist={!!el.receiptImg}
+                    onClick={() => {
+                      if (el.receiptImg !== "") {
+                        onClickReceipt(el.receiptImg);
+                      }
+                    }}
+                  >
+                    <SvgIcon
+                      component={ReceiptLongOutlinedIcon}
+                      sx={{ stroke: "#ffffff", strokeWidth: 0.3 }}
+                    />
+                  </Receipt>
+                  {el.wasteList && <div className="waste"></div>}
+                </li>
+              );
+            }
+          })
+        )}
+      </Container>
+      {isOpen && (
+        <ReceiptCheckModal imageUrl={imageUrl} setIsOpen={setIsOpen} />
       )}
-    </Container>
+    </>
   );
 };
 
@@ -171,11 +195,6 @@ const Container = styled.ul`
       }
     }
 
-    svg {
-      font-size: 1.8rem;
-      margin-left: 0.5rem;
-    }
-
     .money__red {
       color: ${(props) => props.theme.COLORS.LIGHT_RED};
     }
@@ -235,5 +254,14 @@ const NullContainer = styled.div`
   p {
     font-size: 1.5rem;
     color: gray;
+  }
+`;
+
+const Receipt = styled.div<{ $exist: boolean }>`
+  > svg {
+    cursor: ${(props) => (props.$exist ? "pointer" : "not-allowed")};
+    font-size: 1.8rem;
+    margin-left: 0.5rem;
+    opacity: ${(props) => (props.$exist ? "1" : "0.4")};
   }
 `;
