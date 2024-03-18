@@ -113,6 +113,17 @@
 
 <br>
 
+### [비밀번호 변경 & 회원 탈퇴]
+- 기존 비밀번호, 새로운 비밀번호를 입력하여 비밀번호를 변경할 수 있습니다.
+- 회원 탈퇴를 한 뒤, 해당 계정으로 재가입이 가능합니다.
+- 설정 페이지에서 해당 기능들을 사용할 수 있습니다.
+
+| 비밀번호 변경 | 회원 탈퇴 |
+|:---:|:---:|
+|![2024-03-158 59 10-ezgif com-video-to-gif-converter](https://github.com/kimtjrgus/Salog/assets/120611048/7ded3643-a0ae-41ad-9e94-075dae104f4b)|![2024-03-159 02 38-ezgif com-video-to-gif-converter](https://github.com/kimtjrgus/Salog/assets/120611048/e02657b5-9acc-46ec-9559-cc5c34978ff0)|
+
+<br>
+
 ### [로그아웃]
 - 좌측의 sidebar에 있는 로그아웃을 클릭 후 나타나는 모달창의 확인 버튼을 클릭하면 로그아웃이 됩니다.
 - 로그아웃시 로컬 저장소 및 쿠키의 토큰 값을 삭제하고 로그인 화면으로 이동합니다.
@@ -218,6 +229,18 @@
 
 <br>
 
+### [영수증 인식]
+- 영수증의 가계 이름, 지출 일, 총 합계의 항목을 인식하여 가계부를 작성할 수 있습니다.
+- 영수증 인식을 통하여 가계부를 작성하면 가계부 조회 시 영수증 사진을 볼 수 있습니다.
+- 대시보드 페이지, 지출&수입 페이지에서 가계부를 작성할 때 사용 가능합니다.
+- 이미지 업로드 -> 영수증 인식 -> 내용 확인 -> 자동작성의 플로우를 가집니다.
+
+| 영수증 인식(대시보드 페이지) | 영수증 인식(지출&수입 페이지) |
+|:---:|:---:|
+|![2024-03-159 13 28-ezgif com-video-to-gif-converter](https://github.com/kimtjrgus/Salog/assets/120611048/4399bb91-b6a4-47d9-ac69-49ff0df71766)|![2024-03-159 16 49-ezgif com-video-to-gif-converter](https://github.com/kimtjrgus/Salog/assets/120611048/813f0f05-cb88-4bc2-9db8-7565155d8b8a)|
+
+<br>
+
 ### [알림]
 - 웹 알림, 이메일 알림이 있습니다.
   - 웹 알림은 헤더의 알림 아이콘을 클릭하여 확인 가능하며, 알람을 확인 후 삭제하면 로컬 저장소에 저장되어 알림이 다시 발송되지 않습니다. 
@@ -282,6 +305,9 @@
 <a href="https://docs.google.com/spreadsheets/d/1_bI9UAymfg1Typ5DVZzbXZe_OQ08q-AZO9Ve1Ph1SL8/edit#gid=256906179" target="_blank">기능 명세서</a>
 <br />
 <br />
+<a href="https://www.figma.com/file/aKvGgfBlFxHudca45yo8Oe/Fontpair-(Community)?type=design&node-id=298%3A7004&mode=design&t=YwHkQlgXU63AX6HR-1" target="_blank">화면 정의서</a>
+<br />
+<br />
 <a href="https://docs.google.com/spreadsheets/d/1_bI9UAymfg1Typ5DVZzbXZe_OQ08q-AZO9Ve1Ph1SL8/edit#gid=89922257" target="_blank">API 명세서</a>
 <br />
 <br />
@@ -289,6 +315,8 @@
 <br />
 <br />
 <a href="https://docs.google.com/spreadsheets/d/1_bI9UAymfg1Typ5DVZzbXZe_OQ08q-AZO9Ve1Ph1SL8/edit#gid=1829469387" target="_blank">코드 컨벤션</a>
+
+<br>
 
 ## 💡 브랜치 전략
 
