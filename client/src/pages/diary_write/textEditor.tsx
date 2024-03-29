@@ -20,21 +20,29 @@ interface propsType {
 const ReactQuillComponent = (props: propsType) => {
   const quillRef = useRef<any>(null);
 
+  // 비동기 작업을 수행하지만 리턴 값은 없음
   const imageHandler = async (): Promise<void> => {
     const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/*");
-    input.click();
+    input.setAttribute("type", "file"); // 생성한 input 요소의 type을 file로 설정
+    input.setAttribute("accept", "image/*"); // 이미지 파일만 선택할 수 있도록 설정
+    input.click(); // input element가 만들어지면 클릭을 호출하여 파일을 선택하도록 함
+
+    // 네트워크 요청이 포함되는 작업 비동기 처리
     await new Promise<void>((resolve) => {
+      // 사용자가 파일을 선택했을 때 이벤트 처리
       input.addEventListener("change", () => {
-        const editor = quillRef.current.getEditor();
-        const file = input?.files?.[0];
-        const range = editor.getSelection(true);
+        const editor = quillRef.current.getEditor(); // 텍스트 에디터의 인스턴스를 가져옴
+        const file = input?.files?.[0]; // 사용자가 선택한 첫 번째 파일을 가져옴
+        const range = editor.getSelection(true); // 에디터에서 사용자의 입력 커서 위치를 알아내기 위한 정보
+
         if (file) {
+          // Firebase Storage에 저장할 파일의 참조를 생성한 뒤 업로드
           const storageRef = ref(storage, `image/${Date.now()}`);
           const uploadTask = uploadBytes(storageRef, file);
           uploadTask
+            // 업로드 성공 시 업로드된 파일에 대한 정보(snapshot)를 이용할 수 있음
             .then((snapshot) => {
+              // 업로드 된 파일의 URL을 받아 에디터에 삽입
               getDownloadURL(snapshot.ref)
                 .then((url) => {
                   editor.insertEmbed(range.index, "image", url);
@@ -47,6 +55,7 @@ const ReactQuillComponent = (props: propsType) => {
                   resolve();
                 });
             })
+            // 업로드 실패 시
             .catch((error) => {
               console.log(error);
             });
