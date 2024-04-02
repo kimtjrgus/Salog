@@ -16,6 +16,7 @@
     "@typescript-eslint/indent" : "off",
     "@typescript-eslint/strict-boolean-expressions" : 0,
     "@typescript-eslint/no-non-null-assertion" : "off",
+    "@typescript-eslint/return-await":"off",
     "react/react-in-jsx-scope": "off",
     "prettier/prettier": 0,
     "@typescript-eslint/no-misused-promises": [
