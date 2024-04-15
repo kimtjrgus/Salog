@@ -1,5 +1,5 @@
 import { styled } from "styled-components";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -121,8 +121,6 @@ const MonthRadio = () => {
       };
     }
   };
-
-  console.log(percentages.lastRadio, percentages.currentRadio);
 
   // const { lastTwoRadio, lastRadio, currentRadio } = calculateRadio(
   //   lastTwoMonthlyOutgo?.monthlyTotal,
@@ -525,7 +523,7 @@ const MonthRadio = () => {
   );
 };
 
-export default MonthRadio;
+export default React.memo(MonthRadio);
 
 const Container = styled.div`
   width: 92%;

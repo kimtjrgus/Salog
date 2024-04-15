@@ -78,7 +78,6 @@ const ScheduleModal = ({ isOpen, setIsOpen }: Props) => {
     })
   );
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
-  console.log(isDisabled, outgoValues, incomeValues);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();

@@ -18,6 +18,7 @@ export interface valuesType {
 
 const DiaryWrite = () => {
   const [values, setValues] = useState<valuesType>({ title: "", body: "" });
+
   const [categories, setCategories] = useState<string[]>([]);
   const [category, setCategory] = useState<string>("");
   const [isOpen, setIsOpen] = useState<boolean>(false);

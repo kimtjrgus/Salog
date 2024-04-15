@@ -36,7 +36,6 @@ const DiaryDetail = () => {
     img: "",
     tagList: [],
   });
-
   const [outgo, setOutgo] = useState<outgoType[]>([]);
   const [income, setIncome] = useState<incomeType[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
