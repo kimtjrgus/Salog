@@ -1,28 +1,32 @@
 import axios from 'axios';
-import { getCookie, removeCookie, setCookie } from './cookie';
+import { getCookie,removeCookie, setCookie } from './cookie';
 
 export const api = axios.create({
   baseURL: process.env.REACT_APP_SERVER_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// Add a request interceptor
+// 요청이 전송되기 전 실행할 로직
 api.interceptors.request.use(
   (config) => {
-    // Do something before request is sent
-    const accessToken = getCookie('accessToken'); // accessToken 토큰을 가져오는 함수
+
+    // accessToken 토큰을 가져오는 함수
+    const accessToken = getCookie('accessToken'); 
     if (accessToken) {
       config.headers.Authorization = `${accessToken}`;
     }
     return config;
   },
+  // Promise를 반환하는 문에서는 async 사용을 권장함
   async (error) => {
     // Do something with request error
+    console.log(error);
+    
     await Promise.reject(error);
   }
 )
 
-// Add a response interceptor
+// 서버로부터 응답 받은 뒤 실행할 로직
 api.interceptors.response.use(
   (response) => {
    // 2xx 응답코드에 대한 트리거
@@ -36,20 +40,19 @@ api.interceptors.response.use(
     if (errorResponse.status === 401) {
       return await resetTokenAndReattemptRequest(error);
     }
-
     return await Promise.reject(error);
   }
 );
 
 let subscribers: any = [];
+// 새로운 액세스 토큰을 요청 중임을 나타내는 변수
+let isAlreadyFetchingAccessToken = false;
 
+// 토큰 재발급이 되는 경우와 반대의 경우가 랜덤으로 발생함.
 const resetTokenAndReattemptRequest = async (error: any) => {
-
-  let isAlreadyFetchingAccessToken = false;
 
   try {
     const { response: errorResponse } = error;
-
     // subscribers에 access token을 받은 이후 재요청할 함수 추가 (401로 실패했던)
     // retryOriginalRequest는 pending 상태로 있다가
     // access token을 받은 이후 onAccessTokenFetched가 호출될 때
@@ -69,7 +72,33 @@ const resetTokenAndReattemptRequest = async (error: any) => {
     // refresh token을 이용해서 access token 요청
     if (!isAlreadyFetchingAccessToken) {
       isAlreadyFetchingAccessToken = true; // 문닫기 (한 번만 요청)
-      const accessToken = localStorage.getItem("accessToken");
+      
+      RefreshToken().catch(() => {
+        // 재발급에 실패하면 로그아웃 처리 (refreshToken이 없다고 판단)
+            signOut();
+      });
+      isAlreadyFetchingAccessToken = false; // 문열기 (초기화)
+    }
+    
+
+    return await retryOriginalRequest; // pending 됐다가 onAccessTokenFetched가 호출될 때 resolve
+  } catch (error) {
+    return await Promise.reject(error);
+  }
+}
+
+const addSubscriber = (callback : (accessToken:any) => void) => {
+  subscribers.push(callback);
+}
+
+const onAccessTokenFetched = (accessToken:any) => {
+  subscribers.forEach((callback: (accessToken: any) => void) => { callback(accessToken) });
+  subscribers = [];
+}
+
+// 토큰 재발급 후 pending된 요청들에 대하여 재요청을 보냄
+const RefreshToken = async() => {
+   const accessToken = localStorage.getItem("accessToken");
       const refreshToken = getCookie("refreshToken");
 
       const { data } = await axios.post(
@@ -91,29 +120,11 @@ const resetTokenAndReattemptRequest = async (error: any) => {
       setCookie('refreshToken', data.refreshToken, {
             path: "/",
             expires: current,
-          });
-
-      isAlreadyFetchingAccessToken = false; // 문열기 (초기화)
-
-      onAccessTokenFetched(data.accessToken);
-    }
-
-    return await retryOriginalRequest; // pending 됐다가 onAccessTokenFetched가 호출될 때 resolve
-  } catch (error) {
-    signOut();
-    return await Promise.reject(error);
-  }
+      });
+  
+  onAccessTokenFetched(data.accessToken);
 }
-
-const addSubscriber = (callback : (accessToken:any) => void) => {
-  subscribers.push(callback);
-}
-
-const onAccessTokenFetched = (accessToken:any) => {
-  subscribers.forEach((callback: (accessToken: any) => void) => { callback(accessToken) });
-  subscribers = [];
-}
-
+ 
 const signOut = () => {
   removeCookie('accessToken');
   localStorage.clear();
