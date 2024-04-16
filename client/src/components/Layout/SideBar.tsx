@@ -160,7 +160,7 @@ const Lists = styled.div`
   border-bottom: 1px solid #e2e2e2;
 `;
 
-const NavStyle = styled(NavLink)<{ $isActive: boolean }>`
+const NavStyle = styled(NavLink)<{ $isActive?: boolean }>`
   display: flex;
   align-items: center;
   padding: 0.5rem 1.3rem;

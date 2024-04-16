@@ -904,7 +904,7 @@ const Container = styled.div`
   }
 `;
 
-const NavStyle = styled(NavLink)<{ $isActive: boolean }>`
+const NavStyle = styled(NavLink)`
   cursor: pointer;
   padding: 0.7rem 0.3rem;
 

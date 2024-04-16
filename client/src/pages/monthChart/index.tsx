@@ -1,5 +1,5 @@
 import { styled } from "styled-components";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -78,10 +78,6 @@ const MonthRadio = () => {
 
   const [wasteList, setWasteList] = useState<wasteType[]>([]);
 
-  // const [monthlyIncome, setMonthlyIncome] = useState<incomeType>({
-  // 	monthlyTotal: 0,
-  // 	tags: [],
-  // });
   const [lastMonthlyOutgo, setLastMonthlyOutgo] = useState<outgoType>({
     monthlyTotal: 0,
     tags: [],
@@ -90,10 +86,12 @@ const MonthRadio = () => {
     monthlyTotal: 0,
     tags: [],
   });
-  // const [lastMonthlyIncome, setLastMonthlyIncome] = useState<incomeType>({
-  // 	monthlyTotal: 0,
-  // 	tags: [],
-  // });
+
+  const [percentages, setPercentages] = useState({
+    lastTwoRadio: 0,
+    lastRadio: 0,
+    currentRadio: 0,
+  });
 
   const weeks = generateWeeklyData(calendar);
   const weeklyStatistics = calculateWeeklyStatistics(weeks);
@@ -104,24 +102,33 @@ const MonthRadio = () => {
     currentTotal: number
   ) => {
     const totalSum = lastTwoTotal + lastTotal + currentTotal;
-    const lastTwoRadio = lastTwoTotal / totalSum;
-    const lastRadio = lastTotal / totalSum;
-    const currentRadio = currentTotal / totalSum;
+    if (totalSum === 0) {
+      // 총합이 0인 경우, 적절한 대체값이나 예외 처리를 수행
+      return {
+        lastTwoRadio: 0,
+        lastRadio: 0,
+        currentRadio: 0,
+      };
+    } else {
+      const lastTwoRadio = lastTwoTotal / totalSum;
+      const lastRadio = lastTotal / totalSum;
+      const currentRadio = currentTotal / totalSum;
 
-    return {
-      lastTwoRadio,
-      lastRadio,
-      currentRadio,
-    };
+      return {
+        lastTwoRadio,
+        lastRadio,
+        currentRadio,
+      };
+    }
   };
 
-  const radios = weeklyCalculateRadio(weeklyStatistics);
+  // const { lastTwoRadio, lastRadio, currentRadio } = calculateRadio(
+  //   lastTwoMonthlyOutgo?.monthlyTotal,
+  //   lastMonthlyOutgo?.monthlyTotal,
+  //   monthlyOutgo?.monthlyTotal
+  // );
 
-  const { lastTwoRadio, lastRadio, currentRadio } = calculateRadio(
-    lastTwoMonthlyOutgo?.monthlyTotal,
-    lastMonthlyOutgo?.monthlyTotal,
-    monthlyOutgo?.monthlyTotal
-  );
+  const radios = weeklyCalculateRadio(weeklyStatistics);
 
   // pieChart에 필요한 가공된 데이터
   const statLists = [
@@ -151,91 +158,149 @@ const MonthRadio = () => {
     );
   };
 
+  // useEffect(() => {
+  //   api
+  //     .get(`/calendar?date=${moment().format("YYYY-MM-DD")}`)
+  //     .then((res) => {
+  //       setCalendar(res.data);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  //   api
+  //     .get(`/outgo/monthly?date=${moment().format("YYYY-MM-DD")}`)
+  //     .then((res) => {
+  //       setMonthlyOutgo(res.data);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  //   api
+  //     .get(
+  //       `/outgo/monthly?date=${moment()
+  //         .subtract(1, "months")
+  //         .format("YYYY-MM-DD")}`
+  //     )
+  //     .then((res) => {
+  //       setLastMonthlyOutgo(res.data);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  //   api
+  //     .get(
+  //       `/outgo/monthly?date=${moment()
+  //         .subtract(2, "months")
+  //         .format("YYYY-MM-DD")}`
+  //     )
+  //     .then((res) => {
+  //       setLastTwoMonthlyOutgo(res.data);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  //   api
+  //     .get(`/monthlyBudget?date=${moment().format("YYYY-MM")}`)
+  //     .then((res) => {
+  //       res.data === ""
+  //         ? setMonthlyBudget({
+  //             budget: 0,
+  //             totalOutgo: 0,
+  //             dayRemain: 0,
+  //           })
+  //         : setMonthlyBudget(res.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  //   const date = moment().format("YYYY-MM");
+  //   const customDate = `${date}-00`;
+  //   api
+  //     .get(`/outgo/wasteList?page=1&size=30&date=${customDate}`)
+  //     .then((res) => {
+  //       setWasteList(res.data.data);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+
+  //   // 여기서 마운트 시에 필요한 값을 계산하고 상태에 저장
+  //   const lastTwoMonthlyOutgoTotal = lastTwoMonthlyOutgo?.monthlyTotal || 0;
+  //   const lastMonthlyOutgoTotal = lastMonthlyOutgo?.monthlyTotal || 0;
+  //   const monthlyOutgoTotal = monthlyOutgo?.monthlyTotal || 0;
+
+  //   const result = calculateRadio(
+  //     lastTwoMonthlyOutgoTotal,
+  //     lastMonthlyOutgoTotal,
+  //     monthlyOutgoTotal
+  //   );
+
+  //   setPercentages(result);
+  // }, []);
+
   useEffect(() => {
-    api
-      .get(`/calendar?date=${moment().format("YYYY-MM-DD")}`)
-      .then((res) => {
-        setCalendar(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    api
-      .get(`/outgo/monthly?date=${moment().format("YYYY-MM-DD")}`)
-      .then((res) => {
-        setMonthlyOutgo(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    api
-      .get(
-        `/outgo/monthly?date=${moment()
+    const fetchData = async () => {
+      try {
+        const currentDate = moment().format("YYYY-MM-DD");
+        const lastMonthDate = moment()
           .subtract(1, "months")
-          .format("YYYY-MM-DD")}`
-      )
-      .then((res) => {
-        setLastMonthlyOutgo(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    api
-      .get(
-        `/outgo/monthly?date=${moment()
+          .format("YYYY-MM-DD");
+        const lastTwoMonthDate = moment()
           .subtract(2, "months")
-          .format("YYYY-MM-DD")}`
-      )
-      .then((res) => {
-        setLastTwoMonthlyOutgo(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    api
-      .get(`/monthlyBudget?date=${moment().format("YYYY-MM")}`)
-      .then((res) => {
-        res.data === ""
-          ? setMonthlyBudget({
-              budget: 0,
-              totalOutgo: 0,
-              dayRemain: 0,
-            })
-          : setMonthlyBudget(res.data);
-      })
-      .catch((error) => {
+          .format("YYYY-MM-DD");
+        const currentMonth = moment().format("YYYY-MM");
+        const customDate = `${currentMonth}-00`;
+
+        const [
+          calendarResponse,
+          monthlyOutgoResponse,
+          lastMonthlyOutgoResponse,
+          lastTwoMonthlyOutgoResponse,
+          monthlyBudgetResponse,
+          wasteListResponse,
+        ] = await Promise.all([
+          api.get(`/calendar?date=${currentDate}`),
+          api.get(`/outgo/monthly?date=${currentDate}`),
+          api.get(`/outgo/monthly?date=${lastMonthDate}`),
+          api.get(`/outgo/monthly?date=${lastTwoMonthDate}`),
+          api.get(`/monthlyBudget?date=${currentMonth}`),
+          api.get(`/outgo/wasteList?page=1&size=30&date=${customDate}`),
+        ]);
+
+        setCalendar(calendarResponse.data);
+        setMonthlyOutgo(monthlyOutgoResponse.data);
+        setLastMonthlyOutgo(lastMonthlyOutgoResponse.data);
+        setLastTwoMonthlyOutgo(lastTwoMonthlyOutgoResponse.data);
+
+        const monthlyBudgetData =
+          monthlyBudgetResponse.data === ""
+            ? { budget: 0, totalOutgo: 0, dayRemain: 0 }
+            : monthlyBudgetResponse.data;
+        setMonthlyBudget(monthlyBudgetData);
+
+        setWasteList(wasteListResponse.data.data);
+
+        const lastTwoMonthlyOutgoTotal =
+          lastTwoMonthlyOutgoResponse.data?.monthlyTotal || 0;
+        const lastMonthlyOutgoTotal =
+          lastMonthlyOutgoResponse.data?.monthlyTotal || 0;
+        const monthlyOutgoTotal = monthlyOutgoResponse.data?.monthlyTotal || 0;
+
+        const result = calculateRadio(
+          lastTwoMonthlyOutgoTotal,
+          lastMonthlyOutgoTotal,
+          monthlyOutgoTotal
+        );
+
+        setPercentages(result);
+      } catch (error) {
         console.error(error);
-      });
-    const date = moment().format("YYYY-MM");
-    const customDate = `${date}-00`;
-    api
-      .get(`/outgo/wasteList?page=1&size=30&date=${customDate}`)
-      .then((res) => {
-        setWasteList(res.data.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    // api
-    // 	.get(`/income/monthly?date=${moment().format("YYYY-MM-DD")}`)
-    // 	.then((res) => {
-    // 		setMonthlyIncome(res.data);
-    // 	})
-    // 	.catch((error) => {
-    // 		console.log(error);
-    // 	});
-    // api
-    // 	.get(
-    // 		`/income/monthly?date=${moment()
-    // 			.subtract(1, "months")
-    // 			.format("YYYY-MM-DD")}`,
-    // 	)
-    // 	.then((res) => {
-    // 		setLastMonthlyIncome(res.data);
-    // 	})
-    // 	.catch((error) => {
-    // 		console.log(error);
-    // 	});
+      }
+    };
+
+    fetchData().catch((error) => {
+      console.log(error);
+    });
   }, []);
 
   return (
@@ -305,7 +370,7 @@ const MonthRadio = () => {
             <div className="right">
               <h5>최근 3개월 지출 합계</h5>
               <ul className="bar">
-                <LastTwoBarList height={`${lastTwoRadio * 100}`}>
+                <LastTwoBarList height={`${percentages.lastTwoRadio * 100}`}>
                   <div></div>
                   <p>{lastTwoMonthlyOutgo.monthlyTotal.toLocaleString()}원</p>
                   {/* -1을 해서 2달 전을 나타내는데 0이나 -1이 될 때에만 예외처리 */}
@@ -317,7 +382,7 @@ const MonthRadio = () => {
                         : new Date().getMonth() - 1
                   }월 지출`}</p>
                 </LastTwoBarList>
-                <LastBarList height={`${lastRadio * 100}`}>
+                <LastBarList height={`${percentages.lastRadio * 100}`}>
                   <div></div>
                   <p>{lastMonthlyOutgo.monthlyTotal.toLocaleString()}원</p>
                   {/* getMonth()는 0~11 이기 때문에 0만 예외처리 */}
@@ -325,7 +390,7 @@ const MonthRadio = () => {
                     new Date().getMonth() === 0 ? 12 : new Date().getMonth()
                   }월 지출`}</p>
                 </LastBarList>
-                <BarList height={`${currentRadio * 100}`}>
+                <BarList height={`${percentages.currentRadio * 100}`}>
                   <div></div>
                   <p>{monthlyOutgo.monthlyTotal.toLocaleString()}원</p>
                   {/* 원래 +1을 하여 사용하는 것이므로 예외처리 X */}
@@ -458,7 +523,7 @@ const MonthRadio = () => {
   );
 };
 
-export default MonthRadio;
+export default React.memo(MonthRadio);
 
 const Container = styled.div`
   width: 92%;
@@ -992,7 +1057,7 @@ const Waste = styled.div`
       width: 50%;
 
       &:first-child {
-        border-right: 1px solid#c9c5c5;
+        border-right: 1px solid #c9c5c5;
       }
     }
   }
