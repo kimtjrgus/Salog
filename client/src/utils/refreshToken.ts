@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getCookie,removeCookie, setCookie } from './cookie';
+import { getCookie, setCookie } from './cookie';
 
 export const api = axios.create({
   baseURL: process.env.REACT_APP_SERVER_URL,
@@ -9,7 +9,6 @@ export const api = axios.create({
 // 요청이 전송되기 전 실행할 로직
 api.interceptors.request.use(
   (config) => {
-
     // accessToken 토큰을 가져오는 함수
     const accessToken = getCookie('accessToken'); 
     if (accessToken) {
@@ -19,9 +18,6 @@ api.interceptors.request.use(
   },
   // Promise를 반환하는 문에서는 async 사용을 권장함
   async (error) => {
-    // Do something with request error
-    console.log(error);
-    
     await Promise.reject(error);
   }
 )
@@ -75,7 +71,7 @@ const resetTokenAndReattemptRequest = async (error: any) => {
       
       RefreshToken().catch(() => {
         // 재발급에 실패하면 로그아웃 처리 (refreshToken이 없다고 판단)
-            signOut();
+            // signOut();
       });
       isAlreadyFetchingAccessToken = false; // 문열기 (초기화)
     }
@@ -100,7 +96,8 @@ const onAccessTokenFetched = (accessToken:any) => {
 const RefreshToken = async() => {
    const accessToken = localStorage.getItem("accessToken");
       const refreshToken = getCookie("refreshToken");
-
+      console.log(accessToken, refreshToken);
+      
       const { data } = await axios.post(
             `${process.env.REACT_APP_SERVER_URL}/refresh`,
             {
@@ -125,9 +122,9 @@ const RefreshToken = async() => {
   onAccessTokenFetched(data.accessToken);
 }
  
-const signOut = () => {
-  removeCookie('accessToken');
-  localStorage.clear();
-  removeCookie('refreshToken');
-  window.location.href = ("/login");
-}
+// const signOut = () => {
+//   removeCookie('accessToken');
+//   localStorage.clear();
+//   removeCookie('refreshToken');
+//   window.location.href = ("/login");
+// }
