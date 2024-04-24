@@ -78,6 +78,16 @@
 - 이를 해결하기 위해 무한스크롤을 구현하였으며, IntersectionObserver API를 이용해 커스텀 훅을 만들어 재사용 가능하도록 코드를 작성했습니다. 
 - 해당 기능을 구현하여 서버 부하 감소와 UX 향상에 도움이 되었습니다.
 
+### refreshToken을 이용한 accessToken 재발급
+- accessToken이 만료 될 때마다 로그인을 다시 해야하는 불편함이 생겼습니다.
+- Axios Interceptor를 이용하여 응답 에러코드가 401일 때, 아래의 과정을 거쳐 토큰을 재발급 받습니다.<br />
+  발생한 요청을 보류 (pending) -> 토큰 재발급 함수 실행 -> 재발급이 완료되면 보류된 요청들을 다시 실행
+
+### 번들 사이즈 최적화
+- React.lazy(), Suspense를 이용한 Code Splitting / depcheck를 이용한 사용하지 않는 종속성 제거를 진행했습니다.
+- 번들의 크기를 4.69MB -> 1.51MB로 약 68% 감소시켰습니다.
+- <a href="https://velog.io/@yujunsun0/React-%EB%B2%88%EB%93%A4-%EC%82%AC%EC%9D%B4%EC%A6%88%EB%A5%BC-%EC%A4%84%EC%97%AC%EB%B3%B4%EC%9E%90#%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC-%ED%8C%A8%ED%82%A4%EC%A7%80-%EC%82%AD%EC%A0%9C" target="_blank">해결 과정을 기록한 블로그 게시글</a>
+
 
 <br />
 <br />
