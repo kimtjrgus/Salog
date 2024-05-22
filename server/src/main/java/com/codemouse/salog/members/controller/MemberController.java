@@ -130,6 +130,7 @@ public class MemberController {
     // todo 2023-12-20 로그아웃 시 토큰 블랙리스트에 리프레쉬도 추가해야함 (리프레쉬 탈취 방지)
     // 로그아웃
     @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.OK)
     public void logout(@RequestHeader (name="Authorization") String token) {
         tokenBlackListService.addToBlackList(token);
     }
