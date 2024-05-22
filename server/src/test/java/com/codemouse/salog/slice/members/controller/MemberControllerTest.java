@@ -3,6 +3,7 @@ package com.codemouse.salog.slice.members.controller;
 import com.codemouse.salog.auth.config.SecurityConfiguration;
 import com.codemouse.salog.auth.utils.TokenBlackListService;
 import com.codemouse.salog.members.controller.MemberController;
+import com.codemouse.salog.members.dto.EmailRequestDto;
 import com.codemouse.salog.members.dto.MemberDto;
 import com.codemouse.salog.members.service.MemberService;
 import com.google.gson.Gson;
@@ -41,63 +42,188 @@ public class MemberControllerTest {
     private SecurityConfiguration securityConfiguration;
 
     @Test
-    @DisplayName("회원가입")
+    @DisplayName("/signup")
     void postMemberTest() throws Exception {
         // given
         MemberDto.Post post = new MemberDto.Post("test@gmail.com", "1234qwer!@#$", false, false);
 
         String content = gson.toJson(post);
 
-        // When
-        mockMvc.perform(post("/members/signup")
+        // when
+        mockMvc.perform(
+                post("/members/signup")
+                        .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(content))
+                        .content(content)
+                )
 
-        // Then
+                // Then
                 .andExpect(status().isCreated())
                 .andDo(print());
         verify(memberService, times(1)).createMember(any(MemberDto.Post.class));
     }
 
     @Test
-    @DisplayName("회원수정")
+    @DisplayName("/update")
     void updateMemberTest() throws Exception {
         // given
         MemberDto.Patch patch = new MemberDto.Patch(true, true);
 
         String content = gson.toJson(patch);
 
-        // when then
+        // when
         mockMvc.perform(
                 patch("/members/update")
                         .header("Authorization", "Bearer fakeToken")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(content))
-                .andExpect(status().isOk()).andDo(print());
+                        .content(content)
+                )
+
+                // then
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
-    @DisplayName("회원조회")
+    @DisplayName("/changePassword")
+    void changePasswordTest() throws Exception {
+        // given
+        MemberDto.PatchPassword dto = new MemberDto.PatchPassword("123!@#asdasd123","123456!@#asd123");
+        String content = gson.toJson(dto);
+
+        // when
+        mockMvc.perform(
+                patch("/members/changePassword")
+                        .header("Authorization", "Bearer fakeToken")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                )
+
+                // then
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("/findPassword")
+    void fondPasswordTest() throws Exception {
+        // given
+        EmailRequestDto dto = new EmailRequestDto("test@mail.com", "123qwe!@#qwe");
+        String content = gson.toJson(dto);
+
+        // when
+        mockMvc.perform(
+                post("/members/findPassword")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+                )
+
+                // then
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("/get")
     void getMemberTest() throws Exception {
-        // when then
+        // when
         mockMvc.perform(
                 get("/members/get")
                         .header("Authorization", "Bearer fakeToken")
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andDo(print());
+                )
+
+                // then
+                .andExpect(status().isOk())
+                .andDo(print());
     }
 
     @Test
-    @DisplayName("회원탈퇴")
+    @DisplayName("/leaveid")
     void deleteMemberTest() throws Exception {
-        // when then
+        // when
         mockMvc.perform(
                 delete("/members/leaveid")
                         .header("Authorization", "Bearer fakeToken")
                         .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent()).andDo(print());
+                )
+
+                // then
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("/emailcheck")
+    void emailCheckMember() throws Exception {
+        // given
+        EmailRequestDto dto = new EmailRequestDto("test@email.com", "123!@#qwe123");
+        String content = gson.toJson(dto);
+
+        // when
+        mockMvc.perform(
+                post("/members/emailcheck")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+        )
+
+                // then
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("/signup/sendmail")
+    void sendVerificationEamil() throws Exception {
+        // given
+        EmailRequestDto dto = new EmailRequestDto("test@email.com", "123!@#123qwe");
+        String content = gson.toJson(dto);
+
+        // when
+        mockMvc.perform(
+                post("/members/signup/sendmail")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+        )
+
+                // then
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("/findPassword/sendmail")
+    void findPasswordSendVerificationEmail() throws Exception {
+        // given
+        EmailRequestDto dto = new EmailRequestDto("test@email.com", "123!@#123qwe");
+        String content = gson.toJson(dto);
+
+        // when
+        mockMvc.perform(
+                post("/members/findPassword/sendmail")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content)
+        )
+
+                // then
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("/logout")
+    void logout() throws Exception {
+        // when
+        mockMvc.perform(
+                post("/members/logout")
+                        .header("Authorization", "Bearer fakeToken")
+                        .accept(MediaType.APPLICATION_JSON)
+        )
+
+                // then
+                .andExpect(status().isOk());
     }
 }
