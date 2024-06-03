@@ -22,12 +22,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/* todo
-비번변경, 비번찾기, 이메일체크, 이메일 인증 (가입), 이메일 인증 (찾기), 로그아웃
- */
-
 @WebMvcTest(value = MemberController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisplayName("회원 컨트롤러 슬라이스 테스트")
 public class MemberControllerTest {
     @Autowired
@@ -43,6 +40,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("/signup")
+    @Order(1)
     void postMemberTest() throws Exception {
         // given
         MemberDto.Post post = new MemberDto.Post("test@gmail.com", "1234qwer!@#$", false, false);
@@ -65,6 +63,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("/update")
+    @Order(2)
     void updateMemberTest() throws Exception {
         // given
         MemberDto.Patch patch = new MemberDto.Patch(true, true);
@@ -87,6 +86,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("/changePassword")
+    @Order(3)
     void changePasswordTest() throws Exception {
         // given
         MemberDto.PatchPassword dto = new MemberDto.PatchPassword("123!@#asdasd123","123456!@#asd123");
@@ -108,6 +108,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("/findPassword")
+    @Order(4)
     void fondPasswordTest() throws Exception {
         // given
         EmailRequestDto dto = new EmailRequestDto("test@mail.com", "123qwe!@#qwe");
@@ -128,6 +129,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("/get")
+    @Order(5)
     void getMemberTest() throws Exception {
         // when
         mockMvc.perform(
@@ -143,6 +145,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("/leaveid")
+    @Order(6)
     void deleteMemberTest() throws Exception {
         // when
         mockMvc.perform(
@@ -158,6 +161,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("/emailcheck")
+    @Order(7)
     void emailCheckMember() throws Exception {
         // given
         EmailRequestDto dto = new EmailRequestDto("test@email.com", "123!@#qwe123");
@@ -177,6 +181,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("/signup/sendmail")
+    @Order(8)
     void sendVerificationEamil() throws Exception {
         // given
         EmailRequestDto dto = new EmailRequestDto("test@email.com", "123!@#123qwe");
@@ -196,6 +201,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("/findPassword/sendmail")
+    @Order(9)
     void findPasswordSendVerificationEmail() throws Exception {
         // given
         EmailRequestDto dto = new EmailRequestDto("test@email.com", "123!@#123qwe");
@@ -215,6 +221,7 @@ public class MemberControllerTest {
 
     @Test
     @DisplayName("/logout")
+    @Order(10)
     void logout() throws Exception {
         // when
         mockMvc.perform(
