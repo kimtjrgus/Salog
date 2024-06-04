@@ -52,6 +52,7 @@ public class MemberControllerTest {
                 post("/members/signup")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
                         .content(content)
                 )
 
@@ -76,6 +77,7 @@ public class MemberControllerTest {
                         .header("Authorization", "Bearer fakeToken")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
                         .content(content)
                 )
 
@@ -98,6 +100,7 @@ public class MemberControllerTest {
                         .header("Authorization", "Bearer fakeToken")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
                         .content(content)
                 )
 
@@ -119,6 +122,7 @@ public class MemberControllerTest {
                 post("/members/findPassword")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
                         .content(content)
                 )
 
@@ -172,6 +176,7 @@ public class MemberControllerTest {
                 post("/members/emailcheck")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
                         .content(content)
         )
 
@@ -192,6 +197,7 @@ public class MemberControllerTest {
                 post("/members/signup/sendmail")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
                         .content(content)
         )
 
@@ -212,6 +218,7 @@ public class MemberControllerTest {
                 post("/members/findPassword/sendmail")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
                         .content(content)
         )
 
