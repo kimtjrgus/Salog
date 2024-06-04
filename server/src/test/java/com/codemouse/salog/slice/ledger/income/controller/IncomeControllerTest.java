@@ -1,4 +1,4 @@
-package com.codemouse.salog.slice.ledger.income;
+package com.codemouse.salog.slice.ledger.income.controller;
 
 import com.codemouse.salog.auth.config.SecurityConfiguration;
 import com.codemouse.salog.auth.utils.TokenBlackListService;
