@@ -3,7 +3,7 @@ package com.codemouse.salog.helper;
 import java.util.Random;
 public class RandomGenerator {
 
-    public static String generateRandomCode(int length) {
+    public String generateRandomCode(int length) {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder sb = new StringBuilder(length);
         Random random = new Random();

@@ -30,6 +30,7 @@ public class MemberService {
     private final CustomAuthorityUtils authorityUtils;
     private final MemberMapper memberMapper;
     private final EmailSender emailSender;
+    private final RandomGenerator randomGenerator;
 
     public void createMember(MemberDto.Post postDto) {
         Member member = memberMapper.memberPostDtoToMember(postDto);
@@ -137,7 +138,7 @@ public class MemberService {
     // 이메일 발송, 에러 핸들링
     public String sendEmail(String email) throws MessagingException {
         // 인증번호 생성기
-        String verificationCode = RandomGenerator.generateRandomCode(4);
+        String verificationCode = randomGenerator.generateRandomCode(4);
 
         try {
             emailSender.sendVerificationEmail(email, verificationCode); // 메일 발송

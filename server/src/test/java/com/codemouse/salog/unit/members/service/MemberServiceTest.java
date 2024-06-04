@@ -5,6 +5,7 @@ import com.codemouse.salog.auth.utils.CustomAuthorityUtils;
 import com.codemouse.salog.exception.BusinessLogicException;
 import com.codemouse.salog.exception.ExceptionCode;
 import com.codemouse.salog.helper.EmailSender;
+import com.codemouse.salog.helper.RandomGenerator;
 import com.codemouse.salog.members.dto.MemberDto;
 import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.mapper.MemberMapper;
@@ -26,6 +27,8 @@ import static org.mockito.Mockito.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.mail.MessagingException;
+
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) // 순서보장 (cf. https://junit.org/junit5/docs/current/user-guide/#writing-tests-test-execution-order)
 @DisplayName("회원 서비스 유닛 테스트")
@@ -44,6 +47,8 @@ public class MemberServiceTest {
     private MemberMapper memberMapper;
     @Mock
     private EmailSender emailSender;
+    @Mock
+    private RandomGenerator randomGenerator;
 
     // log
     private static final Logger logger = LoggerFactory.getLogger(MemberServiceTest.class);
@@ -316,7 +321,7 @@ public class MemberServiceTest {
     @Test
     @DisplayName("findVerifiedMember 1 : 존재하는 회원")
     @Order(10)
-    void findVerifiedMember1() {
+    void findVerifiedMemberTest1() {
         // Given
         long memberId = 1L;
 
@@ -339,7 +344,7 @@ public class MemberServiceTest {
     @Test
     @DisplayName("findVerifiedMember 2 : 존재하지 않는 회원")
     @Order(11)
-    void findVerifiedMember2() {
+    void findVerifiedMemberTest2() {
         // Given
         long memberId = 1L;
 
@@ -349,5 +354,112 @@ public class MemberServiceTest {
         assertThrows(BusinessLogicException.class, () -> {
             memberService.findVerifiedMember(memberId);
         });
+    }
+
+    @Test
+    @DisplayName("isExistEmail 1 : 이메일 중복 X")
+    @Order(12)
+    void isExistEmailTest1() {
+        // Given
+        String email = "test@email.com";
+
+        when(memberRepository.existsByEmail(email)).thenReturn(false);
+
+        // When & Then
+        assertDoesNotThrow(() -> {
+            memberService.isExistEmail(email);
+        });
+    }
+
+    @Test
+    @DisplayName("isExistEmail 1 : 이메일 중복 O")
+    @Order(13)
+    void isExistEmailTest2() {
+        // Given
+        String email = "test@email.com";
+
+        when(memberRepository.existsByEmail(email)).thenReturn(true);
+
+        // When & Then
+        assertThrows(BusinessLogicException.class, () ->{
+            memberService.isExistEmail(email);
+        });
+    }
+
+    @Test
+    @DisplayName("verifiedEmail 1 : 이메일 존재 true")
+    @Order(14)
+    void verifiedEmailTest1() {
+        // Given
+        String email = "test@email.com";
+
+        when(memberRepository.existsByEmail(email)).thenReturn(true);
+
+        // When
+        boolean result = memberService.verifiedEmail(email);
+
+        // Then
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("verifiedEmail 2 : 이메일 존재 false")
+    @Order(15)
+    void verifiedEmailTest2() {
+        // Given
+        String email = "test@email.com";
+
+        when(memberRepository.existsByEmail(email)).thenReturn(false);
+
+        // When
+        boolean result = memberService.verifiedEmail(email);
+
+        // Then
+        assertFalse(result);
+    }
+
+//    @Test
+//    @DisplayName("sendEmail 1 : 정상 실행")
+//    @Order(16)
+//    void sendEmail1() throws MessagingException {
+//        // Given
+//        String email = "test@email.com";
+//        String verificationCode = "1234";
+//
+//        when(randomGenerator.generateRandomCode(4)).thenReturn(verificationCode);
+//
+//        // When
+//        emailSender.sendVerificationEmail(email, verificationCode);
+//
+//        // Then
+//        verify(randomGenerator).generateRandomCode(4);
+//        verify(emailSender).sendVerificationEmail(email, verificationCode);
+//    }
+
+    @Test
+    @DisplayName("sendEmail 2 : AuthenticationFailedException")
+    @Order(16)
+    void sendEmail2() {
+        // Given
+        // When
+        // Then
+    }
+
+    @Test
+    @DisplayName("sendEmail 3 : SendFailedException")
+    @Order(16)
+    void sendEmail3() {
+        // Given
+        // When
+        // Then
+    }
+
+    @Test
+    @DisplayName("sendEmail 4 : MessagingException")
+    @Order(16)
+    void sendEmail4() {
+        // Given
+        // When
+        // Then
     }
 }
