@@ -12,6 +12,7 @@ import java.util.List;
 
 public class IncomeDto {
     @AllArgsConstructor
+    @Setter
     @Getter
     public static class Post {
         private int money;
@@ -25,6 +26,7 @@ public class IncomeDto {
     }
 
     @AllArgsConstructor
+    @Setter
     @Getter
     public static class Patch {
         private int money;
