@@ -109,7 +109,7 @@ public class MemberControllerTest {
     @Test
     @DisplayName("/findPassword")
     @Order(4)
-    void fondPasswordTest() throws Exception {
+    void findPasswordTest() throws Exception {
         // given
         EmailRequestDto dto = new EmailRequestDto("test@mail.com", "123qwe!@#qwe");
         String content = gson.toJson(dto);
