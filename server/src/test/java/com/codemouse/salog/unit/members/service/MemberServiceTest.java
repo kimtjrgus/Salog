@@ -27,7 +27,9 @@ import static org.mockito.Mockito.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.mail.AuthenticationFailedException;
 import javax.mail.MessagingException;
+import javax.mail.SendFailedException;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) // 순서보장 (cf. https://junit.org/junit5/docs/current/user-guide/#writing-tests-test-execution-order)
@@ -418,48 +420,140 @@ public class MemberServiceTest {
         assertFalse(result);
     }
 
-//    @Test
-//    @DisplayName("sendEmail 1 : 정상 실행")
-//    @Order(16)
-//    void sendEmail1() throws MessagingException {
-//        // Given
-//        String email = "test@email.com";
-//        String verificationCode = "1234";
-//
-//        when(randomGenerator.generateRandomCode(4)).thenReturn(verificationCode);
-//
-//        // When
-//        emailSender.sendVerificationEmail(email, verificationCode);
-//
-//        // Then
-//        verify(randomGenerator).generateRandomCode(4);
-//        verify(emailSender).sendVerificationEmail(email, verificationCode);
-//    }
+    @Test
+    @DisplayName("sendEmail 1 : 정상 실행")
+    @Order(16)
+    void sendEmailTest1() throws MessagingException {
+        // Given
+        String email = "test@email.com";
+        String verificationCode = "1234";
+
+        when(randomGenerator.generateRandomCode(4)).thenReturn(verificationCode);
+
+        // When
+        String code = memberService.sendEmail(email);
+
+        // Then
+        assertEquals(verificationCode, code);
+        verify(randomGenerator).generateRandomCode(4);
+        verify(emailSender).sendVerificationEmail(email, verificationCode);
+
+        // logs
+        logger.info("Generated Verification Code: {}", verificationCode);
+        logger.info("Returned Verification Code: {}", code);
+    }
 
     @Test
     @DisplayName("sendEmail 2 : AuthenticationFailedException")
-    @Order(16)
-    void sendEmail2() {
+    @Order(17)
+    void sendEmailTest2() throws MessagingException {
         // Given
-        // When
-        // Then
+        String email = "test@email.com";
+        String verificationCode = "1234";
+
+        when(randomGenerator.generateRandomCode(4)).thenReturn(verificationCode);
+        doThrow(new AuthenticationFailedException()).when(emailSender).sendVerificationEmail(email, verificationCode);
+
+        // When & Then
+        MessagingException exception = assertThrows(MessagingException.class, () -> {
+            memberService.sendEmail(email);
+        });
+
+        assertEquals("인증에 실패했습니다. 이메일과 비밀번호를 확인해주세요", exception.getMessage());
     }
 
     @Test
     @DisplayName("sendEmail 3 : SendFailedException")
-    @Order(16)
-    void sendEmail3() {
+    @Order(18)
+    void sendEmailTest3() throws MessagingException {
         // Given
-        // When
-        // Then
+        String email = "test@email.com";
+        String verificationCode = "1234";
+
+        when(randomGenerator.generateRandomCode(4)).thenReturn(verificationCode);
+        doThrow(new SendFailedException()).when(emailSender).sendVerificationEmail(email, verificationCode);
+
+        // When & Then
+        MessagingException exception = assertThrows(MessagingException.class, () -> {
+           memberService.sendEmail(email);
+        });
+
+        assertEquals("이메일이 정상적으로 전송되지 않았습니다.", exception.getMessage());
     }
 
     @Test
     @DisplayName("sendEmail 4 : MessagingException")
-    @Order(16)
-    void sendEmail4() {
+    @Order(19)
+    void sendEmailTest4() throws MessagingException {
         // Given
-        // When
-        // Then
+        String email = "test@email.com";
+        String verificationCode = "1234";
+
+        when(randomGenerator.generateRandomCode(4)).thenReturn(verificationCode);
+        doThrow(new MessagingException()).when(emailSender).sendVerificationEmail(email, verificationCode);
+
+        // When & Then
+        MessagingException exception = assertThrows(MessagingException.class, () -> {
+           memberService.sendEmail(email);
+        });
+
+        assertEquals("이메일 전송 중 오류가 발생했습니다.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("verifiedRequest 1 : 요청 회원과 서비스 회원 일치")
+    @Order(20)
+    void verifiedRequestTest1() {
+        // Given
+        String token = "testToken";
+        long serviceMemberId = 1L;
+
+        when(jwtTokenizer.getMemberId(token)).thenReturn(1L);
+
+        // When & Then
+        assertDoesNotThrow(() -> memberService.verifiedRequest(token, serviceMemberId));
+    }
+
+    @Test
+    @DisplayName("verifiedRequest 2 : 요청 회원과 서비스 회원 불일치")
+    @Order(21)
+    void verifiedRequestTest2() {
+        // Given
+        String token = "testToken";
+        long serviceMemberId = 2L;
+
+        when(jwtTokenizer.getMemberId(token)).thenReturn(1L);
+
+        // When & Then
+        BusinessLogicException exception = assertThrows(BusinessLogicException.class, () -> {
+           memberService.verifiedRequest(token, serviceMemberId);
+        });
+
+        assertEquals(ExceptionCode.MEMBER_MISMATCHED, exception.getExceptionCode());
+    }
+
+    @Test
+    @DisplayName("socialCheck 1 : 소셜 회원이 아닌 경우")
+    @Order(22)
+    void socialCheckTest1() {
+        // Given
+        member.setPassword("testPassword");
+
+        // When & Then
+        assertDoesNotThrow(() -> memberService.socialCheck(member));
+    }
+
+    @Test
+    @DisplayName("socialCheck 2 : 소셜 회원인 경우")
+    @Order(23)
+    void socialCheckTest2() {
+        // Given
+
+        // When & Then
+        BusinessLogicException exception = assertThrows(BusinessLogicException.class, () -> {
+            memberService.socialCheck(member);
+        });
+
+        assertEquals(ExceptionCode.SOCIAL_MEMBER, exception.getExceptionCode());
     }
 }
