@@ -83,6 +83,7 @@ public class MemberServiceTest {
 
         // Then
         verify(memberRepository, times(1)).save(member);
+        assertEquals("test@email.com", member.getEmail());
         assertEquals("encodedPassword", member.getPassword());
         assertEquals(List.of("ROLE_USER"), member.getRoles());
 
@@ -374,7 +375,7 @@ public class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("isExistEmail 1 : 이메일 중복 O")
+    @DisplayName("isExistEmail 2 : 이메일 중복 O")
     @Order(13)
     void isExistEmailTest2() {
         // Given
