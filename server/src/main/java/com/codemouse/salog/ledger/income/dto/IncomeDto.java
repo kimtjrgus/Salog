@@ -3,6 +3,7 @@ package com.codemouse.salog.ledger.income.dto;
 import com.codemouse.salog.tags.ledgerTags.dto.LedgerTagDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Pattern;
@@ -12,6 +13,7 @@ import java.util.List;
 
 public class IncomeDto {
     @AllArgsConstructor
+    @NoArgsConstructor
     @Setter
     @Getter
     public static class Post {
@@ -26,6 +28,7 @@ public class IncomeDto {
     }
 
     @AllArgsConstructor
+    @NoArgsConstructor
     @Setter
     @Getter
     public static class Patch {
@@ -39,6 +42,7 @@ public class IncomeDto {
     }
 
     @AllArgsConstructor
+    @NoArgsConstructor
     @Getter
     @Setter
     public static class Response {
@@ -51,6 +55,7 @@ public class IncomeDto {
     }
 
     @AllArgsConstructor
+    @NoArgsConstructor
     @Getter
     @Setter
     public static class MonthlyResponse {
