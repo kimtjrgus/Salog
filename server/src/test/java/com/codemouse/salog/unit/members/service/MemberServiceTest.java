@@ -32,7 +32,7 @@ import javax.mail.MessagingException;
 import javax.mail.SendFailedException;
 
 @ExtendWith(MockitoExtension.class)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class) // 순서보장 (cf. https://junit.org/junit5/docs/current/user-guide/#writing-tests-test-execution-order)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class) // 순서보장 (ref. https://junit.org/junit5/docs/current/user-guide/#writing-tests-test-execution-order)
 @DisplayName("회원 서비스 유닛 테스트")
 public class MemberServiceTest {
     @InjectMocks
