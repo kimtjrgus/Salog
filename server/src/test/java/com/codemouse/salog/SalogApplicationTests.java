@@ -10,4 +10,5 @@ class SalogApplicationTests {
 	void contextLoads() {
 	}
 
+	// test for execute all tests pre push
 }
