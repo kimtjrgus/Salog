@@ -1,6 +1,10 @@
 package com.codemouse.salog.helper;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Random;
+
+@Component
 public class RandomGenerator {
 
     public String generateRandomCode(int length) {
