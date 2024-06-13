@@ -1,0 +1,42 @@
+= API Documentation
+:toc: left
+:toclevels: 2
+:sectlinks:
+:sectanchors:
+:doctype: book
+:icons: font
+:encoding: utf-8
+:docdir: {docdir}
+
+= API Documentation
+:revnumber: 0.0.1-SNAPSHOT
+:revdate: 2024-06-13 13:11:28 +0900
+
+=== 회원가입
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/postMemberTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/postMemberTest/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/postMemberTest/http-response.adoc[]
+
+=== 회원수정
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/updateMemberTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/updateMemberTest/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/updateMemberTest/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/updateMemberTest/http-response.adoc[]
+
+=== 비밀번호 변경
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/changePasswordTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/changePasswordTest/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/changePasswordTest/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/changePasswordTest/http-response.adoc[]
+
+=== 비밀번호 찾기
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordTest/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordTest/http-response.adoc[]
+
+== Version 0.0.1-SNAPSHOT
+Last updated 2024-06-13 13:11:28 +0900
