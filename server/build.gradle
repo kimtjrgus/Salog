@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.17'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'com.codemouse'
@@ -53,6 +54,7 @@ dependencies {
 
 	// DB - mysql
 	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.h2database:h2'
 
 	// Mapper
 	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
@@ -60,12 +62,40 @@ dependencies {
 
 	// Gson
 	implementation 'com.google.code.gson:gson'
+
+	// api 문서화
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
 tasks.named('bootBuildImage') {
 	builder = 'paketobuildpacks/builder-jammy-base:latest'
 }
 
+// api 문서화 관련
+
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+asciidoctor {
+	inputs.dir snippetsDir
+	dependsOn test  // test 태스크에 의존하도록 설정
+	sourceDir 'src/docs/asciidoc'
+	outputDir 'build/docs/asciidoc'
+
+	doLast {
+		copy {
+			from "${outputDir}/html5"
+			into "src/main/resources/static/docs"
+		}
+	}
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
+	outputs.dir(snippetsDir)  // 테스트 출력 디렉토리를 설정
+}
+
+clean { // 빌드 시 스니펫 초기화
+	delete 'build/generated-snippets'
 }
