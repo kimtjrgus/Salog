@@ -1,0 +1,102 @@
+= API Documentation
+:toc: left
+:toclevels: 2
+:sectlinks:
+:sectanchors:
+:doctype: book
+:icons: font
+:encoding: utf-8
+:docdir: {docdir}
+
+= API Documentation
+:revnumber: 0.0.1-SNAPSHOT
+:revdate: 2024-06-13 13:11:28 +0900
+
+=== 회원가입
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/postMemberTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/postMemberTest/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/postMemberTest/http-response.adoc[]
+
+=== 회원수정
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/updateMemberTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/updateMemberTest/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/updateMemberTest/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/updateMemberTest/http-response.adoc[]
+
+=== 비밀번호 변경
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/changePasswordTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/changePasswordTest/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/changePasswordTest/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/changePasswordTest/http-response.adoc[]
+
+=== 비밀번호 찾기
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordTest/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordTest/http-response.adoc[]
+
+=== 회원조회
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/getMemberTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/getMemberTest/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/getMemberTest/http-response.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/getMemberTest/response-fields.adoc[]
+
+=== 회원탈퇴
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/deleteMemberTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/deleteMemberTest/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/deleteMemberTest/http-response.adoc[]
+
+=== 이메일 중복 체크_success
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_success/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_success/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_success/http-response.adoc[]
+
+=== 이메일 중복 체크_failure
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_failure/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_failure/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_failure/http-response.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_failure/response-fields.adoc[]
+
+=== 회원가입 시 이메일 인증_success
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_success/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_success/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_success/http-response.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_success/response-fields.adoc[]
+
+=== 회원가입 시 이메일 인증_failure
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_failure/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_failure/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_failure/http-response.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_failure/response-fields.adoc[]
+
+=== 비밀번호 찾기 시 이메일 인증_success
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_success/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_success/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_success/http-response.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_success/response-fields.adoc[]
+
+=== 비밀번호 찾기 이메일 인증_failure
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_failure/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_failure/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_failure/http-response.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_failure/response-fields.adoc[]
+
+=== 로그아웃
+
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/logoutTest/http-request.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/logoutTest/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/MemberIntegrationTest/logoutTest/http-response.adoc[]
+
+== Version 0.0.1-SNAPSHOT
+Last updated 2024-06-13 13:11:28 +0900
