@@ -86,7 +86,7 @@ include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMembe
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_Success/request-fields.adoc[]
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_Success/http-response.adoc[]
 
-=== 이메일 중복 체크_failure
+=== 이메일 중복 체크_fail
 
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_Fail/http-request.adoc[]
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/emailCheckMemberTest_Fail/request-fields.adoc[]
@@ -100,7 +100,7 @@ include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificatio
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_Success/http-response.adoc[]
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_Success/response-fields.adoc[]
 
-=== 회원가입 시 이메일 인증_failure
+=== 회원가입 시 이메일 인증_fail
 
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_Fail/http-request.adoc[]
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/sendVerificationEmailTest_Fail/request-fields.adoc[]
@@ -114,7 +114,7 @@ include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSen
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_Success/http-response.adoc[]
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_Success/response-fields.adoc[]
 
-=== 비밀번호 찾기 이메일 인증_failure
+=== 비밀번호 찾기 이메일 인증_fail
 
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_Fail/http-request.adoc[]
 include::{docdir}/build/generated-snippets/MemberIntegrationTest/findPasswordSendVerificationEmailTest_Fail/request-fields.adoc[]
