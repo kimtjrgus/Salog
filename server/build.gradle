@@ -77,16 +77,80 @@ ext {
 	snippetsDir = file('build/generated-snippets')
 }
 
-asciidoctor {
-	inputs.dir snippetsDir
-	dependsOn test  // test 태스크에 의존하도록 설정
-	sourceDir 'src/docs/asciidoc'
-	outputDir 'build/docs/asciidoc'
+// 도메인 별 문서 분리
 
+task memberTest(type: Test) {
+	include '**/MemberIntegrationTest.class'
+	outputs.dir file("$buildDir/generated-snippets/MemberIntegrationTest")
+}
+
+task incomeTest(type: Test) {
+	include '**/IncomeIntegrationTest.class'
+	outputs.dir file("$buildDir/generated-snippets/IncomeIntegrationTest")
+}
+
+task fixedIncomeTest(type: Test) {
+	include '**/FixedIncomeIntegrationTest.class'
+	outputs.dir file("$buildDir/generated-snippets/FixedIncomeIntegrationTest")
+}
+
+task budgetTest(type: Test) {
+	include '**/BudgetIntegrationTest.class'
+	outputs.dir file("$buildDir/generated-snippets/BudgetIntegrationTest")
+}
+
+task asciidoctorMember(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+	sourceDir = file('src/docs/asciidoc/MemberIntegrationTest')
+	outputDir = file("$buildDir/docs/asciidoc/MemberIntegrationTest")
+	inputs.dir file("$buildDir/generated-snippets/MemberIntegrationTest")
+	attributes 'snippets': file("$buildDir/generated-snippets/MemberIntegrationTest")
+	dependsOn memberTest
 	doLast {
 		copy {
 			from "${outputDir}/html5"
-			into "src/main/resources/static/docs"
+			into "src/main/resources/static/docs/MemberIntegrationTest"
+		}
+	}
+}
+
+task asciidoctorIncome(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+	sourceDir = file('src/docs/asciidoc/IncomeIntegrationTest')
+	outputDir = file("$buildDir/docs/asciidoc/IncomeIntegrationTest")
+	inputs.dir file("$buildDir/generated-snippets/IncomeIntegrationTest")
+	attributes 'snippets': file("$buildDir/generated-snippets/IncomeIntegrationTest")
+	dependsOn incomeTest
+	doLast {
+		copy {
+			from "${outputDir}/html5"
+			into "src/main/resources/static/docs/IncomeIntegrationTest"
+		}
+	}
+}
+
+task asciidoctorFixedIncome(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+	sourceDir = file('src/docs/asciidoc/FixedIncomeIntegrationTest')
+	outputDir = file("$buildDir/docs/asciidoc/FixedIncomeIntegrationTest")
+	inputs.dir file("$buildDir/generated-snippets/FixedIncomeIntegrationTest")
+	attributes 'snippets': file("$buildDir/generated-snippets/FixedIncomeIntegrationTest")
+	dependsOn fixedIncomeTest
+	doLast {
+		copy {
+			from "${outputDir}/html5"
+			into "src/main/resources/static/docs/FixedIncomeIntegrationTest"
+		}
+	}
+}
+
+task asciidoctorBudget(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+	sourceDir = file('src/docs/asciidoc/BudgetIntegrationTest')
+	outputDir = file("$buildDir/docs/asciidoc/BudgetIntegrationTest")
+	inputs.dir file("$buildDir/generated-snippets/BudgetIntegrationTest")
+	attributes 'snippets': file("$buildDir/generated-snippets/BudgetIntegrationTest")
+	dependsOn budgetTest
+	doLast {
+		copy {
+			from "${outputDir}/html5"
+			into "src/main/resources/static/docs/BudgetIntegrationTest"
 		}
 	}
 }
@@ -98,4 +162,11 @@ tasks.named('test') {
 
 clean { // 빌드 시 스니펫 초기화
 	delete 'build/generated-snippets'
+}
+
+bootJar {
+	dependsOn asciidoctorMember, asciidoctorIncome
+	from("$buildDir/docs/asciidoc") {
+		into 'static/docs'
+	}
 }
