@@ -82,21 +82,25 @@ ext {
 task memberTest(type: Test) {
 	include '**/MemberIntegrationTest.class'
 	outputs.dir file("$buildDir/generated-snippets/MemberIntegrationTest")
+	useJUnitPlatform()
 }
 
 task incomeTest(type: Test) {
 	include '**/IncomeIntegrationTest.class'
 	outputs.dir file("$buildDir/generated-snippets/IncomeIntegrationTest")
+	useJUnitPlatform()
 }
 
 task fixedIncomeTest(type: Test) {
 	include '**/FixedIncomeIntegrationTest.class'
 	outputs.dir file("$buildDir/generated-snippets/FixedIncomeIntegrationTest")
+	useJUnitPlatform()
 }
 
 task budgetTest(type: Test) {
 	include '**/BudgetIntegrationTest.class'
 	outputs.dir file("$buildDir/generated-snippets/BudgetIntegrationTest")
+	useJUnitPlatform()
 }
 
 task asciidoctorMember(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
