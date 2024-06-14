@@ -51,10 +51,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) // 테스트 케이스 순서 보장
 @Transactional
 public class MemberIntegrationTest {
-
     @Autowired
     private MockMvc mockMvc;
-    @SpyBean // 실제 객체의 메서드를 호출하면서도 메서드 호출을 검증
+    @SpyBean // 실제 객체의 메서드를 호출하면서도 메서드 호출을 검증 ref.https://jojoldu.tistory.com/226
     private MemberService memberService;
     @SpyBean
     private TokenBlackListService tokenBlackListService;
@@ -140,15 +139,11 @@ public class MemberIntegrationTest {
                         )
                 ));
 
-        // verify
+        // Assertions
         // postDto 객체를 JSON으로 변환하고 다시 역직렬화하는 과정에서
         // 동일한 객체가 아니게 되므로
         // 필드 값을 검증하기 위해 ArgumentCaptor를 사용하여 실제로 전달된 객체의 필드를 비교
         ArgumentCaptor<MemberDto.Post> captor = forClass(MemberDto.Post.class);
-        verify(memberService, times(1)).createMember(captor.capture()); // 통합 테스트 특성 상 메서드가 하나라도 정상 작동 하지 않으면 실패하기 때문에 메서드 호출에 대한 verify는 불필요함, 그렇기 때문에 추후 삭제할 것
-        verify(memberRepository, times(1)).save(member);
-
-        // Assertions
         MemberDto.Post capturedArgument = captor.getValue();
         assertEquals("test@gmail.com", capturedArgument.getEmail());
         assertEquals("1234qwer!@#$", capturedArgument.getPassword());
@@ -194,14 +189,8 @@ public class MemberIntegrationTest {
                         )
                 ));
 
-        // verify
-        verify(tokenBlackListService, times(1)).isBlackListed(token);
-
-        ArgumentCaptor<MemberDto.Patch> captor = forClass(MemberDto.Patch.class);
-        verify(memberService, times(1)).updateMember(eq(token), captor.capture());
-        verify(memberRepository, times(1)).save(member);
-
         // Assertions
+        ArgumentCaptor<MemberDto.Patch> captor = forClass(MemberDto.Patch.class);
         MemberDto.Patch capturedArgument = captor.getValue();
         assertTrue(capturedArgument.isHomeAlarm());
         assertTrue(capturedArgument.isEmailAlarm());
@@ -245,14 +234,8 @@ public class MemberIntegrationTest {
                 )
         ));
 
-        // verify
-        verify(tokenBlackListService, times(1)).isBlackListed(token);
-
-        ArgumentCaptor<MemberDto.PatchPassword> captor = forClass(MemberDto.PatchPassword.class);
-        verify(memberService, times(1)).updatePassword(eq(token), captor.capture());
-        verify(memberRepository, times(1)).save(member);
-
         // Assertions
+        ArgumentCaptor<MemberDto.PatchPassword> captor = forClass(MemberDto.PatchPassword.class);
         MemberDto.PatchPassword capturedArgument = captor.getValue();
         assertEquals("1234qwer!@#$", capturedArgument.getCurPassword());
         assertEquals("123456!@#asd123", capturedArgument.getNewPassword());
@@ -292,13 +275,9 @@ public class MemberIntegrationTest {
                         )
                 ));
 
-        // verify
+        // Assertions
         ArgumentCaptor<String> emailCaptor = forClass(String.class);
         ArgumentCaptor<String> passwordCaptor = forClass(String.class);
-        verify(memberService, times(1)).findPassword(emailCaptor.capture(), passwordCaptor.capture());
-        verify(memberRepository, times(1)).save(member);
-
-        // Assertions
         assertEquals(member.getEmail(), emailCaptor.getValue());
         assertEquals("123456!@#asd123", passwordCaptor.getValue());
     }
@@ -344,10 +323,6 @@ public class MemberIntegrationTest {
                                 fieldWithPath("data.outgoTags").description("지출 태그 목록")
                         )
                 ));
-
-        // verify
-        verify(tokenBlackListService, times(1)).isBlackListed(token);
-        verify(memberService, times(1)).findMember(token);
     }
 
     @Test
@@ -375,16 +350,12 @@ public class MemberIntegrationTest {
                                 headerWithName("Authorization").description("JWT 액세스 토큰")
                         )
                 ));
-
-        // verify
-        verify(tokenBlackListService, times(1)).isBlackListed(token);
-        verify(memberService, times(1)).deleteMember(token);
     }
 
     @Test
     @DisplayName("이메일 중복 체크 1 : 이메일 중복 아닐 시")
     @Order(7)
-    void emailCheckMemberTest_success() throws Exception {
+    void emailCheckMemberTest_Success() throws Exception {
         // given
         EmailRequestDto emailRequestDto = new EmailRequestDto(
                 "check@example.com", null
@@ -406,7 +377,7 @@ public class MemberIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("MemberIntegrationTest/emailCheckMemberTest_success",
+                .andDo(document("MemberIntegrationTest/emailCheckMemberTest_Success",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
@@ -418,7 +389,7 @@ public class MemberIntegrationTest {
     @Test
     @DisplayName("이메일 중복 체크 2 : 이메일 중복 시")
     @Order(8)
-    void emailCheckMemberTest_failure() throws Exception {
+    void emailCheckMemberTest_Fail() throws Exception {
         // given
         EmailRequestDto emailRequestDto = new EmailRequestDto(
                 member.getEmail(), null
@@ -440,7 +411,7 @@ public class MemberIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("MemberIntegrationTest/emailCheckMemberTest_failure",
+                .andDo(document("MemberIntegrationTest/emailCheckMemberTest_Fail",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
@@ -458,7 +429,7 @@ public class MemberIntegrationTest {
     @Test
     @DisplayName("회원가입 시 이메일 인증 1 : 이메일이 존재하지 않는 경우")
     @Order(9)
-    void sendVerificationEmailTest_success() throws Exception {
+    void sendVerificationEmailTest_Success() throws Exception {
         // given
         EmailRequestDto emailRequestDto = new EmailRequestDto(
                 "check@example.com", null
@@ -483,7 +454,7 @@ public class MemberIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("MemberIntegrationTest/sendVerificationEmailTest_success",
+                .andDo(document("MemberIntegrationTest/sendVerificationEmailTest_Success",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
@@ -499,7 +470,7 @@ public class MemberIntegrationTest {
     @Test
     @DisplayName("회원가입 시 이메일 인증 2 : 이메일이 이미 존재할 경우")
     @Order(10)
-    void sendVerificationEmailTest_failure() throws Exception {
+     void sendVerificationEmailTest_Fail() throws Exception {
         // given
         EmailRequestDto emailRequestDto = new EmailRequestDto(
                 member.getEmail(), null
@@ -524,7 +495,7 @@ public class MemberIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("MemberIntegrationTest/sendVerificationEmailTest_failure",
+                .andDo(document("MemberIntegrationTest/sendVerificationEmailTest_Fail",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
@@ -540,7 +511,7 @@ public class MemberIntegrationTest {
     @Test
     @DisplayName("비밀번호 찾기 이메일 인증 1 : 이메일이 존재할 경우")
     @Order(11)
-    void findPasswordSendVerificationEmailTest_success() throws Exception {
+    void findPasswordSendVerificationEmailTest_Success() throws Exception {
         // given
         EmailRequestDto emailRequestDto = new EmailRequestDto(
                 member.getEmail(), null
@@ -565,7 +536,7 @@ public class MemberIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("MemberIntegrationTest/findPasswordSendVerificationEmailTest_success",
+                .andDo(document("MemberIntegrationTest/findPasswordSendVerificationEmailTest_Success",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
@@ -581,7 +552,7 @@ public class MemberIntegrationTest {
     @Test
     @DisplayName("비밀번호 찾기 이메일 인증 2 : 이메일이 존재하지 않을 경우")
     @Order(12)
-    void findPasswordSendVerificationEmailTest_failure() throws Exception {
+    void findPasswordSendVerificationEmailTest_Fail() throws Exception {
         // given
         EmailRequestDto emailRequestDto = new EmailRequestDto(
                 "check@example.com", null
@@ -606,7 +577,7 @@ public class MemberIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("MemberIntegrationTest/findPasswordSendVerificationEmailTest_failure",
+                .andDo(document("MemberIntegrationTest/findPasswordSendVerificationEmailTest_Fail",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
@@ -644,7 +615,5 @@ public class MemberIntegrationTest {
                                 headerWithName("Authorization").description("JWT 액세스 토큰")
                         )
                 ));
-
-        verify(tokenBlackListService, times(1)).addToBlackList(token);
     }
 }
