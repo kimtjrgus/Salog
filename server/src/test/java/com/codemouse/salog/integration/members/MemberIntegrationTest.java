@@ -1,4 +1,4 @@
-package com.codemouse.salog.integration.member;
+package com.codemouse.salog.integration.members;
 
 import com.codemouse.salog.auth.utils.TokenBlackListService;
 import com.codemouse.salog.helper.EmailSender;
