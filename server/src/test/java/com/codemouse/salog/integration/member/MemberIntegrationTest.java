@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest // 테스트 환경 애플리케이션 컨텍스트 로드
 @AutoConfigureMockMvc // MockMvc 자동 구성, 웹 계층 테스트
-@AutoConfigureRestDocs // Rest Docs 자동 구성, 문서화
+@AutoConfigureRestDocs(outputDir = "target/snippets/MemberIntegrationTest") // Rest Docs 자동 구성, 문서화
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class}) // JUnit5, Rest Docs 통합 지원
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) // 테스트 케이스 순서 보장
 @Transactional
