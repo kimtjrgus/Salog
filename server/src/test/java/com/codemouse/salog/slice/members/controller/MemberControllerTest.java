@@ -166,7 +166,7 @@ public class MemberControllerTest {
     @Test
     @DisplayName("/emailcheck")
     @Order(7)
-    void emailCheckMember() throws Exception {
+    void emailCheckMemberTest() throws Exception {
         // given
         EmailRequestDto dto = new EmailRequestDto("test@email.com", "123!@#qwe123");
         String content = gson.toJson(dto);
@@ -187,7 +187,7 @@ public class MemberControllerTest {
     @Test
     @DisplayName("/signup/sendmail")
     @Order(8)
-    void sendVerificationEamil() throws Exception {
+    void sendVerificationEmailTest() throws Exception {
         // given
         EmailRequestDto dto = new EmailRequestDto("test@email.com", "123!@#123qwe");
         String content = gson.toJson(dto);
@@ -208,7 +208,7 @@ public class MemberControllerTest {
     @Test
     @DisplayName("/findPassword/sendmail")
     @Order(9)
-    void findPasswordSendVerificationEmail() throws Exception {
+    void findPasswordSendVerificationEmailTest() throws Exception {
         // given
         EmailRequestDto dto = new EmailRequestDto("test@email.com", "123!@#123qwe");
         String content = gson.toJson(dto);
@@ -229,7 +229,7 @@ public class MemberControllerTest {
     @Test
     @DisplayName("/logout")
     @Order(10)
-    void logout() throws Exception {
+    void logoutTest() throws Exception {
         // when
         mockMvc.perform(
                 post("/members/logout")
