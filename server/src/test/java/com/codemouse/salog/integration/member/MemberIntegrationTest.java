@@ -1,12 +1,12 @@
 package com.codemouse.salog.integration.member;
 
 import com.codemouse.salog.auth.utils.TokenBlackListService;
+import com.codemouse.salog.helper.EmailSender;
 import com.codemouse.salog.members.dto.EmailRequestDto;
 import com.codemouse.salog.members.dto.MemberDto;
 import com.codemouse.salog.members.entity.Member;
 import com.codemouse.salog.members.repository.MemberRepository;
 import com.codemouse.salog.members.service.MemberService;
-import com.codemouse.salog.tags.ledgerTags.dto.LedgerTagDto;
 import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.*;
@@ -19,35 +19,30 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
 
 @SpringBootTest // 테스트 환경 애플리케이션 컨텍스트 로드
 @AutoConfigureMockMvc // MockMvc 자동 구성, 웹 계층 테스트
@@ -70,6 +65,10 @@ public class MemberIntegrationTest {
     @Autowired
     Gson gson = new Gson();
 
+    // 이메일 전송 로직 모킹
+    @MockBean
+    EmailSender emailSender;
+
     private String token;
     private Member member;
 
@@ -85,10 +84,12 @@ public class MemberIntegrationTest {
         member.setEmailAlarm(false);
         member.setHomeAlarm(false);
         member.setRoles(List.of("USER"));
+        member.setLedgerTags(Collections.emptyList());
         memberRepository.save(member);
 
         // JWT 토큰 생성
         token = generateAccessToken(member.getEmail());
+
     }
 
     // 실제 동작을 모의하기 위한 login 요청 (액세스토큰 추출)
@@ -125,6 +126,7 @@ public class MemberIntegrationTest {
 
                 // then
                 .andExpect(status().isCreated())
+                .andDo(print())
 
                 // documentation
                 .andDo(document("MemberIntegrationTest/postMemberTest",
@@ -143,7 +145,7 @@ public class MemberIntegrationTest {
         // 동일한 객체가 아니게 되므로
         // 필드 값을 검증하기 위해 ArgumentCaptor를 사용하여 실제로 전달된 객체의 필드를 비교
         ArgumentCaptor<MemberDto.Post> captor = forClass(MemberDto.Post.class);
-        verify(memberService, times(1)).createMember(captor.capture());
+        verify(memberService, times(1)).createMember(captor.capture()); // 통합 테스트 특성 상 메서드가 하나라도 정상 작동 하지 않으면 실패하기 때문에 메서드 호출에 대한 verify는 불필요함, 그렇기 때문에 추후 삭제할 것
         verify(memberRepository, times(1)).save(member);
 
         // Assertions
@@ -177,6 +179,7 @@ public class MemberIntegrationTest {
 
                 // then
                 .andExpect(status().isOk())
+                .andDo(print())
 
                 // documentation
                 .andDo(document("MemberIntegrationTest/updateMemberTest",
@@ -227,6 +230,7 @@ public class MemberIntegrationTest {
 
                 // then
                 .andExpect(status().isOk())
+                .andDo(print())
 
                 // documentation
                 .andDo(document("MemberIntegrationTest/changePasswordTest",
@@ -276,6 +280,7 @@ public class MemberIntegrationTest {
 
                 // then
                 .andExpect(status().isOk())
+                .andDo(print())
 
                 // documentation
                 .andDo(document("MemberIntegrationTest/findPasswordTest",
@@ -301,17 +306,8 @@ public class MemberIntegrationTest {
     @Test
     @DisplayName("회원조회")
     @Order(5)
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD) // memberId 누적 증가 문제로 테스트 실행 전 컨택스트 리로딩
     void getMemberTest() throws Exception {
-        // given
-        MemberDto.Response response = new MemberDto.Response();
-        response.setMemberId(member.getMemberId());
-        response.setEmail(member.getEmail());
-        response.setEmailAlarm(member.isEmailAlarm());
-        response.setHomeAlarm(member.isHomeAlarm());
-        response.setCreatedAt(member.getCreatedAt());
-        response.setIncomeTags(List.of(new LedgerTagDto.Response(1L, "incomeTag")));
-        response.setOutgoTags(List.of(new LedgerTagDto.Response(1L, "outgoTag")));
-
         // when
         mockMvc.perform(
                         get("/members/get")
@@ -323,34 +319,332 @@ public class MemberIntegrationTest {
 
                 // then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.memberId").value(member.getMemberId()))
-                .andExpect(jsonPath("$.email").value(member.getEmail()))
-                .andExpect(jsonPath("$.emailAlarm").value(member.isEmailAlarm()))
-                .andExpect(jsonPath("$.homeAlarm").value(member.isHomeAlarm()))
-                .andExpect(jsonPath("$.incomeTags", hasSize(1)))
-                .andExpect(jsonPath("$.outgoTags", hasSize(1)))
+                .andExpect(jsonPath("$.data.memberId").value(member.getMemberId()))
+                .andExpect(jsonPath("$.data.email").value(member.getEmail()))
+                .andExpect(jsonPath("$.data.emailAlarm").value(member.isEmailAlarm()))
+                .andExpect(jsonPath("$.data.homeAlarm").value(member.isHomeAlarm()))
+                .andExpect(jsonPath("$.data.incomeTags", hasSize(0)))
+                .andExpect(jsonPath("$.data.outgoTags", hasSize(0)))
+                .andDo(print())
 
                 // documentation
                 .andDo(document("MemberIntegrationTest/getMemberTest",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 액세스 토큰")
+                        ),
                         responseFields(
-                                fieldWithPath("memberId").description("회원 ID"),
-                                fieldWithPath("email").description("회원 이메일"),
-                                fieldWithPath("emailAlarm").description("이메일 알림 설정"),
-                                fieldWithPath("homeAlarm").description("홈 알림 설정"),
-                                fieldWithPath("createdAt").description("계정 생성 일시"),
-                                fieldWithPath("incomeTags").description("수입 태그 목록"),
-                                fieldWithPath("incomeTags[].id").description("태그 ID"),
-                                fieldWithPath("incomeTags[].name").description("태그 이름"),
-                                fieldWithPath("outgoTags").description("지출 태그 목록"),
-                                fieldWithPath("outgoTags[].id").description("태그 ID"),
-                                fieldWithPath("outgoTags[].name").description("태그 이름")
+                                fieldWithPath("data.memberId").description("회원 ID"),
+                                fieldWithPath("data.email").description("회원 이메일"),
+                                fieldWithPath("data.homeAlarm").description("웹 페이지 고정 지출 알람"),
+                                fieldWithPath("data.emailAlarm").description("이메일 고정 지출 알람"),
+                                fieldWithPath("data.createdAt").description("계정 생성 일시"),
+                                fieldWithPath("data.incomeTags").description("수입 태그 목록"),
+                                fieldWithPath("data.outgoTags").description("지출 태그 목록")
                         )
                 ));
 
         // verify
         verify(tokenBlackListService, times(1)).isBlackListed(token);
         verify(memberService, times(1)).findMember(token);
+    }
+
+    @Test
+    @DisplayName("회원탈퇴")
+    @Order(6)
+    void deleteMemberTest() throws Exception {
+        // when
+        mockMvc.perform(
+                        delete("/members/leaveid")
+                                .header("Authorization", token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                )
+
+                // then
+                .andExpect(status().isNoContent())
+                .andDo(print())
+
+                // documentation
+                .andDo(document("MemberIntegrationTest/deleteMemberTest",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 액세스 토큰")
+                        )
+                ));
+
+        // verify
+        verify(tokenBlackListService, times(1)).isBlackListed(token);
+        verify(memberService, times(1)).deleteMember(token);
+    }
+
+    @Test
+    @DisplayName("이메일 중복 체크 1 : 이메일 중복 아닐 시")
+    @Order(7)
+    void emailCheckMemberTest_success() throws Exception {
+        // given
+        EmailRequestDto emailRequestDto = new EmailRequestDto(
+                "check@example.com", null
+        );
+
+        String content = gson.toJson(emailRequestDto);
+
+        // when
+        mockMvc.perform(
+                        post("/members/emailcheck")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                                .content(content)
+                )
+
+                // then
+                .andExpect(status().isOk())
+                .andDo(print())
+
+                // documentation
+                .andDo(document("MemberIntegrationTest/emailCheckMemberTest_success",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").description("가입 이메일")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("이메일 중복 체크 2 : 이메일 중복 시")
+    @Order(8)
+    void emailCheckMemberTest_failure() throws Exception {
+        // given
+        EmailRequestDto emailRequestDto = new EmailRequestDto(
+                member.getEmail(), null
+        );
+
+        String content = gson.toJson(emailRequestDto);
+
+        // when
+        mockMvc.perform(
+                        post("/members/emailcheck")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                                .content(content)
+                )
+
+                // then
+                .andExpect(status().isConflict())
+                .andDo(print())
+
+                // documentation
+                .andDo(document("MemberIntegrationTest/emailCheckMemberTest_failure",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").description("가입 이메일")
+                        ),
+                        responseFields(
+                                fieldWithPath("status").description("상태 코드"),
+                                fieldWithPath("message").description("에러 상세 내용"),
+                                fieldWithPath("fieldErrors").description("유효성 검사"),
+                                fieldWithPath("violationErrors").description("규칙 위반")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("회원가입 시 이메일 인증 1 : 이메일이 존재하지 않는 경우")
+    @Order(9)
+    void sendVerificationEmailTest_success() throws Exception {
+        // given
+        EmailRequestDto emailRequestDto = new EmailRequestDto(
+                "check@example.com", null
+        );
+
+        String content = gson.toJson(emailRequestDto);
+
+        // 실제 이메일 전송 하지 않도록 모킹
+        doNothing().when(emailSender).sendVerificationEmail(anyString(), anyString());
+
+        // when
+        mockMvc.perform(
+                post("/members/signup/sendmail")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .content(content)
+        )
+
+                // then
+                .andExpect(status().isOk())
+                .andDo(print())
+
+                // documentation
+                .andDo(document("MemberIntegrationTest/sendVerificationEmailTest_success",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").description("가입 이메일")
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("인증용 랜덤 코드"),
+                                fieldWithPath("active").description("이메일 존재 여부")
+                        )
+        ));
+    }
+
+    @Test
+    @DisplayName("회원가입 시 이메일 인증 2 : 이메일이 이미 존재할 경우")
+    @Order(10)
+    void sendVerificationEmailTest_failure() throws Exception {
+        // given
+        EmailRequestDto emailRequestDto = new EmailRequestDto(
+                member.getEmail(), null
+        );
+
+        String content = gson.toJson(emailRequestDto);
+
+        // 실제 이메일 전송 하지 않도록 모킹
+        doNothing().when(emailSender).sendVerificationEmail(anyString(), anyString());
+
+        // when
+        mockMvc.perform(
+                post("/members/signup/sendmail")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .content(content)
+        )
+
+                // then
+                .andExpect(status().isOk())
+                .andDo(print())
+
+                // documentation
+                .andDo(document("MemberIntegrationTest/sendVerificationEmailTest_failure",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").description("가입 이메일")
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("상태 메시지"),
+                                fieldWithPath("active").description("이메일 존재 여부")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("비밀번호 찾기 이메일 인증 1 : 이메일이 존재할 경우")
+    @Order(11)
+    void findPasswordSendVerificationEmailTest_success() throws Exception {
+        // given
+        EmailRequestDto emailRequestDto = new EmailRequestDto(
+                member.getEmail(), null
+        );
+
+        String content = gson.toJson(emailRequestDto);
+
+        // 실제 이메일 전송 하지 않도록 모킹
+        doNothing().when(emailSender).sendVerificationEmail(anyString(), anyString());
+
+        // when
+        mockMvc.perform(
+                        post("/members/findPassword/sendmail")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                                .content(content)
+                )
+
+                // then
+                .andExpect(status().isOk())
+                .andDo(print())
+
+                // documentation
+                .andDo(document("MemberIntegrationTest/findPasswordSendVerificationEmailTest_success",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").description("가입 이메일")
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("인증용 랜덤 코드"),
+                                fieldWithPath("active").description("이메일 존재 여부")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("비밀번호 찾기 이메일 인증 2 : 이메일이 존재하지 않을 경우")
+    @Order(12)
+    void findPasswordSendVerificationEmailTest_failure() throws Exception {
+        // given
+        EmailRequestDto emailRequestDto = new EmailRequestDto(
+                "check@example.com", null
+        );
+
+        String content = gson.toJson(emailRequestDto);
+
+        // 실제 이메일 전송 하지 않도록 모킹
+        doNothing().when(emailSender).sendVerificationEmail(anyString(), anyString());
+
+        // when
+        mockMvc.perform(
+                        post("/members/findPassword/sendmail")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                                .content(content)
+                )
+
+                // then
+                .andExpect(status().isOk())
+                .andDo(print())
+
+                // documentation
+                .andDo(document("MemberIntegrationTest/findPasswordSendVerificationEmailTest_failure",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").description("가입 이메일")
+                        ),
+                        responseFields(
+                                fieldWithPath("message").description("상태 메시지"),
+                                fieldWithPath("active").description("이메일 존재 여부")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("로그아웃")
+    @Order(13)
+    void logoutTest() throws Exception {
+        // when
+        mockMvc.perform(
+                post("/members/logout")
+                        .header("Authorization", token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+        )
+
+                // then
+                .andExpect(status().isOk())
+                .andDo(print())
+
+                // documentation
+                .andDo(document("MemberIntegrationTest/logoutTest",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                                headerWithName("Authorization").description("JWT 액세스 토큰")
+                        )
+                ));
+
+        verify(tokenBlackListService, times(1)).addToBlackList(token);
     }
 }
