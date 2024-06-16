@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
@@ -67,6 +68,8 @@ public class MemberIntegrationTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     Gson gson = new Gson();
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     // 이메일 전송 로직 모킹
     @MockBean
@@ -78,6 +81,8 @@ public class MemberIntegrationTest {
     // given : 회원 모킹
     @BeforeEach
     void setup() throws Exception {
+        jdbcTemplate.execute("ALTER TABLE member ALTER COLUMN member_id RESTART WITH 1");
+
         memberRepository.deleteAll();
 
         member = new Member();
@@ -267,7 +272,6 @@ public class MemberIntegrationTest {
     @Test
     @DisplayName("비밀번호 변경 실패 : 소셜가입한 회원")
     @Order(5)
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD) // 회원 중복 저장 회피
     void changePasswordTest_Fail() throws Exception {
         // given
         member.setPassword(null);
@@ -392,7 +396,6 @@ public class MemberIntegrationTest {
     @Test
     @DisplayName("비밀번호 찾기 실패 2 : 소셜가입한 회원")
     @Order(8)
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD) // 회원 중복 저장 회피
     void findPasswordTest_Fail_2() throws Exception {
         // given
         member.setPassword(null);
@@ -437,7 +440,6 @@ public class MemberIntegrationTest {
     @Test
     @DisplayName("회원조회 성공")
     @Order(9)
-    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD) // memberId 누적 증가 문제로 테스트 실행 전 컨택스트 리로딩
     void getMemberTest_Success() throws Exception {
         // when
         mockMvc.perform(
