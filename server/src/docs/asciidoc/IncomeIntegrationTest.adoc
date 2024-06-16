@@ -1,0 +1,228 @@
+= API Documentation
+:toc: left
+:toclevels: 2
+:sectlinks:
+:sectanchors:
+:doctype: book
+:icons: font
+:encoding: utf-8
+:docdir: {docdir}
+
+= API Documentation
+:revnumber: 0.0.1-SNAPSHOT
+:revdate: 2024-06-14 14:32:58 +0900
+
+= 수입 생성
+
+== pass
+
+=== 수입 생성_성공 1 : 태그가 Null인 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success1/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success1/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success1/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success1/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success1/response-fields.adoc[]
+
+=== 수입 생성_성공 2 : 태그가 존재하지 않는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success2/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success2/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success2/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success2/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success2/response-fields.adoc[]
+
+=== 수입 생성_성공 3 : 태그가 이미 존재하는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success3/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success3/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success3/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success3/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Success3/response-fields.adoc[]
+
+
+== fail
+
+=== 수입 생성_실패 : 태그가 유효성 검증에 실패하는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Fail/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Fail/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Fail/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Fail/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/postIncomeTest_Fail/response-fields.adoc[]
+
+
+
+= 수입 수정
+
+== pass
+
+=== 수입 수정_성공 1 : 태그가 Null인 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success1/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success1/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success1/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success1/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success1/response-fields.adoc[]
+
+=== 수입 수정_성공 2 : 태그가 존재하지 않는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success2/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success2/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success2/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success2/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success2/response-fields.adoc[]
+
+=== 수입 수정_성공 3 : 태그가 이미 존재하는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success3/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success3/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success3/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success3/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Success3/response-fields.adoc[]
+
+
+== fail
+
+=== 수입 수정_실패 1 : 태그가 유효성 검증에 실패하는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Fail1/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Fail1/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Fail1/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Fail1/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Fail1/response-fields.adoc[]
+
+=== 수입 수정_실패 2 : 수입이 존재하지 않는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Fail2/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Fail2/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Fail2/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Fail2/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/updateIncomeTest_Fail2/response-fields.adoc[]
+
+
+
+= 수입 조회
+
+== pass
+
+=== 수입 조회_성공 1 : 태그가 없고 일자가 유효한 경우 (일별 조회)
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success1/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success1/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success1/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success1/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success1/response-fields.adoc[]
+
+=== 수입 조회_성공 2 : 태그가 없고 일자가 00인 경우 (월별 조회)
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success2/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success2/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success2/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success2/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success2/response-fields.adoc[]
+
+=== 수입 조회_성공 3 : 태그가 있고 일자가 유효한 경우 (일별 조회)
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success3/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success3/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success3/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success3/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success3/response-fields.adoc[]
+
+=== 수입 조회_성공 4 : 태그가 있고 일자가 00인 경우 (월별 조회)
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success4/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success4/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success4/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success4/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Success4/response-fields.adoc[]
+
+
+== fail
+
+=== 수입 조회_실패 1 : 월자가 유효하지 않은 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Fail1/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Fail1/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Fail1/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Fail1/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Fail1/response-fields.adoc[]
+
+=== 수입 조회_실패 2 : 일자가 유효하지 않은 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Fail2/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Fail2/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Fail2/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Fail2/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getAllIncomesTest_Fail2/response-fields.adoc[]
+
+
+
+= 수입 삭제
+
+== pass
+
+=== 수입 삭제_성공 1 : 태그가 null인 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Success1/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Success1/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Success1/http-response.adoc[]
+
+=== 수입 삭제_성공 2 : 태그와 연결된 다른 수입이 없는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Success2/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Success2/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Success2/http-response.adoc[]
+
+=== 수입 삭제_성공 3 : 태그와 연결된 다른 수입이 있는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Success3/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Success3/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Success3/http-response.adoc[]
+
+
+== fail
+
+=== 수입 삭제_실패 : 수입이 존재하지 않는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Fail/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Fail/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Fail/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/deleteIncomeTest_Fail/response-fields.adoc[]
+
+
+
+= 월별 수입 조회
+
+== pass
+
+=== 월별 수입 조회_성공 1 : 수입이 존재하는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Success1/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Success1/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Success1/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Success1/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Success1/response-fields.adoc[]
+
+=== 월별 수입 조회_성공 2 : 수입이 존재하지 않는 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Success2/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Success2/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Success2/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Success2/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Success2/response-fields.adoc[]
+
+
+== fail
+
+=== 월별 수입 조회_실패 : 날짜가 유효하지 않은 경우
+
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Fail/http-request.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Fail/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Fail/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Fail/http-response.adoc[]
+include::{docdir}/build/generated-snippets/IncomeIntegrationTest/getMonthlyIncomeTest_Fail/response-fields.adoc[]
+
+== Version 0.0.1-SNAPSHOT
+Last updated 2024-06-14 14:32:58 +0900
