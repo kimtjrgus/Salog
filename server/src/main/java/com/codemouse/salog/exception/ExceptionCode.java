@@ -41,7 +41,11 @@ public enum ExceptionCode {
 
     // 월간 예산
     BUDGET_NOT_FOUND(404, "BUDGET_NOT_FOUND 존재하지 않는 월별 예산"),
-    BUDGET_EXIST(400, "BUDGET_EXIST 이미 존재하는 예산");
+    BUDGET_EXIST(400, "BUDGET_EXIST 이미 존재하는 예산"),
+
+    // 가계부 조회 시 유효한 날짜가 아닐 시
+    UNVALIDATED_DAY(400, "UNVALIDATED_DAY 유효하지 않은 일자"),
+    UNVALIDATED_MONTH(400, "UNVALIDATED_MONTH 유효하지 않은 월자");
 
     private int status;
 

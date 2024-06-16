@@ -84,6 +84,12 @@ public class IncomeService {
         int month = arr[1];
         int day = arr[2];
 
+        if (month < 0 || month > 12) {
+            throw new BusinessLogicException(ExceptionCode.UNVALIDATED_MONTH);
+        } else if (day < 0 || day > 31 ) {
+            throw new BusinessLogicException(ExceptionCode.UNVALIDATED_DAY);
+        }
+
         if (incomeTag != null) {
             String decodedTag = URLDecoder.decode(incomeTag, StandardCharsets.UTF_8);
             log.info("DecodedTag To UTF-8 : {}", decodedTag);
