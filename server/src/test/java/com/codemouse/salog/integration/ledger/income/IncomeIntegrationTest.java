@@ -82,7 +82,7 @@ public class IncomeIntegrationTest {
     void setup() throws Exception {
         /*
         회원과 수입이 각 테스트 실행 시 마다 DB에서 식별자가 증가하는 문제가 있기 때문에
-        기존 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)를 사용했었음
+        기존 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)를 사용해서 컨택스트를 리로딩함
         ex. memberIntegrationTest
         그러나 아래의 jdbc 템플릿 라이브러리를 사용하여 매 테스트 시작 전 sql 문을 삽입하여 문제를 해결함
         이로써 기존에 컨택스트를 리로딩하면서 발생하는 테스트 속도 저하를 해결함
@@ -90,7 +90,6 @@ public class IncomeIntegrationTest {
         다만, DB 종속성 문제가 있을 수 있으나, 기본적으로 테스트 db는 H2를 사용하는데, 실 사용 DB가 Mysql이기 때문에
         현재까지는 문제가 없음
          */
-        // todo - 2024-6-16 : 추후 회원 통합 테스트에도 적용할 것
         jdbcTemplate.execute("ALTER TABLE member ALTER COLUMN member_id RESTART WITH 1");
         jdbcTemplate.execute("ALTER TABLE income ALTER COLUMN income_id RESTART WITH 1");
         jdbcTemplate.execute("ALTER TABLE ledger_tag ALTER COLUMN ledger_tag_id RESTART WITH 1");
