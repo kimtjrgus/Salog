@@ -129,7 +129,7 @@ public class FixedIncomeIntegrationTest {
     @Test
     @DisplayName("고정 수입 생성 성공")
     @Order(1)
-    void postFixedIncome_Success() throws Exception {
+    void postFixedIncomeTest_Success() throws Exception {
         // given
         FixedIncomeDto.Post postDto = new FixedIncomeDto.Post(
                 10000, "testName", LocalDate.of(2024,1,1)
@@ -157,7 +157,7 @@ public class FixedIncomeIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("FixedIncomeIntegrationTest/postFixedIncome_Success",
+                .andDo(document("FixedIncomeIntegrationTest/postFixedIncomeTest_Success",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -180,7 +180,7 @@ public class FixedIncomeIntegrationTest {
     @Test
     @DisplayName("고정 수입 수정 성공")
     @Order(2)
-    void patchFixedIncome_Success() throws Exception {
+    void patchFixedIncomeTest_Success() throws Exception {
         // given
         FixedIncomeDto.Patch patchDto = new FixedIncomeDto.Patch(
                 1000, "fixedName", LocalDate.of(2024,1,2)
@@ -208,7 +208,7 @@ public class FixedIncomeIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("FixedIncomeIntegrationTest/patchFixedIncome_Success",
+                .andDo(document("FixedIncomeIntegrationTest/patchFixedIncomeTest_Success",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -231,7 +231,7 @@ public class FixedIncomeIntegrationTest {
     @Test
     @DisplayName("고정 수입 수정 실패 : 고정 수입이 존재하지 않는 경우")
     @Order(3)
-    void patchFixedIncome_Fail() throws Exception {
+    void patchFixedIncomeTest_Fail() throws Exception {
         // given
         FixedIncomeDto.Patch patchDto = new FixedIncomeDto.Patch(
                 1000, "fixedName", LocalDate.of(2024,1,2)
@@ -259,7 +259,7 @@ public class FixedIncomeIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("FixedIncomeIntegrationTest/patchFixedIncome_Fail",
+                .andDo(document("FixedIncomeIntegrationTest/patchFixedIncomeTest_Fail",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -282,7 +282,7 @@ public class FixedIncomeIntegrationTest {
     @Test
     @DisplayName("고정 수입 조회 성공 1 : 일자가 유효한 경우 (일별 조회)")
     @Order(4)
-    void getAllFixedIncomes_Success1() throws Exception {
+    void getAllFixedIncomesTest_Success1() throws Exception {
         // when
         mockMvc.perform(
                 get("/fixedIncome/get")
@@ -299,7 +299,7 @@ public class FixedIncomeIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("FixedIncomeIntegrationTest/getAllFixedIncomes_Success1",
+                .andDo(document("FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success1",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -328,7 +328,7 @@ public class FixedIncomeIntegrationTest {
     @Test
     @DisplayName("고정 수입 조회 성공 2 : 일자가 0인 경우 (월별 조회)")
     @Order(5)
-    void getAllFixedIncomes_Success2() throws Exception {
+    void getAllFixedIncomesTest_Success2() throws Exception {
         // when
         mockMvc.perform(
                         get("/fixedIncome/get")
@@ -345,7 +345,7 @@ public class FixedIncomeIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("FixedIncomeIntegrationTest/getAllFixedIncomes_Success2",
+                .andDo(document("FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success2",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -374,7 +374,7 @@ public class FixedIncomeIntegrationTest {
     @Test
     @DisplayName("고정 수입 조회 실패 1 : 일자가 유효하지 않은 경우")
     @Order(6)
-    void getAllFixedIncomes_Fail1() throws Exception {
+    void getAllFixedIncomesTest_Fail1() throws Exception {
         // when
         mockMvc.perform(
                         get("/fixedIncome/get")
@@ -391,7 +391,7 @@ public class FixedIncomeIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("FixedIncomeIntegrationTest/getAllFixedIncomes_Fail1",
+                .andDo(document("FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail1",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -414,7 +414,7 @@ public class FixedIncomeIntegrationTest {
     @Test
     @DisplayName("고정 수입 조회 실패 2 : 월자가 유효하지 않은 경우")
     @Order(7)
-    void getAllFixedIncomes_Fail2() throws Exception {
+    void getAllFixedIncomesTest_Fail2() throws Exception {
         // when
         mockMvc.perform(
                         get("/fixedIncome/get")
@@ -431,7 +431,7 @@ public class FixedIncomeIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("FixedIncomeIntegrationTest/getAllFixedIncomes_Fail2",
+                .andDo(document("FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail2",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -454,7 +454,7 @@ public class FixedIncomeIntegrationTest {
     @Test
     @DisplayName("고정 수입 삭제 성공")
     @Order(8)
-    void deleteFixedIncome_Success() throws Exception {
+    void deleteFixedIncomeTest_Success() throws Exception {
         // when
         mockMvc.perform(
                         delete("/fixedIncome/delete/{fixedIncome-id}", 1L)
@@ -468,7 +468,7 @@ public class FixedIncomeIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("FixedIncomeIntegrationTest/deleteFixedIncome_Success",
+                .andDo(document("FixedIncomeIntegrationTest/deleteFixedIncomeTest_Success",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -480,7 +480,7 @@ public class FixedIncomeIntegrationTest {
     @Test
     @DisplayName("고정 수입 삭제 실패 : 고정 수입이 존재하지 않는 경우")
     @Order(9)
-    void deleteFixedIncome_Fail() throws Exception {
+    void deleteFixedIncomeTest_Fail() throws Exception {
         // when
         mockMvc.perform(
                         delete("/fixedIncome/delete/{fixedIncome-id}", 2L)
@@ -494,7 +494,7 @@ public class FixedIncomeIntegrationTest {
                 .andDo(print())
 
                 // documentation
-                .andDo(document("FixedIncomeIntegrationTest/deleteFixedIncome_Fail",
+                .andDo(document("FixedIncomeIntegrationTest/deleteFixedIncomeTest_Fail",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(

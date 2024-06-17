@@ -18,11 +18,11 @@
 
 === 고정 수입 생성_성공
 
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedIncome_Success/http-request.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedIncome_Success/request-headers.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedIncome_Success/request-fields.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedIncome_Success/http-response.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedIncome_Success/response-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedIncomeTest_Success/http-request.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedIncomeTest_Success/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedIncomeTest_Success/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedIncomeTest_Success/http-response.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedIncomeTest_Success/response-fields.adoc[]
 
 
 
@@ -32,22 +32,22 @@ include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/postFixedI
 
 === 고정 수입 수정_성공
 
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncome_Success/http-request.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncome_Success/request-headers.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncome_Success/request-fields.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncome_Success/http-response.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncome_Success/response-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncomeTest_Success/http-request.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncomeTest_Success/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncomeTest_Success/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncomeTest_Success/http-response.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncomeTest_Success/response-fields.adoc[]
 
 
 == fail
 
 === 고정 수입 수정_실패 : 고정 수입이 존재하지 않는 경우
 
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncome_Fail/http-request.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncome_Fail/request-headers.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncome_Fail/request-fields.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncome_Fail/http-response.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncome_Fail/response-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncomeTest_Fail/http-request.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncomeTest_Fail/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncomeTest_Fail/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncomeTest_Fail/http-response.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixedIncomeTest_Fail/response-fields.adoc[]
 
 
 
@@ -57,38 +57,38 @@ include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/patchFixed
 
 === 고정 수입 조회_성공 1 : 일자가 유효한 경우 (일별 조회)
 
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Success1/http-request.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Success1/request-headers.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Success1/request-parameters.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Success1/http-response.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Success1/response-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success1/http-request.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success1/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success1/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success1/http-response.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success1/response-fields.adoc[]
 
 === 고정 수입 조회 성공 2 : 일자가 0인 경우 (월별 조회)
 
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Success2/http-request.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Success2/request-headers.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Success2/request-parameters.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Success2/http-response.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Success2/response-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success2/http-request.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success2/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success2/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success2/http-response.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Success2/response-fields.adoc[]
 
 
 == fail
 
 === 고정 수입 조회 실패 1 : 일자가 유효하지 않은 경우
 
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Fail1/http-request.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Fail1/request-headers.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Fail1/request-parameters.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Fail1/http-response.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Fail1/response-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail1/http-request.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail1/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail1/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail1/http-response.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail1/response-fields.adoc[]
 
 === 고정 수입 조회 실패 2 : 월자가 유효하지 않은 경우
 
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Fail2/http-request.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Fail2/request-headers.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Fail2/request-parameters.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Fail2/http-response.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomes_Fail2/response-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail2/http-request.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail2/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail2/request-parameters.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail2/http-response.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixedIncomesTest_Fail2/response-fields.adoc[]
 
 
 
@@ -98,19 +98,19 @@ include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/getAllFixe
 
 === 고정 수입 삭제 성공
 
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncome_Success/http-request.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncome_Success/request-headers.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncome_Success/http-response.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncomeTest_Success/http-request.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncomeTest_Success/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncomeTest_Success/http-response.adoc[]
 
 
 == fail
 
 === 고정 수입 삭제 실패 : 고정 수입이 존재하지 않는 경우
 
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncome_Fail/http-request.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncome_Fail/request-headers.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncome_Fail/http-response.adoc[]
-include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncome_Fail/response-fields.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncomeTest_Fail/http-request.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncomeTest_Fail/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncomeTest_Fail/http-response.adoc[]
+include::{docdir}/build/generated-snippets/FixedIncomeIntegrationTest/deleteFixedIncomeTest_Fail/response-fields.adoc[]
 
 == Version 0.0.1-SNAPSHOT
 Last updated 2024-06-16 18:24:54 +0900
