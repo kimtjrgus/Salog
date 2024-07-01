@@ -53,3 +53,14 @@ jwt:
   key: ${JWT_SECRET_KEY}
   access-token-expiration-minutes: 60
   refresh-token-expiration-minutes: 1440
+
+# 모니터링
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+  metrics:
+    enabled: true
+  prometheus:
+    enabled: true
