@@ -3,6 +3,7 @@ package com.codemouse.salog.ledger.outgo.dto;
 import com.codemouse.salog.tags.ledgerTags.dto.LedgerTagDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -27,6 +28,13 @@ public class OutgoDto {
         private Boolean wasteList;
     }
 
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Getter
+    public static class PostImage {
+        private String receiptImageUrl;
+    }
+
     @AllArgsConstructor
     @Getter
     public static class Patch {
@@ -46,7 +54,7 @@ public class OutgoDto {
     @AllArgsConstructor
     @Getter
     public static class Response {
-        private long outgoId;
+        private Long outgoId;
         private LocalDate date;
         private int money;
         private String outgoName;
@@ -54,6 +62,15 @@ public class OutgoDto {
         private String memo;
         private LedgerTagDto.Response outgoTag;
         private boolean wasteList;
+        private String receiptImg;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public static class ImageOcrResponse {
+        private String date;
+        private int money;
+        private String outgoName;
         private String receiptImg;
     }
 
