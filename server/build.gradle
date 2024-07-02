@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.17'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'com.codemouse'
@@ -31,6 +32,7 @@ dependencies {
 
 	//Spring Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
 
 	// JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -52,6 +54,7 @@ dependencies {
 
 	// DB - mysql
 	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.h2database:h2'
 
 	// Mapper
 	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
@@ -59,12 +62,119 @@ dependencies {
 
 	// Gson
 	implementation 'com.google.code.gson:gson'
+
+	// api 문서화
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+	// 모니터링 (프로메테우스)
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('bootBuildImage') {
 	builder = 'paketobuildpacks/builder-jammy-base:latest'
 }
 
+// api 문서화 관련
+
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+// 도메인 별 문서 분리
+
+task memberTest(type: Test) {
+	include '**/MemberIntegrationTest.class'
+	outputs.dir file("$buildDir/generated-snippets/MemberIntegrationTest")
+	useJUnitPlatform()
+}
+
+task incomeTest(type: Test) {
+	include '**/IncomeIntegrationTest.class'
+	outputs.dir file("$buildDir/generated-snippets/IncomeIntegrationTest")
+	useJUnitPlatform()
+}
+
+task fixedIncomeTest(type: Test) {
+	include '**/FixedIncomeIntegrationTest.class'
+	outputs.dir file("$buildDir/generated-snippets/FixedIncomeIntegrationTest")
+	useJUnitPlatform()
+}
+
+task budgetTest(type: Test) {
+	include '**/BudgetIntegrationTest.class'
+	outputs.dir file("$buildDir/generated-snippets/BudgetIntegrationTest")
+	useJUnitPlatform()
+}
+
+task asciidoctorMember(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+	sourceDir = file('src/docs/asciidoc/MemberIntegrationTest')
+	outputDir = file("$buildDir/docs/asciidoc/MemberIntegrationTest")
+	inputs.dir file("$buildDir/generated-snippets/MemberIntegrationTest")
+	attributes 'snippets': file("$buildDir/generated-snippets/MemberIntegrationTest")
+	dependsOn memberTest
+	doLast {
+		copy {
+			from "${outputDir}/html5"
+			into "src/main/resources/static/docs/MemberIntegrationTest"
+		}
+	}
+}
+
+task asciidoctorIncome(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+	sourceDir = file('src/docs/asciidoc/IncomeIntegrationTest')
+	outputDir = file("$buildDir/docs/asciidoc/IncomeIntegrationTest")
+	inputs.dir file("$buildDir/generated-snippets/IncomeIntegrationTest")
+	attributes 'snippets': file("$buildDir/generated-snippets/IncomeIntegrationTest")
+	dependsOn incomeTest
+	doLast {
+		copy {
+			from "${outputDir}/html5"
+			into "src/main/resources/static/docs/IncomeIntegrationTest"
+		}
+	}
+}
+
+task asciidoctorFixedIncome(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+	sourceDir = file('src/docs/asciidoc/FixedIncomeIntegrationTest')
+	outputDir = file("$buildDir/docs/asciidoc/FixedIncomeIntegrationTest")
+	inputs.dir file("$buildDir/generated-snippets/FixedIncomeIntegrationTest")
+	attributes 'snippets': file("$buildDir/generated-snippets/FixedIncomeIntegrationTest")
+	dependsOn fixedIncomeTest
+	doLast {
+		copy {
+			from "${outputDir}/html5"
+			into "src/main/resources/static/docs/FixedIncomeIntegrationTest"
+		}
+	}
+}
+
+task asciidoctorBudget(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+	sourceDir = file('src/docs/asciidoc/BudgetIntegrationTest')
+	outputDir = file("$buildDir/docs/asciidoc/BudgetIntegrationTest")
+	inputs.dir file("$buildDir/generated-snippets/BudgetIntegrationTest")
+	attributes 'snippets': file("$buildDir/generated-snippets/BudgetIntegrationTest")
+	dependsOn budgetTest
+	doLast {
+		copy {
+			from "${outputDir}/html5"
+			into "src/main/resources/static/docs/BudgetIntegrationTest"
+		}
+	}
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
+	outputs.dir(snippetsDir)  // 테스트 출력 디렉토리를 설정
+}
+
+clean { // 빌드 시 스니펫 초기화
+	delete 'build/generated-snippets'
+}
+
+bootJar {
+	dependsOn asciidoctorMember, asciidoctorIncome
+	from("$buildDir/docs/asciidoc") {
+		into 'static/docs'
+	}
 }

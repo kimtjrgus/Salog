@@ -110,6 +110,8 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                         .antMatchers(HttpMethod.GET, "/ledgerTags").hasRole("USER")
                         .antMatchers(HttpMethod.GET, "/diaryTags").hasRole("USER")
 
+                        // 프로메테우스
+                        .antMatchers("/actuator/prometheus").permitAll()
                 )
                 .oauth2Login();  // OAuth2 로그인 설정
         return http.build();

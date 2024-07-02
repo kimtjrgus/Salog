@@ -72,3 +72,14 @@ naver:
   ocr:
     key: ${NAVER_OCR_SECRET}
     url: ${NAVER_OCR_URL}
+
+# 모니터링
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+  metrics:
+    enabled: true
+  prometheus:
+    enabled: true

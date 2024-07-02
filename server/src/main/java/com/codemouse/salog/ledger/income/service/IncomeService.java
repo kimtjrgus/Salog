@@ -84,6 +84,12 @@ public class IncomeService {
         int month = arr[1];
         int day = arr[2];
 
+        if (month < 1 || month > 12) {
+            throw new BusinessLogicException(ExceptionCode.UNVALIDATED_MONTH);
+        } else if (day < 0 || day > 31 ) {
+            throw new BusinessLogicException(ExceptionCode.UNVALIDATED_DAY);
+        }
+
         if (incomeTag != null) {
             String decodedTag = URLDecoder.decode(incomeTag, StandardCharsets.UTF_8);
             log.info("DecodedTag To UTF-8 : {}", decodedTag);
@@ -119,6 +125,10 @@ public class IncomeService {
         int[] arr = Arrays.stream(date.split("-")).mapToInt(Integer::parseInt).toArray();
         int year = arr[0];
         int month = arr[1];
+
+        if (month > 12 || month < 1) {
+            throw new BusinessLogicException(ExceptionCode.UNVALIDATED_MONTH);
+        }
 
         // 월별 태그 합계 계산
         List<Object[]> totalIncomeByTag = incomeRepository.findTotalIncomeByMonthGroupByTag(memberId, year, month);

@@ -71,6 +71,12 @@ public class FixedIncomeService {
         int month = dates[1];
         int day = dates[2];
 
+        if (month < 1 || month > 12) {
+            throw new BusinessLogicException(ExceptionCode.UNVALIDATED_MONTH);
+        } else if (day < 0 || day > 31 ) {
+            throw new BusinessLogicException(ExceptionCode.UNVALIDATED_DAY);
+        }
+
         if (day == 0) {
             fixedIncomes = fixedIncomeRepository.findByMonth(memberId, year, month,
                     PageRequest.of(page - 1, size, Sort.by("date").descending()));
