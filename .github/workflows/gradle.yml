@@ -50,7 +50,7 @@ jobs:
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
         run: |
           cd ./server/
-          ./gradlew clean test --debug -i --stacktrace
+          ./gradlew clean test
 
       - name: Build with Gradle
         env:
