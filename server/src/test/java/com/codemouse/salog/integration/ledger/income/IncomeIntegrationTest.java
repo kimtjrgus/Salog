@@ -53,7 +53,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs(outputDir = "build/generated-snippets") // Rest Docs 자동 구성, 문서화
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class) // 테스트 케이스 순서 보장
 @Transactional
-@ActiveProfiles("application-test") // 테스트용 프로필 활성화
 public class IncomeIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
