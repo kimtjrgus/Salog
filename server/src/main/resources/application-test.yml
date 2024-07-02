@@ -65,6 +65,10 @@ jwt:
   key: ${JWT_SECRET_KEY}
   access-token-expiration-minutes: 30
   refresh-token-expiration-minutes: 1440
+naver:
+  ocr:
+    key: ${NAVER_OCR_SECRET}
+    url: ${NAVER_OCR_URL}
 
 # 모니터링
 management:
