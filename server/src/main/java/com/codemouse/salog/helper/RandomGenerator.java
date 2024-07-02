@@ -1,9 +1,13 @@
 package com.codemouse.salog.helper;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Random;
+
+@Component
 public class RandomGenerator {
 
-    public static String generateRandomCode(int length) {
+    public String generateRandomCode(int length) {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder sb = new StringBuilder(length);
         Random random = new Random();

@@ -1,0 +1,105 @@
+= API Documentation
+:toc: left
+:toclevels: 2
+:sectlinks:
+:sectanchors:
+:doctype: book
+:icons: font
+:encoding: utf-8
+:docdir: {docdir}
+
+= API Documentation
+:revnumber: 0.0.1-SNAPSHOT
+:revdate: 2024-06-17 13:51:22 +0900
+
+= 예산 생성
+
+== pass
+
+=== 예산 생성 성공
+
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/postBudgetTest_Success/http-request.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/postBudgetTest_Success/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/postBudgetTest_Success/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/postBudgetTest_Success/http-response.adoc[]
+
+
+== fail
+
+=== 예산 생성 실패 : 이미 예산이 존재하는 달
+
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/postBudgetTest_Fail/http-request.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/postBudgetTest_Fail/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/postBudgetTest_Fail/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/postBudgetTest_Fail/http-response.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/postBudgetTest_Fail/response-fields.adoc[]
+
+
+
+= 예산 수정
+
+== pass
+
+=== 예산 수정 성공
+
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/updateBudgetTest_Success/http-request.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/updateBudgetTest_Success/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/updateBudgetTest_Success/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/updateBudgetTest_Success/http-response.adoc[]
+
+
+== fail
+
+=== 예산 수정 실패 : 수정할 예산이 없는 경우
+
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/updateBudgetTest_Fail/http-request.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/updateBudgetTest_Fail/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/updateBudgetTest_Fail/request-fields.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/updateBudgetTest_Fail/http-response.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/updateBudgetTest_Fail/response-fields.adoc[]
+
+
+
+= 예산 조회
+
+== pass
+
+=== 예산 조회 성공 1
+
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/getMonthlyBudgetTest_Success1/http-request.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/getMonthlyBudgetTest_Success1/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/getMonthlyBudgetTest_Success1/request-params.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/getMonthlyBudgetTest_Success1/http-response.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/getMonthlyBudgetTest_Success1/response-fields.adoc[]
+
+=== 예산 조회 성공 2 : 예산이 없는 경우 (빈 바디)
+
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/getMonthlyBudgetTest_Success2/http-request.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/getMonthlyBudgetTest_Success2/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/getMonthlyBudgetTest_Success2/request-params.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/getMonthlyBudgetTest_Success2/http-response.adoc[]
+
+
+
+= 예산 삭제
+
+== pass
+
+=== 예산 삭제 성공
+
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/deleteBudgetTest_Success/http-request.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/deleteBudgetTest_Success/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/deleteBudgetTest_Success/http-response.adoc[]
+
+
+== fail
+
+=== 예산 삭제 실패 : 예산이 존재하지 않는 경우
+
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/deleteBudgetTest_Fail/http-request.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/deleteBudgetTest_Fail/request-headers.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/deleteBudgetTest_Fail/http-response.adoc[]
+include::{docdir}/build/generated-snippets/BudgetIntegrationTest/deleteBudgetTest_Fail/response-fields.adoc[]
+
+== Version 0.0.1-SNAPSHOT
+Last updated 2024-06-17 13:51:22 +0900
