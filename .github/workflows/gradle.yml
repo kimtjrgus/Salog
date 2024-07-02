@@ -35,10 +35,20 @@ jobs:
           chmod +x ./gradlew
 
       - name: Run tests
-        run: |
-          cd ./server/
-          ./gradlew test -i -Dspring.profiles.active=test -DAWS_RDS_URL=${{ secrets.AWS_RDS_URL }} -DAWS_RDS_PASSWORD=${{ secrets.AWS_RDS_PASSWORD }} -DJWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} -DEMAIL=${{ secrets.EMAIL }} -DEMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} -DOAUTH_GOOGLE_CLIENT_ID=${{ secrets.OAUTH_GOOGLE_CLIENT_ID }} -DOAUTH_GOOGLE_CLIENT_SECRET=${{ secrets.OAUTH_GOOGLE_CLIENT_SECRET }} -DOAUTH_GOOGLE_REDIRECT_URI=${{ secrets.OAUTH_GOOGLE_REDIRECT_URI }} -DNAVER_OCR_SECRET=${{ secrets.NAVER_OCR_SECRET }} -DNAVER_OCR_URL=${{ secrets.NAVER_OCR_URL }} -DKEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}
-
+        run: ./server/gradlew test --debug -i --stacktrace -Dspring.profiles.active=test
+        env:
+          AWS_RDS_URL: ${{ secrets.AWS_RDS_URL }}
+          AWS_RDS_PASSWORD: ${{ secrets.AWS_RDS_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          EMAIL: ${{ secrets.EMAIL }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          OAUTH_GOOGLE_CLIENT_ID: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
+          OAUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.OAUTH_GOOGLE_CLIENT_SECRET }}
+          OAUTH_GOOGLE_REDIRECT_URI: ${{ secrets.OAUTH_GOOGLE_REDIRECT_URI }}
+          NAVER_OCR_SECRET: ${{ secrets.NAVER_OCR_SECRET }}
+          NAVER_OCR_URL: ${{ secrets.NAVER_OCR_URL }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+    
       - name: Build with Gradle
         run: |
           cd ./server/
