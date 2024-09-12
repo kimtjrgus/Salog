@@ -46,6 +46,8 @@ const WriteModal = ({
   setMonthlyOutgo,
   setMonthlyIncome,
 }: Props) => {
+  const isFeatureUnderMaintenance = true; // OCR이 점검 중일 때 true / 아니면 false
+
   const [isHovered, setIsHovered] = useState<hoverType>({
     hover: false,
     click: false,
@@ -210,8 +212,15 @@ const WriteModal = ({
 
   // 파일 업로드 감지 함수
   const handleUpload = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
-    if (target.files && target.files.length > 0) {
-      const file = target.files[0];
+    if (isFeatureUnderMaintenance) {
+      // 실제 조건으로 변경해야 할 수 있습니다.
+      window.alert("기능 점검 중 입니다.");
+      return; // 함수 종료
+    }
+
+    const files = target.files!;
+    if (files && files.length > 0) {
+      const file = files[0];
       setFileInfo(file); // 코드 추가
       setFileName(file.name);
       setInputKey(Date.now()); // key 값을 현재 시간으로 업데이트하여 input을 재설정
