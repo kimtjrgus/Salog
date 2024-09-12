@@ -427,11 +427,15 @@ const LedgerWrite = ({
         <div className="header">
           <h3>가계부 작성하기</h3>
           <button
+            // CLOVA API를 동작시키면 해당 코드 활성화
+            // onClick={() => {
+            //   setIsOpen((prev) => {
+            //     const updated = { ...prev };
+            //     return { ...updated, uploadModal: true };
+            //   });
+            // }}
             onClick={() => {
-              setIsOpen((prev) => {
-                const updated = { ...prev };
-                return { ...updated, uploadModal: true };
-              });
+              window.alert("기능 점검 중 입니다.");
             }}
           >
             영수증 업로드
